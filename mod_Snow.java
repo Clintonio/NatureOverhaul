@@ -10,8 +10,8 @@ public class mod_Snow extends BaseMod
 {
 
 	public static int SnowMode = PReader.PropInt("/mods/CJ/SnowMod.properties", "Snow Mode", "1", "# 0 Disables snow\n# 1 Enables snow in cold biomes only (or everywhere if playing on SMP)\n# 2 Enables snow everywhere.\n");
-	public static int SnowRate = PReader.PropInt("/mods/CJ/SnowMod.properties", "Snow Frequency", "5", "# 1 is fastest, 10 is slowest. Default is 5\n");
-	public static int SnowPerTick = PReader.PropInt("/mods/CJ/SnowMod.properties", "Number of Blocks", "8", "# Number of snow blocks that should be placed in the chunk at the same time (Max = 30 - Default = 8)\n");
+	public static int SnowRate = PReader.PropInt("/mods/CJ/SnowMod.properties", "Snow Frequency", "6", "# 1 is fastest, 15 is slowest. Default is 6\n");
+	public static int SnowPerTick = PReader.PropInt("/mods/CJ/SnowMod.properties", "Number of Blocks", "5", "# Number of snow blocks that should be placed in the chunk at the same time (Max = 50 - Default = 5)\n");
 	//public static boolean Mayhem = PReader.PropBoolean("/SnowMod.properties", "Mayhem Mode", "False", "# True = enabled, False = disabled\n");
 	//public static int SnowLayers = PReader.PropInt("/SnowMod.properties", "Snow Layers", "5", "# Number of snow blocks that should be placed on top of each other in mayhem mode (Max = 15, Default = 5)\n");
 	
@@ -26,6 +26,17 @@ public class mod_Snow extends BaseMod
     		SnowRate = 1;
     		SnowPerTick = 50;
     	} else*/
+		
+		if (SnowPerTick>50)
+			SnowPerTick=50;
+		else if (SnowPerTick<0)
+		SnowPerTick=0;
+      
+		if (SnowRate>15)
+			SnowRate=15;
+		else if (SnowRate<1)
+		SnowRate=1;
+		
     	{
     		if (SnowMode < 1) Offset = 1.0D;
     		else if (SnowMode > 1) Offset = -1.0D;
@@ -50,6 +61,6 @@ public class mod_Snow extends BaseMod
 
     public String Version()
     {
-        return "1.3_01 MLv5";
+        return "SnowMod v0.5 for MC 1.4_01";
     }
 }
