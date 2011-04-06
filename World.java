@@ -1217,16 +1217,7 @@ public class World
             {
                 int j1 = getBlockId(nextticklistentry.xCoord, nextticklistentry.yCoord, nextticklistentry.zCoord);
                 if(j1 == nextticklistentry.blockID && j1 > 0)
-                {				
-					//=======================
-					// START NATURE OVERHAUL
-					//=======================	
-					if(isAirBlock(nextticklistentry.xCoord, nextticklistentry.yCoord + 1, nextticklistentry.zCoord)) {
-						addSnow(nextticklistentry.xCoord, nextticklistentry.yCoord + 1, nextticklistentry.zCoord);
-					}
-					//=======================
-					// END NATURE OVERHAUL
-					//=======================
+                {
                     Block.blocksList[j1].updateTick(this, nextticklistentry.xCoord, nextticklistentry.yCoord, nextticklistentry.zCoord, rand);
                 }
             }
@@ -1862,7 +1853,122 @@ public class World
         worldInfo.setWorldTime(l1);
         TickUpdates(false);
         updateBlocksAndPlayCaveSounds();
+        
+        //START SNOW MOD
+        DoSnowBlockPlacement();
     }
+    
+    private void DoSnowBlockPlacement()
+    {
+    	if(multiplayerWorld)
+        {
+            return;
+        }
+        
+        int i = 0;
+        for(int j = 0; j < playerEntities.size(); j++)
+        {
+            EntityPlayer entityplayer = (EntityPlayer)playerEntities.get(j);
+            int k = MathHelper.floor_double(entityplayer.posX / 16D);
+            int l = MathHelper.floor_double(entityplayer.posZ / 16D);
+            byte byte0 = 9;
+            for(int i1 = -byte0; i1 <= byte0; i1++)
+            {
+                for(int j1 = -byte0; j1 <= byte0; j1++)
+                {
+                	//Probability of updates per tick :
+                    if(rand.nextInt(mod_Snow.SnowRate) != 0 || !chunkExists(i1 + k, j1 + l))
+                    //if(rand.nextInt(8) != 0 || !chunkExists(i1 + k, j1 + l))
+                    {
+                        continue;
+                    }
+                    int k1 = (k + i1) * 16 + rand.nextInt(16);
+                    int l1 = (l + j1) * 16 + rand.nextInt(16);
+                    if(SnowBlockPlacement(k1, l1))
+                    {
+                        i++;
+                    }
+                }
+            }
+        }
+    }
+    
+    public boolean SnowBlockPlacement(int i, int j)
+    {
+    	// Number of Blocks placed per tick :
+    	int UpdatePerTick = mod_Snow.SnowPerTick;
+    	String biomeName = getBiomeName(i, j);
+    	if(biomeName.equals("Hell") || mod_Snow.SnowMode == 0)
+    		return false;	
+    	if((mod_Snow.SnowMode == 1) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
+            return false;
+        //prevent placement on non solid blocks
+        int k = findTopSolidBlock(i, j);
+        if(k < 0)
+        {
+            k = 0;
+        }
+    	
+        int cb = getBlockId(i, k, j);
+        int bb = getBlockId(i, k - 1, j);
+        
+        if(cb != 0)
+        {
+            return false;
+        }
+        
+        int location = rand.nextInt(10);
+        	if(bb != 0 && Block.blocksList[bb].isOpaqueCube())
+        	{
+        		//Preventing placement on non-solid blocks 
+        		if(!getBlockMaterial(i, k - 1, j).getIsSolid())
+        		{
+        			return false;
+        		}
+        		/*Preventing placement on Nether-y materials
+        		if (getBlockId(i, k - 1, j)== Block.bloodStone.blockID || getBlockId(i, k - 1, j) == Block.slowSand.blockID || getBlockId(i, k - 1, j)== Block.lightStone.blockID)
+	            {
+	                return false;
+	            }*/
+	            //prevent placement on heated blocks
+	            if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
+	            {
+	                return false;
+	            }
+	            setBlockWithNotify(i, k, j, Block.snow.blockID);
+	            UpdatePerTick--;
+        	} else
+        		if(bb == Block.waterMoving.blockID && getBlockMetadata(i, k - 1, j) == 0)
+        		{
+        			if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9) //prevent placement of ice on heated water blocks
+        			{
+        				return false;
+        			}
+        			setBlockWithNotify(i, k - 1, j, Block.ice.blockID);
+        			UpdatePerTick--;
+        		} else
+        			if (bb == Block.snow.blockID && getBlockMetadata(i, k - 1, j) == 0)// && mod_Snow.Mayhem)
+			    	{
+			    		//prevent placement on heated blocks
+			    		if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
+			    		{
+			    			return false;
+			    		}
+			    		setBlockWithNotify(i, k - 1, j, Block.blockSnow.blockID);
+			    		UpdatePerTick--;
+			    	} return true;
+    }
+    
+    public String getBiomeName(int i, int j)
+    {
+        getWorldChunkManager().func_4069_a(i, j, 1, 1);
+        double temp = getWorldChunkManager().temperature[0];
+        double humi = getWorldChunkManager().humidity[0];
+        MobSpawnerBase mobspawnerbase = MobSpawnerBase.getBiomeFromLookup(temp, humi);
+        return mobspawnerbase.biomeName;
+    }
+    
+    //END SNOW MOD
 
     protected void updateBlocksAndPlayCaveSounds()
     {
@@ -1924,16 +2030,7 @@ public class World
                 int i4 = k2 >> 16 & 0x7f;
                 int j4 = chunk.blocks[i3 << 11 | k3 << 7 | i4] & 0xff;
                 if(Block.tickOnLoad[j4])
-                {					
-					//=======================
-					// START NATURE OVERHAUL
-					//=======================
-					if(isAirBlock(i3 + k, i4 + 1, k3 + i1)) {
-						addSnow(i3 + k, i4 + 1, k3 + i1);
-					}
-					//=======================
-					// END NATURE OVERHAUL
-					//=======================
+                {
                     Block.blocksList[j4].updateTick(this, i3 + k, i4, k3 + i1, rand);
                 }
                 l1++;
@@ -1970,61 +2067,13 @@ public class World
             int k = getBlockId(nextticklistentry.xCoord, nextticklistentry.yCoord, nextticklistentry.zCoord);
             if(k == nextticklistentry.blockID && k > 0)
             {
-				//=======================
-				// START NATURE OVERHAUL
-				//=======================
-				if(isAirBlock(nextticklistentry.xCoord, nextticklistentry.yCoord + 1, nextticklistentry.zCoord)) {
-					addSnow(nextticklistentry.xCoord, nextticklistentry.yCoord + 1, nextticklistentry.zCoord);
-				}
-				//=======================
-				// END NATURE OVERHAUL
-				//=======================
                 Block.blocksList[k].updateTick(this, nextticklistentry.xCoord, nextticklistentry.yCoord, nextticklistentry.zCoord, rand);
             }
         }
 
         return scheduledTickTreeSet.size() != 0;
     }
-	
-	//=======================
-	// START NATURE OVERHAUL
-	//=======================
-	/**
-	* Attempt to add a snow block at given coords
-	*/
-	private void addSnow(int i, int j, int k) {
-		boolean snowEnabled = ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-								.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME)
-								.getOption("Snowfall")).getValue();
-		if((snowEnabled) && ((isBlockOpaqueCube(i,j - 1,k)) || (getBlockId(i,j - 1,k) == Block.leaves.blockID))) { 
-			if(canBlockSeeTheSky(i,j,k)) {
-				String biomeName = getBiomeName(i, k);
-				//if(rand.nextInt(1) == 0) {
-				if(((biomeName.equals("Taiga")) && (rand.nextInt(500) == 0)) || 
-					((biomeName.equals("Tundra")) && (rand.nextInt(200) == 0)) ||
-					((biomeName.equals("Ice Desert")) && (rand.nextInt(200) == 0))) {
-					setBlock(i,j,k,Block.snow.blockID);
-				}
-			}
-		}
-	}
-	
-	/**
-	* Get the biome name for a set of coordinates
-	*/
-	public String getBiomeName(int i, int k) {
-		// Get Biome info
-		getWorldChunkManager().func_4069_a(i, k, 1, 1);
-		double d = getWorldChunkManager().temperature[0];
-		double d1 = getWorldChunkManager().humidity[0];
-		MobSpawnerBase msb = MobSpawnerBase.getBiomeFromLookup(d, d1);
-		
-		return msb.biomeName;
-	}
-	//=======================
-	// END NATURE OVERHAUL
-	//=======================
-	
+
     public void randomDisplayUpdates(int i, int j, int k)
     {
         byte byte0 = 16;
