@@ -736,8 +736,24 @@ public class World
 
     public float getLightBrightness(int i, int j, int k)
     {
-        return worldProvider.lightBrightnessTable[getBlockLightValue(i, j, k)];
-    }
+		int oldLightValue = getBlockLightValue(i, j, k);
+		float torchLight = PlayerTorchArray.getLightBrightness(this, i, j, k);
+		
+		if (oldLightValue < torchLight)
+		{
+			int floorValue = (int)Math.floor(torchLight);
+			if (floorValue == 15)
+			{
+				return this.worldProvider.lightBrightnessTable[15];
+			}
+			
+			int ceilValue = (int)Math.ceil(torchLight);
+			float lerpValue = torchLight - floorValue;
+			return (1.0F - lerpValue) * this.worldProvider.lightBrightnessTable[floorValue] + lerpValue * this.worldProvider.lightBrightnessTable[ceilValue];
+		}
+		
+		return this.worldProvider.lightBrightnessTable[oldLightValue];
+	}
 
     public boolean isDaytime()
     {
@@ -993,6 +1009,14 @@ public class World
             playerEntities.remove((EntityPlayer)entity);
             updateAllPlayersSleepingFlag();
         }
+        if(entity instanceof EntityItem)
+        {
+			EntityItem entityItem = (EntityItem)entity;
+			if(entityItem.bIsLight)
+			{
+				PlayerTorchArray.RemoveTorchFromArray(this, entityItem.itemtorch);
+			}
+		}
     }
 
     public void addWorldAccess(IWorldAccess iworldaccess)

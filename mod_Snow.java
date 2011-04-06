@@ -41,7 +41,7 @@ public class mod_Snow extends BaseMod
 		
 		climate.loadValues();
     	
-    	System.out.printf("SnowMod v0.3 by CJ - Loaded.\n");
+    	System.out.printf("SnowMod v0.5 by CJ - Loaded.\n");
 		//System.out.printf("Snow Mode = %d\n", SnowMode);
 		//System.out.printf("Snow Proba = %d\n", SnowRate);
 		//System.out.printf("Snow Per Tick = %d\n", SnowPerTick);
