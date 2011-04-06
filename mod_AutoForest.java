@@ -72,13 +72,16 @@ public class mod_AutoForest extends BaseMod {
 		Integer[] keys 		= {5, 3, 1, 0, 9, 7};
 		String[]  values 	= {"DEFAULT/AVERAGE", "FAST", "VERY FAST", "INSTANT", "VERY SLOW", "SLOW"};
 		tree.addMappedMultiOption("TreeGrowthRate", keys, values);
-		tree.addToggle("TreeDeath");
-		tree.addMappedMultiOption("DeathRate", dKeys, labels);
 		tree.addToggle("Lumberjack");
-		tree.addToggle("ApplesGrow");
+		tree.addMappedMultiOption("DeathRate", dKeys, labels);
+		tree.addToggle("TreeDeath");
+		
 		
 		Integer[] aKeys = {3000, 1200, 250, 5, 30000, 10000};
+		tree.addMappedMultiOption("CocoaGrowthRate", aKeys, labels);
+		tree.addToggle("CocoaGrows");
 		tree.addMappedMultiOption("AppleGrowthRate", aKeys, labels);
+		tree.addToggle("ApplesGrow");
 		
 		// Plant related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};

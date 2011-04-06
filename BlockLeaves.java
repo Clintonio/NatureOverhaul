@@ -179,18 +179,29 @@ public class BlockLeaves extends BlockLeavesBase
 		ModBooleanOption o = (ModBooleanOption) mo.getOption("ForestGrowth");
 		boolean appleGrowth = ((ModBooleanOption) mo.getSubOption(mod_AutoForest.TREE_MENU_NAME)
 								.getOption("ApplesGrow")).getValue();
+		boolean cocoaGrowth = ((ModBooleanOption) mo.getSubOption(mod_AutoForest.TREE_MENU_NAME)
+								.getOption("CocoaGrows")).getValue();
 		// Sapling growth frequency
 		double freq = getSaplingFreq(world, i, j, k);
 		// Apple growth frequency
 		double appleFreq = getAppleFreq(world, i, j, k);
+		// Cocoa frequency
+		double cocoaFreq = getCocoaFreq(world, i, j, k);
 		if((o.getValue()) && (growth(freq))) {
 			// Try to emit a sapling
 			if(world.getBlockId(i, j + 1, k) == 0) {
-				emitSapling(world, i, j + 1, k, world.getBlockMetadata(i, j, k) % 4);
+				emitItem(world, i, j + 1, k, new ItemStack(Block.sapling, 1,
+										world.getBlockMetadata(i, j, k) % 4));
 			} 
 		} else if((appleGrowth) && (growth(appleFreq))) {
 			if((world.getBlockId(i, j - 1, k) == 0) && (appleCanGrow(world,i,j,k))) {
-				emitApple(world, i, j - 1, k);
+				emitItem(world, i, j - 1, k, new ItemStack(Item.appleRed));
+			}
+		} else if((cocoaGrowth) && (growth(cocoaFreq))) {
+			String biomes[] = {"Rainforest"};
+			if((world.getBlockId(i, j - 1, k) == 0) && (canGrow(world,i,j,k, biomes))) {
+				System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
+				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
 			}
 		}
 		//========
@@ -202,25 +213,32 @@ public class BlockLeaves extends BlockLeavesBase
 	//========
 	// BEGIN AUTOFOREST
 	//========
-	private void emitSapling(World world, int x, int y, int z) {
-		emitSapling(world, x, y, z, world.getBlockMetadata(x, y, z) % 4);
-	}
-	private void emitSapling(World world, int x, int y, int z, int metaData) {
-		//System.out.println("(AutoForest): SAPLING GROWN");
-		// Create the new sapling and emit it
-		EntityItem entityitem = new EntityItem(world, x, y, z, 
-											   new ItemStack(Block.sapling, 1,
-											   metaData));
-        world.entityJoinedWorld(entityitem);
-		//System.out.println("Saplng growth");
+	
+	/**
+	* Emit a specific item
+	*
+	* @param item	Item to emit
+	*/
+	private void emitItem(World world, int i, int j, int k, ItemStack item) {
+		EntityItem entityitem = new EntityItem(world, i, j, k, item);
+		world.entityJoinedWorld(entityitem);
 	}
 	
-	private void emitApple(World world, int x, int y, int z) {
-		//System.out.println("(AutoForest): SAPLING GROWN");
-		// Create the new sapling and emit it
-		EntityItem entityitem = new EntityItem(world, x, y, z, 
-											   new ItemStack(Item.appleRed));
-        world.entityJoinedWorld(entityitem);
+	/**
+	* Check if an item can grow in this biome
+	*
+	* @param	biomes		List of biome names
+	* @return	true if can
+	*/
+	private boolean canGrow(World world, int i, int j, int k, String[] biomes) {
+		String curBiome = world.getBiomeName(i,k);
+		for(String biome : biomes) {
+			if(curBiome.equals(biome)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -314,6 +332,19 @@ public class BlockLeaves extends BlockLeavesBase
 	}
 
 	/**
+	* Returns cocoa growth rate
+	*
+	* @return	cocoa freq
+	*/
+	private double getCocoaFreq(World world, int i, int j, int k) {
+		ModMappedMultiOption o = (ModMappedMultiOption) ModOptionsAPI
+							.getModOptions(mod_AutoForest.MENU_NAME)
+							.getSubOption(mod_AutoForest.TREE_MENU_NAME)
+							.getOption("CocoaGrowthRate");
+		return (double) 1 / o.getValue();
+	}
+	
+	/**
 	* Removes leaves from a tree when it's dying
 	* Now integrated with NatureOverhaul
 	* Removes leaves when forest growth is on at the rate
@@ -330,7 +361,8 @@ public class BlockLeaves extends BlockLeavesBase
 		if(forestGrowth) {
 			// Use increased growth rate here
 			if(growth(getSaplingFreq(world, i, j, k) * 120)) {
-				emitSapling(world, i, j, k, world.getBlockMetadata(i, j, k) % 4);
+				emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
+										 world.getBlockMetadata(i, j, k) % 4));
 			}
 		} else {
 			dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k));
@@ -339,7 +371,7 @@ public class BlockLeaves extends BlockLeavesBase
 		// Apples grow independently
 		if(appleGrowth) {
 			if(growth(getAppleFreq(world, i, j, k))) {
-				emitApple(world, i, j, k);
+				emitItem(world, i, j, k, new ItemStack(Item.appleRed));
 			}
 		}
         world.setBlockWithNotify(i, j, k, 0);

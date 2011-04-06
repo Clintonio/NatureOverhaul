@@ -33,10 +33,13 @@ public class mod_Snow extends BaseMod
 		
 		SnowRate = new ModSliderOption("SnowRate", 1, 15);
 		SnowPerTick = new ModSliderOption("SnowPerTick", 1, 50);
+		SnowPerTick.setIntValue(30);
 		
 		climate.addOption(SnowPerTick);
 		climate.addOption(SnowRate);
 		climate.addOption(SnowMode);
+		
+		climate.loadValues();
     	
     	System.out.printf("SnowMod v0.3 by CJ - Loaded.\n");
 		//System.out.printf("Snow Mode = %d\n", SnowMode);
