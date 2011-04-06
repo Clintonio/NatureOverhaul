@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 public class mod_Snow extends BaseMod
 {
 	
-	public static ModBooleanOption SnowMode;
+	public static ModMappedMultiOption SnowMode;
 	public static ModSliderOption SnowRate;
 	public static ModSliderOption SnowPerTick;
 	//public static boolean Mayhem = PReader.PropBoolean("/SnowMod.properties", "Mayhem Mode", "False", "# True = enabled, False = disabled\n");
@@ -21,9 +21,16 @@ public class mod_Snow extends BaseMod
     public mod_Snow()
     {
 		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME);
-		climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
+		ModOptions climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
 		
-		SnowMode = new ModBooleanOption("Snowfall");
+		Integer keys[]  = {0,1,2};
+		String values[] = {"Off", "SnowyBiomes", "Everywhere"};
+		
+		SnowMode = new ModMappedMultiOption("Snowfall");
+		for(int x = 0; x < keys.length; x++) {
+			SnowMode.addValue(keys[x], values[x]);
+		}
+		
 		SnowRate = new ModSliderOption("SnowRate", 1, 15);
 		SnowPerTick = new ModSliderOption("SnowPerTick", 1, 50);
 		

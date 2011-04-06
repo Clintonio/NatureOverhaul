@@ -539,12 +539,12 @@ public class EntityRenderer
             GL11.glDisable(3042 /*GL_BLEND*/);
             
             // Snow Rendering (only if in real dimension)
-            if (mc.thePlayer.dimension == 0 && mod_Snow.SnowMode == 2)
+            if (mc.thePlayer.dimension == 0 && (mod_Snow.SnowMode.getValue() == 2))
             {
                 renderSnowMode2(f);
             }
             
-            if (mc.thePlayer.dimension == 0 && mod_Snow.SnowMode == 1) // && (theWorld.biome.equals("Taiga") || theWorld.biome.equals("Ice Desert") || theWorld.biome.equals("Tundra"))))
+            if (mc.thePlayer.dimension == 0 && (mod_Snow.SnowMode.getValue() == 1)) // && (theWorld.biome.equals("Taiga") || theWorld.biome.equals("Ice Desert") || theWorld.biome.equals("Tundra"))))
             {
                 renderSnowMode1(f);
             }
