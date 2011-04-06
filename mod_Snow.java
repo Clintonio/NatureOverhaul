@@ -4,14 +4,15 @@ package net.minecraft.src;
 // Decompiler options: packimports(3) braces deadcode 
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.modoptionsapi.*;
 import org.lwjgl.input.Keyboard;
 
 public class mod_Snow extends BaseMod
 {
-
-	public static int SnowMode = PReader.PropInt("/mods/CJ/SnowMod.properties", "Snow Mode", "1", "# 0 Disables snow\n# 1 Enables snow in cold biomes only (or everywhere if playing on SMP)\n# 2 Enables snow everywhere.\n");
-	public static int SnowRate = PReader.PropInt("/mods/CJ/SnowMod.properties", "Snow Frequency", "6", "# 1 is fastest, 15 is slowest. Default is 6\n");
-	public static int SnowPerTick = PReader.PropInt("/mods/CJ/SnowMod.properties", "Number of Blocks", "5", "# Number of snow blocks that should be placed in the chunk at the same time (Max = 50 - Default = 5)\n");
+	
+	public static ModBooleanOption SnowMode;
+	public static ModSliderOption SnowRate;
+	public static ModSliderOption SnowPerTick;
 	//public static boolean Mayhem = PReader.PropBoolean("/SnowMod.properties", "Mayhem Mode", "False", "# True = enabled, False = disabled\n");
 	//public static int SnowLayers = PReader.PropInt("/SnowMod.properties", "Snow Layers", "5", "# Number of snow blocks that should be placed on top of each other in mayhem mode (Max = 15, Default = 5)\n");
 	
@@ -19,16 +20,21 @@ public class mod_Snow extends BaseMod
 	
     public mod_Snow()
     {
-    	if(SnowRate < 1) SnowRate = 1 ;
-        else if(SnowRate > 15) SnowRate = 15;
-    	
-    	if(SnowPerTick < 1) SnowPerTick = 1 ;
-        else if(SnowPerTick > 50) SnowPerTick = 50;
+		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME);
+		climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
+		
+		SnowMode = new ModBooleanOption("Snowfall");
+		SnowRate = new ModSliderOption("SnowRate", 1, 15);
+		SnowPerTick = new ModSliderOption("SnowPerTick", 1, 50);
+		
+		climate.addOption(SnowPerTick);
+		climate.addOption(SnowRate);
+		climate.addOption(SnowMode);
     	
     	System.out.printf("SnowMod v0.3 by CJ - Loaded.\n");
-		System.out.printf("Snow Mode = %d\n", SnowMode);
-		System.out.printf("Snow Proba = %d\n", SnowRate);
-		System.out.printf("Snow Per Tick = %d\n", SnowPerTick);
+		//System.out.printf("Snow Mode = %d\n", SnowMode);
+		//System.out.printf("Snow Proba = %d\n", SnowRate);
+		//System.out.printf("Snow Per Tick = %d\n", SnowPerTick);
 		//System.out.printf("Mayhem Mode = %b\n", Mayhem);
 		//System.out.printf("Snow Layers = %d\n\n", SnowLayers);
     }

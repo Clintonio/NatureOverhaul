@@ -86,7 +86,6 @@ public class mod_AutoForest extends BaseMod {
 		plants.addToggle("PlantsGrow");
 		
 		// Climate related
-		climate.addToggle("Snowfall");
 		climate.addToggle("BiomeModifiedGrowth");
 		addDarkerNights(climate);
 		

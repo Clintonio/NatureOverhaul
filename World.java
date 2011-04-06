@@ -1854,7 +1854,9 @@ public class World
         TickUpdates(false);
         updateBlocksAndPlayCaveSounds();
         
-        //START SNOW MOD
+		//=======================
+		// START NATURE OVERHAUL
+		//=======================
         DoSnowBlockPlacement();
     }
     
@@ -1877,7 +1879,7 @@ public class World
                 for(int j1 = -byte0; j1 <= byte0; j1++)
                 {
                 	//Probability of updates per tick :
-                    if(rand.nextInt(mod_Snow.SnowRate) != 0 || !chunkExists(i1 + k, j1 + l))
+                    if(rand.nextInt(mod_Snow.SnowRate.getIntValue()) != 0 || !chunkExists(i1 + k, j1 + l))
                     //if(rand.nextInt(8) != 0 || !chunkExists(i1 + k, j1 + l))
                     {
                         continue;
@@ -1896,11 +1898,11 @@ public class World
     public boolean SnowBlockPlacement(int i, int j)
     {
     	// Number of Blocks placed per tick :
-    	int UpdatePerTick = mod_Snow.SnowPerTick;
+    	int UpdatePerTick = mod_Snow.SnowPerTick.getIntValue();
     	String biomeName = getBiomeName(i, j);
-    	if(biomeName.equals("Hell") || mod_Snow.SnowMode == 0)
+    	if(biomeName.equals("Hell") || !mod_Snow.SnowMode.getValue())
     		return false;	
-    	if((mod_Snow.SnowMode == 1) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
+    	if((mod_Snow.SnowMode.getValue()) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
             return false;
         //prevent placement on non solid blocks
         int k = findTopSolidBlock(i, j);
@@ -1968,7 +1970,9 @@ public class World
         return mobspawnerbase.biomeName;
     }
     
-    //END SNOW MOD
+	//=======================
+	// END NATURE OVERHAUL
+	//=======================
 
     protected void updateBlocksAndPlayCaveSounds()
     {
