@@ -1913,52 +1913,47 @@ public class World
     	
         int cb = getBlockId(i, k, j);
         int bb = getBlockId(i, k - 1, j);
+        int ab = getBlockId(i, k + 1 ,j);
         
         if(cb != 0)
         {
             return false;
         }
         
-        int location = rand.nextInt(10);
-        	if(bb != 0 && Block.blocksList[bb].isOpaqueCube())
+        // Ice placement algo
+        if (bb == Block.waterStill.blockID && getBlockMetadata(i, k - 1, j) == 0)
+        {
         	{
-        		//Preventing placement on non-solid blocks 
-        		if(!getBlockMaterial(i, k - 1, j).getIsSolid())
-        		{
-        			return false;
-        		}
-        		/*Preventing placement on Nether-y materials
-        		if (getBlockId(i, k - 1, j)== Block.bloodStone.blockID || getBlockId(i, k - 1, j) == Block.slowSand.blockID || getBlockId(i, k - 1, j)== Block.lightStone.blockID)
-	            {
-	                return false;
-	            }*/
-	            //prevent placement on heated blocks
-	            if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-	            {
-	                return false;
-	            }
-	            setBlockWithNotify(i, k, j, Block.snow.blockID);
-	            UpdatePerTick--;
-        	} else
-        		if(bb == Block.waterMoving.blockID && getBlockMetadata(i, k - 1, j) == 0)
-        		{
-        			if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9) //prevent placement of ice on heated water blocks
-        			{
-        				return false;
-        			}
-        			setBlockWithNotify(i, k - 1, j, Block.ice.blockID);
-        			UpdatePerTick--;
-        		} else
-        			if (bb == Block.snow.blockID && getBlockMetadata(i, k - 1, j) == 0)// && mod_Snow.Mayhem)
-			    	{
-			    		//prevent placement on heated blocks
-			    		if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-			    		{
-			    			return false;
-			    		}
-			    		setBlockWithNotify(i, k - 1, j, Block.blockSnow.blockID);
-			    		UpdatePerTick--;
-			    	} return true;
+        		//Preventing placement of ice on heated water blocks
+        		if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
+    			{
+    				return false;
+    			}
+    			setBlockWithNotify(i, k - 1, j, Block.ice.blockID);
+    			//System.out.println("Placing an ice block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
+    			UpdatePerTick--;
+    			return true;
+    		}
+        }
+        
+        // Snow Layers placement algo
+        if(bb != 0 && Block.blocksList[bb].isOpaqueCube())
+        {
+        	//Preventing placement on non-solid blocks 
+        	if(!getBlockMaterial(i, k - 1, j).getIsSolid())
+        	{
+        		return false;
+        	}
+	        if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
+	        {
+	        	return false;
+	        }
+	        setBlockWithNotify(i, k, j, Block.snow.blockID);
+			//System.out.println("Placing a snow block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
+	        UpdatePerTick--;
+	        return true;
+        }
+        return true;
     }
     
     public String getBiomeName(int i, int j)
