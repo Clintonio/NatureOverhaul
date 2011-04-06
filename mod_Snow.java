@@ -19,38 +19,12 @@ public class mod_Snow extends BaseMod
 	
     public mod_Snow()
     {
-    /*	if(Mayhem)
-    	{
-    		Offset = -1.0D;
-    		SnowMode = 2;
-    		SnowRate = 1;
-    		SnowPerTick = 50;
-    	} else*/
-		
-		if (SnowPerTick>50)
-			SnowPerTick=50;
-		else if (SnowPerTick<0)
-		SnowPerTick=0;
-      
-		if (SnowRate>15)
-			SnowRate=15;
-		else if (SnowRate<1)
-		SnowRate=1;
-		
-    	{
-    		if (SnowMode < 1) Offset = 1.0D;
-    		else if (SnowMode > 1) Offset = -1.0D;
-    		else Offset = 0.0D;
+    	if(SnowRate < 1) SnowRate = 1 ;
+        else if(SnowRate > 15) SnowRate = 15;
     	
-    		if(SnowRate < 1) SnowRate = 1 ;
-        	else if(SnowRate > 10) SnowRate = 10;
+    	if(SnowPerTick < 1) SnowPerTick = 1 ;
+        else if(SnowPerTick > 50) SnowPerTick = 50;
     	
-    		if(SnowPerTick < 1) SnowPerTick = 1 ;
-        	else if(SnowPerTick > 15) SnowPerTick = 15;
-    	
-    		//if(SnowLayers < 1) SnowLayers = 1 ;
-        	//else if(SnowLayers > 15) SnowLayers = 15;
-    	}
     	System.out.printf("SnowMod v0.3 by CJ - Loaded.\n");
 		System.out.printf("Snow Mode = %d\n", SnowMode);
 		System.out.printf("Snow Proba = %d\n", SnowRate);
