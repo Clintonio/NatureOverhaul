@@ -46,7 +46,9 @@ public class BlockCactus extends Block
 		//========
 		// BEGIN AUTOFOREST
 		//========
-		attemptGrowth(world, i, j, k);
+		if(!world.multiplayerWorld) {
+			attemptGrowth(world, i, j, k);
+		}
 		//========
 		// END AUTOFOREST
 		//========

@@ -52,8 +52,8 @@ public class mod_AutoForest extends BaseMod {
 		// Options for climate/ biomes
 		climate = new ModOptions(CLIMATE_MENU_NAME);
 		
-		climate.setSingleplayerMode(false);
-		ops.setMultiplayerMode(true);
+		//climate.setSingleplayerMode(false);
+		//ops.setMultiplayerMode(true);
 		
 		ops.addSubOptions(saps);
 		ops.addSubOptions(plants);

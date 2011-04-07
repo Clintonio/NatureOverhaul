@@ -24,7 +24,7 @@ public class mod_Snow extends BaseMod
 		ModOptions climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
 		
 		Integer keys[]  = {0,1,2};
-		String values[] = {"Off", "SnowyBiomes", "Everywhere"};
+		String values[] = {"SnowyBiomes", "Everywhere", "Off"};
 		
 		SnowMode = new ModMappedMultiOption("Snowfall");
 		for(int x = 0; x < keys.length; x++) {
@@ -32,21 +32,23 @@ public class mod_Snow extends BaseMod
 		}
 		
 		SnowRate = new ModSliderOption("SnowRate", 1, 15);
-		SnowPerTick = new ModSliderOption("SnowPerTick", 1, 50);
-		SnowPerTick.setIntValue(30);
+		SnowPerTick = new ModSliderOption("SnowPerTick", 1, 30);
+		SnowPerTick.setGlobalValue(SnowPerTick.getFloatValue(6));
+		SnowRate.setGlobalValue(SnowRate.getFloatValue(4));
 		
 		climate.addOption(SnowPerTick);
 		climate.addOption(SnowRate);
 		climate.addOption(SnowMode);
-		
-		climate.loadValues();
     	
     	System.out.printf("SnowMod v0.5 by CJ - Loaded.\n");
+		System.out.printf("Snow Prob:" + SnowRate.getIntValue());
 		//System.out.printf("Snow Mode = %d\n", SnowMode);
-		//System.out.printf("Snow Proba = %d\n", SnowRate);
-		//System.out.printf("Snow Per Tick = %d\n", SnowPerTick);
+		//System.out.printf("Snow Proba = %d\n", SnowRate.getValue());
+		System.out.printf("Snow Per Tick = %d\n", SnowPerTick.getIntValue());
 		//System.out.printf("Mayhem Mode = %b\n", Mayhem);
 		//System.out.printf("Snow Layers = %d\n\n", SnowLayers);
+		
+		climate.loadValues();
     }
 
     public String Version()

@@ -29,7 +29,9 @@ public class EntityItem extends Entity
 		//========
 		// BEGIN AUTOFOREST
 		//========
-		setInitialVelocity();
+		if(!world.multiplayerWorld) {
+			setInitialVelocity();
+		}
 		//======== 
 		// END AUTOFOREST
 		//========
@@ -69,7 +71,11 @@ public class EntityItem extends Entity
 		//========
 		// BEGIN AUTOFOREST
 		//========
-		setNextYSpeed(item.itemID);
+		if(!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) {
+			setNextYSpeed(item.itemID);
+		} else {
+			motionY -= 0.039999999105930328D;
+		}
 		//========
 		// END AUTOFOREST
 		//========
@@ -97,8 +103,10 @@ public class EntityItem extends Entity
 			// BEGIN AUTOFOREST
 			//========
 			// Saplings - Flowers - Cactii - Reeds
-			if((item.itemID == 6) || ((item.itemID >= 37) && (item.itemID <= 40)) || (item.itemID == 81) || (item.itemID == Item.reed.shiftedIndex)
-				|| (item.itemID == Block.pumpkin.blockID)) {
+			if((!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) 
+				&& ((item.itemID == 6) || ((item.itemID >= 37) && (item.itemID <= 40)) 
+				|| (item.itemID == 81) || (item.itemID == Item.reed.shiftedIndex)
+				|| (item.itemID == Block.pumpkin.blockID))) {
 				attemptPlant(i);
 			}
 			//========

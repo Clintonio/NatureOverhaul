@@ -5,11 +5,17 @@ package net.minecraft.src;
 
 import java.util.Random;
 import java.util.HashSet;
+//=======================
+// START NATURE OVERHAUL
+//=======================
 import net.minecraft.src.modoptionsapi.*;
+//=======================
+// END NATURE OVERHAUL
+//=======================
 
 public class BlockLog extends Block
 {
-	private static int MAX_TREE_HEIGHT = 15; // Maximum tree height known
+	private static final int MAX_TREE_HEIGHT = 16;
 	
     protected BlockLog(int i)
     {
@@ -18,19 +24,27 @@ public class BlockLog extends Block
         blockIndexInTexture = 20;
     }
 	
+	//=======================
+	// START NATURE OVERHAUL
+	//=======================
 	public void updateTick(World world, int i, int j, int k, Random random) {
-		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).getSubOption(mod_AutoForest.TREE_MENU_NAME);
-		boolean treeDeath = ((ModBooleanOption) mo.getOption("TreeDeath")).getValue();
-		// Death rate per thousand per tick
-		int deathRate = ((ModMappedMultiOption) mo.getOption("DeathRate")).getValue();	 
-		// Modify the rate, higher for drying biomes
-		deathRate = (int) mod_AutoForest.applyBiomeModifier(deathRate, BiomeMod.TREE_DEATH,
-													  world, i, k);
-		if((treeDeath) &&  ((deathRate <= 0) || (random.nextInt(deathRate) == 0)) && (isTree(world, i, j, k))) {
-			int lowestLogJ = getLowestLogJ(world, i, j, k);
-			System.out.println("KILLING A TREE IN BIOME " + world.getBiomeName(i,k) + ". WITH RATE: " + deathRate);
-			killTree(world, i, lowestLogJ, k);
+		if(!world.multiplayerWorld) {
+			ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).getSubOption(mod_AutoForest.TREE_MENU_NAME);
+			boolean treeDeath = ((ModBooleanOption) mo.getOption("TreeDeath")).getValue();
+			// Death rate per thousand per tick
+			int deathRate = ((ModMappedMultiOption) mo.getOption("DeathRate")).getValue();	 
+			// Modify the rate, higher for drying biomes
+			deathRate = (int) mod_AutoForest.applyBiomeModifier(deathRate, BiomeMod.TREE_DEATH,
+														  world, i, k);
+			if((treeDeath) &&  ((deathRate <= 0) || (random.nextInt(deathRate) == 0)) && (isTree(world, i, j, k))) {
+				int lowestLogJ = getLowestLogJ(world, i, j, k);
+				System.out.println("KILLING A TREE IN BIOME " + world.getBiomeName(i,k) + ". WITH RATE: " + deathRate);
+				killTree(world, i, lowestLogJ, k);
+			}
 		}
+	//=======================
+	// END NATURE OVERHAUL
+	//=======================
 	}
 	
     public int tickRate()
@@ -43,6 +57,9 @@ public class BlockLog extends Block
         return 1;
     }
 	
+	//=======================
+	// START NATURE OVERHAUL
+	//=======================
 	/**
 	* Check if current block is a part of tree trunk
 	* Does not ignore current block
@@ -119,17 +136,20 @@ public class BlockLog extends Block
 	/**
 	* Kill tree, includes selfblock
 	*/
-	private void killTree(World world, int i, int j, int k) {
-		killTree(world,i,j,k,true);
+	private int killTree(World world, int i, int j, int k) {
+		return killTree(world,i,j,k,true);
 	}
 	/**
 	* Kills a tree from the given block upwards
 	*
 	* @param	treeDeath		If true then tree turns into wood
+	* @return	Number of logs removed
 	*/
-	private void killTree(World world, int i, int j, int k, boolean treeDeath) {
+	private int killTree(World world, int i, int j, int k, boolean treeDeath) {
 		boolean ignoreSelf = (world.getBlockId(i,j,k) == 0);
 		int treeHeight = getTreeHeight(world, i, j, k);
+		/* Numbr of blocks removed */
+		int removed = 0;
 		
 		// If ignore self (ie; self could be air, then skip over it)
 		if(ignoreSelf) {
@@ -145,7 +165,7 @@ public class BlockLog extends Block
 		int[] base  = {i, j, k};
 		int[] block = {i, j + 1, k};
 		flagBlock(block, flags);
-		scanAndFlag(world, base, block, flags, treeHeight);
+		return 1 + scanAndFlag(world, base, block, flags, treeHeight);
 	}
 	
 	
@@ -154,12 +174,14 @@ public class BlockLog extends Block
 	*
 	* @param	block	Current block to scan and flag
 	* @param	flags	Flag store
+	* @return	Number of blocks removed
 	*/
-	private void scanAndFlag(World world, int[] base, int[] block, 
+	private int scanAndFlag(World world, int[] base, int[] block, 
 							 HashSet<Integer> flags, int treeHeight) {
 		int i = block[0];
 		int j = block[1];
 		int k = block[2];
+		int removed = 0;
 		
 		//System.out.println("Scan and flag (" + i + ","+j+","+k+")");
 		
@@ -168,14 +190,17 @@ public class BlockLog extends Block
 			if((inRange(nBlock, base,treeHeight)) && (!isBlockFlagged(nBlock, flags))
 				&& ((id == Block.wood.blockID) || (id == Block.leaves.blockID))) {
 				flagBlock(nBlock, flags);
-				scanAndFlag(world, base, nBlock, flags, treeHeight);
+				removed = removed + scanAndFlag(world, base, nBlock, flags, treeHeight);
 			}
 		}
 		// Remove the current block if it's a non-tree log
 		if((world.getBlockId(i,j,k) == Block.wood.blockID)
 			&& ((!isTree(world, i, j, k)) || ((i == base[0]) && (k == base[2])))) {
 			killLog(world, block[0], block[1], block[2], true);
+			removed++;
 		}
+		
+		return removed;
 	}
 	
 	/**
@@ -328,6 +353,24 @@ public class BlockLog extends Block
 				(world.getBlockId(i, j, k - 1) == Block.leaves.blockID));
 	}
 	
+	/**
+	* Do additional damage to an axe if we're lumberjacking a tree
+	*/
+	private void additionalToolDamage(EntityPlayer player, int damage) {
+		ItemStack itemstack = player.getCurrentEquippedItem();
+		if(itemstack != null) {
+			// Damage item compared to the nmber of items found
+			itemstack.func_25190_a(damage - 1, null);
+			if(itemstack.stackSize == 0) {
+				player.destroyCurrentEquippedItem();
+			}
+		}
+	}
+
+	//=======================
+	// END NATURE OVERHAUL
+	//=======================
+	
     public int idDropped(int i, Random random)
     {
         return Block.wood.blockID;
@@ -337,19 +380,25 @@ public class BlockLog extends Block
     {
         super.harvestBlock(world, entityplayer, i, j, k, l);
         entityplayer.func_25058_a(AchievementList.field_25198_c, 1);
-    }
-
-    public void onBlockRemoval(World world, int i, int j, int k)
-    {
+		//=======================
+		// START NATURE OVERHAUL
+		//=======================
 		boolean lumberjack = ((ModBooleanOption) ModOptionsAPI
 							 .getModOptions(mod_AutoForest.MENU_NAME)
 							 .getSubOption(mod_AutoForest.TREE_MENU_NAME)
 							 .getOption("Lumberjack")).getValue();
 		// Delete entire tree on block removal
-		if((lumberjack) && (isTree(world, i, j, k, true))) {
-			killTree(world, i, j, k, false);
+		if((!world.multiplayerWorld) && (lumberjack) && (isTree(world, i, j, k, true))) {
+			int damage = killTree(world, i, j, k, false);
+			additionalToolDamage(entityplayer,damage);
 		}
-		
+		//=======================
+		// END NATURE OVERHAUL
+		//=======================
+    }
+
+    public void onBlockRemoval(World world, int i, int j, int k)
+    {
         byte byte0 = 4;
         int l = byte0 + 1;
         if(world.checkChunksExist(i - l, j - l, k - l, i + l, j + l, k + l))

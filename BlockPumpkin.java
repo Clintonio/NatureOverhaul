@@ -27,7 +27,9 @@ public class BlockPumpkin extends Block
 	// BEGIN AUTOFOREST
 	//========
     public void updateTick(World world, int i, int j, int k, Random random) {
-		attemptGrowth(world, i, j, k);
+		if(!world.multiplayerWorld) {
+			attemptGrowth(world, i, j, k);
+		}
 	}
 	
 	/**

@@ -173,6 +173,16 @@ public class BlockLeaves extends BlockLeavesBase
 		//========
 		// BEGIN AUTOFOREST
 		//========
+		if(!world.multiplayerWorld) {
+			attemptGrowth(world, i, j, k);
+		}
+		
+	}
+	
+	/**
+	* Attempt growth for leaves
+	*/
+	private void attemptGrowth(World world, int i, int j, int k) {
 		// Mod options for autoforest
 		ModOptions mo = ModOptionsAPI.getModOptions("AutoForest");
 		// Attempt to grow a part of the forest (Sapling, apple)
@@ -204,15 +214,8 @@ public class BlockLeaves extends BlockLeavesBase
 				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
 			}
 		}
-		//========
-		// END AUTOFOREST
-		//========
 
     }
-	
-	//========
-	// BEGIN AUTOFOREST
-	//========
 	
 	/**
 	* Emit a specific item
@@ -351,28 +354,32 @@ public class BlockLeaves extends BlockLeavesBase
 	* known to autoforest
 	*/
     private void removeLeaves(World world, int i, int j, int k) {
-		boolean forestGrowth = ((ModBooleanOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getOption("ForestGrowth")).getValue();
-		boolean appleGrowth = ((ModBooleanOption) ModOptionsAPI
+		if(!world.multiplayerWorld) {
+			boolean forestGrowth = ((ModBooleanOption) ModOptionsAPI
 								.getModOptions(mod_AutoForest.MENU_NAME)
-								.getSubOption(mod_AutoForest.TREE_MENU_NAME)
-								.getOption("ApplesGrow")).getValue();
-		if(forestGrowth) {
-			// Use increased growth rate here
-			if(growth(getSaplingFreq(world, i, j, k) * 120)) {
-				emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
-										 world.getBlockMetadata(i, j, k) % 4));
+								.getOption("ForestGrowth")).getValue();
+			boolean appleGrowth = ((ModBooleanOption) ModOptionsAPI
+									.getModOptions(mod_AutoForest.MENU_NAME)
+									.getSubOption(mod_AutoForest.TREE_MENU_NAME)
+									.getOption("ApplesGrow")).getValue();
+			if(forestGrowth) {
+				// Use increased growth rate here
+				if(growth(getSaplingFreq(world, i, j, k) * 120)) {
+					emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
+											 world.getBlockMetadata(i, j, k) % 4));
+				}
+			} else {
+				dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k));
+			}
+			
+			// Apples grow independently
+			if(appleGrowth) {
+				if(growth(getAppleFreq(world, i, j, k))) {
+					emitItem(world, i, j, k, new ItemStack(Item.appleRed));
+				}
 			}
 		} else {
 			dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k));
-		}
-		
-		// Apples grow independently
-		if(appleGrowth) {
-			if(growth(getAppleFreq(world, i, j, k))) {
-				emitItem(world, i, j, k, new ItemStack(Item.appleRed));
-			}
 		}
         world.setBlockWithNotify(i, j, k, 0);
     }
