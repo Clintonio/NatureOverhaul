@@ -227,6 +227,24 @@ public class BlockLeaves extends BlockLeavesBase
 		world.entityJoinedWorld(entityitem);
 	}
 	
+	/** 
+	* Attempts to emit an item at this location
+	* Will emit either sapling, apple or cocoa
+	*/
+	public void grow(World world, int i, int j, int k) {
+		Random rand = new Random();			
+		String biomes[] = {"Rainforest"};
+		int randInt = rand.nextInt(100);
+		if((canGrow(world,i,j,k, biomes)) && (randInt < 10)) {
+			emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
+		} else if((appleCanGrow(world,i,j,k)) && (randInt < 25)) {
+			emitItem(world, i, j - 1, k, new ItemStack(Item.appleRed));
+		} else {
+			emitItem(world, i, j + 1, k, new ItemStack(Block.sapling, 1,
+										world.getBlockMetadata(i, j, k) % 4));
+		}
+	}
+	
 	/**
 	* Check if an item can grow in this biome
 	*

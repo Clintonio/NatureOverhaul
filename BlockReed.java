@@ -66,14 +66,18 @@ public class BlockReed extends Block
 		
 		if(plantsGrow.getValue()) {
 			if(grown(growthRate)) {
-				//System.out.println("(AutoForest): PLANT " + id + " GROWN");
-				// Create the new plan and emit it, let the entity 
-				// code handle the rest
-				EntityItem entityitem = new EntityItem(world, i, j, k, 
-													   new ItemStack(Item.reed));
-				world.entityJoinedWorld(entityitem);
+				grow(world, i, j, k);
 			}
 		}
+	}
+	
+	/**
+	* Cause reed to emit a new reed item
+	*/
+	public void grow(World world, int i, int j, int k) {
+		EntityItem entityitem = new EntityItem(world, i, j, k, 
+											   new ItemStack(Item.reed));
+		world.entityJoinedWorld(entityitem);
 	}
 	
 	/**

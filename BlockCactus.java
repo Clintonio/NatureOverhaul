@@ -70,14 +70,21 @@ public class BlockCactus extends Block
 		
 		if(plantsGrow.getValue()) {
 			if(grown(growthRate)) {
-				//System.out.println("(AutoForest): PLANT " + id + " GROWN");
-				// Create the new plan and emit it, let the entity 
-				// code handle the rest
-				EntityItem entityitem = new EntityItem(world, i, j, k, 
-													   new ItemStack(this));
-				world.entityJoinedWorld(entityitem);
+				grow(world, i, j, k);
 			}
 		}
+	}
+	
+	/**
+	* Grow an item
+	*/
+	public void grow(World world, int i, int j, int k) {
+		//System.out.println("(AutoForest): PLANT " + id + " GROWN");
+		// Create the new plan and emit it, let the entity 
+		// code handle the rest
+		EntityItem entityitem = new EntityItem(world, i, j, k, 
+											   new ItemStack(this));
+		world.entityJoinedWorld(entityitem);
 	}
 	
 	/**

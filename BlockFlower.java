@@ -75,13 +75,17 @@ public class BlockFlower extends Block
 			if(grown(freq)) {
 				System.out.println("(AutoForest): PLANT " + id + " GROWN IN BIOME " + 
 				world.getBiomeName(i,k) + ". FREQ: " + freq);
-				// Create the new plan and emit it, let the entity 
-				// code handle the rest
-				EntityItem entityitem = new EntityItem(world, i, j, k, 
-													   new ItemStack(this));
-				world.entityJoinedWorld(entityitem);
 			}
 		}
+	}
+	
+	/**
+	* Emit new flower in this location
+	*/
+	public void grow(World world, int i, int j, int k) {
+		EntityItem entityitem = new EntityItem(world, i, j, k, 
+											   new ItemStack(this));
+		world.entityJoinedWorld(entityitem);
 	}
 	
 	/**
