@@ -6,7 +6,7 @@ package net.minecraft.src;
 import java.util.Random;
 import net.minecraft.src.modoptionsapi.*;
 
-public class BlockReed extends Block
+public class BlockReed extends Block implements Growable
 {
 
     protected BlockReed(int i, int j)

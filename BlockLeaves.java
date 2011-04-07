@@ -13,7 +13,7 @@ import net.minecraft.src.modoptionsapi.*;
 // END AUTOFOREST
 //========
 
-public class BlockLeaves extends BlockLeavesBase
+public class BlockLeaves extends BlockLeavesBase implements Growable
 {
 
     protected BlockLeaves(int i, int j)

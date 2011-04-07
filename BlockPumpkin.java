@@ -12,7 +12,7 @@ import net.minecraft.src.modoptionsapi.*;
 // END AUTOFOREST
 //========
 
-public class BlockPumpkin extends Block
+public class BlockPumpkin extends Block implements Growable
 {
 
     protected BlockPumpkin(int i, int j, boolean flag)

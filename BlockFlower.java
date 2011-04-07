@@ -9,7 +9,7 @@ import net.minecraft.src.modoptionsapi.ModOptions;
 import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
 import net.minecraft.src.modoptionsapi.ModBooleanOption;
 
-public class BlockFlower extends Block
+public class BlockFlower extends Block implements Growable
 {
 
     protected BlockFlower(int i, int j)
