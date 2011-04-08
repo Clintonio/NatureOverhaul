@@ -346,10 +346,10 @@ public class EntityRenderer
         {
             GL11.glTranslatef((float)cameraYaw, (float)(-cameraPitch), 0.0F);
             GL11.glScaled(cameraZoom, cameraZoom, 1.0D);
-            GLU.gluPerspective(func_914_d(f), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, farPlaneDistance);
+            GLU.gluPerspective(FOV, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, farPlaneDistance);
         } else
         {
-            GLU.gluPerspective(func_914_d(f), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, farPlaneDistance);
+            GLU.gluPerspective(FOV, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, farPlaneDistance);
         }
         GL11.glMatrixMode(5888 /*GL_MODELVIEW0_ARB*/);
         GL11.glLoadIdentity();
