@@ -6,14 +6,6 @@ package net.minecraft.src;
 import java.io.PrintStream;
 import java.util.*;
 
-//=======================
-// START NATURE OVERHAUL
-//=======================
-import net.minecraft.src.modoptionsapi.*;
-//=======================
-// END NATURE OVERHAUL
-//=======================
-
 public class World
     implements IBlockAccess
 {
@@ -736,24 +728,8 @@ public class World
 
     public float getLightBrightness(int i, int j, int k)
     {
-		int oldLightValue = getBlockLightValue(i, j, k);
-		float torchLight = PlayerTorchArray.getLightBrightness(this, i, j, k);
-		
-		if (oldLightValue < torchLight)
-		{
-			int floorValue = (int)Math.floor(torchLight);
-			if (floorValue == 15)
-			{
-				return this.worldProvider.lightBrightnessTable[15];
-			}
-			
-			int ceilValue = (int)Math.ceil(torchLight);
-			float lerpValue = torchLight - floorValue;
-			return (1.0F - lerpValue) * this.worldProvider.lightBrightnessTable[floorValue] + lerpValue * this.worldProvider.lightBrightnessTable[ceilValue];
-		}
-		
-		return this.worldProvider.lightBrightnessTable[oldLightValue];
-	}
+        return worldProvider.lightBrightnessTable[getBlockLightValue(i, j, k)];
+    }
 
     public boolean isDaytime()
     {
@@ -1009,14 +985,6 @@ public class World
             playerEntities.remove((EntityPlayer)entity);
             updateAllPlayersSleepingFlag();
         }
-        if(entity instanceof EntityItem)
-        {
-			EntityItem entityItem = (EntityItem)entity;
-			if(entityItem.bIsLight)
-			{
-				PlayerTorchArray.RemoveTorchFromArray(this, entityItem.itemtorch);
-			}
-		}
     }
 
     public void addWorldAccess(IWorldAccess iworldaccess)
@@ -1077,17 +1045,7 @@ public class World
 
         return field_9428_I;
     }
-	
-	//=======================
-	// START NATURE OVERHAUL
-	//=======================
-	private static boolean  isDay = false;
-	private static boolean	isNight = false;
-	private static int		extraDark = 3;
-	//=======================
-	// END NATURE OVERHAUL
-	//=======================
-	
+
     public int calculateSkylightSubtracted(float f)
     {
         float f1 = getCelestialAngle(f);
@@ -1100,37 +1058,7 @@ public class World
         {
             f2 = 1.0F;
         }
-		
-		//=======================
-		// START NATURE OVERHAUL
-		//=======================
-		ModOptions mo = mod_AutoForest.getDarkerNights();
-		int lightVal = ((ModMappedMultiOption) mo.getOption("Moonlight")).getValue();
-		boolean rand = Boolean.valueOf(mo.getOptionValue("VaryingMoonlight"));
-		
-		if(rand) {
-			if(f2 == 0.0F) {
-				isDay = true;
-				isNight = false;
-			} else if(!isNight) {
-				isDay = false;
-				isNight = true;
-				extraDark = (int) Math.floor(Math.random() * 5);
-				// bias towards dark
-				extraDark = (int) Math.floor(extraDark * (1 + Math.random() * 2));
-				if(extraDark > 4) {
-					extraDark = 4;
-				}
-			}
-			
-			return (int) (f2 * (11F + extraDark));
-		} else {
-			isNight = false;
-			return (int)(f2 * (float) lightVal);
-		}
-		//=======================
-		// END NATURE OVERHAUL
-		//=======================
+        return (int)(f2 * 11F);
     }
 
     public Vec3D func_4079_a(Entity entity, float f)
@@ -1877,125 +1805,7 @@ public class World
         worldInfo.setWorldTime(l1);
         TickUpdates(false);
         updateBlocksAndPlayCaveSounds();
-        
-		//=======================
-		// START NATURE OVERHAUL
-		//=======================
-        DoSnowBlockPlacement();
     }
-    
-    private void DoSnowBlockPlacement()
-    {
-    	if(multiplayerWorld)
-        {
-            return;
-        }
-        
-        int i = 0;
-        for(int j = 0; j < playerEntities.size(); j++)
-        {
-            EntityPlayer entityplayer = (EntityPlayer)playerEntities.get(j);
-            int k = MathHelper.floor_double(entityplayer.posX / 16D);
-            int l = MathHelper.floor_double(entityplayer.posZ / 16D);
-            byte byte0 = 9;
-            for(int i1 = -byte0; i1 <= byte0; i1++)
-            {
-                for(int j1 = -byte0; j1 <= byte0; j1++)
-                {
-                	//Probability of updates per tick :
-                    if(rand.nextInt(mod_Snow.SnowRate.getIntValue()) != 0 || !chunkExists(i1 + k, j1 + l))
-                    //if(rand.nextInt(8) != 0 || !chunkExists(i1 + k, j1 + l))
-                    {
-                        continue;
-                    }
-                    int k1 = (k + i1) * 16 + rand.nextInt(16);
-                    int l1 = (l + j1) * 16 + rand.nextInt(16);
-                    if(SnowBlockPlacement(k1, l1))
-                    {
-                        i++;
-                    }
-                }
-            }
-        }
-    }
-    
-    public boolean SnowBlockPlacement(int i, int j)
-    {
-    	// Number of Blocks placed per tick :
-    	int UpdatePerTick = mod_Snow.SnowPerTick.getIntValue();
-    	String biomeName = getBiomeName(i, j);
-    	if(worldInfo != null && worldInfo.getDimension() == -1)
-        {
-    		return false;
-        }
-    	if(biomeName.equals("Hell") || (mod_Snow.SnowMode.getValue() == 0))
-    		return false;	
-    	if((mod_Snow.SnowMode.getValue() == 1) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
-            return false;
-        //prevent placement on non solid blocks
-        int k = findTopSolidBlock(i, j);
-        if(k < 0)
-        {
-            k = 0;
-        }
-    	
-        int cb = getBlockId(i, k, j);
-        int bb = getBlockId(i, k - 1, j);
-        int ab = getBlockId(i, k + 1 ,j);
-        
-        if(cb != 0)
-        {
-            return false;
-        }
-        
-        // Ice placement algo
-        if (bb == Block.waterStill.blockID && getBlockMetadata(i, k - 1, j) == 0)
-        {
-        	{
-        		//Preventing placement of ice on heated water blocks
-        		if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-    			{
-    				return false;
-    			}
-    			setBlockWithNotify(i, k - 1, j, Block.ice.blockID);
-    			//System.out.println("Placing an ice block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
-    			UpdatePerTick--;
-    			return true;
-    		}
-        }
-        
-        // Snow Layers placement algo
-        if(bb != 0 && Block.blocksList[bb].isOpaqueCube())
-        {
-        	//Preventing placement on non-solid blocks 
-        	if(!getBlockMaterial(i, k - 1, j).getIsSolid())
-        	{
-        		return false;
-        	}
-	        if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-	        {
-	        	return false;
-	        }
-	        setBlockWithNotify(i, k, j, Block.snow.blockID);
-			//System.out.println("Placing a snow block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
-	        UpdatePerTick--;
-	        return true;
-        }
-        return true;
-    }
-    
-    public String getBiomeName(int i, int j)
-    {
-        getWorldChunkManager().func_4069_a(i, j, 1, 1);
-        double temp = getWorldChunkManager().temperature[0];
-        double humi = getWorldChunkManager().humidity[0];
-        MobSpawnerBase mobspawnerbase = MobSpawnerBase.getBiomeFromLookup(temp, humi);
-        return mobspawnerbase.biomeName;
-    }
-    
-	//=======================
-	// END NATURE OVERHAUL
-	//=======================
 
     protected void updateBlocksAndPlayCaveSounds()
     {
