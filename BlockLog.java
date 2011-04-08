@@ -366,7 +366,10 @@ public class BlockLog extends Block
 			}
 		}
 	}
-
+	
+	public InventoryPlayer inventory;
+	
+	
 	//=======================
 	// END NATURE OVERHAUL
 	//=======================
@@ -389,8 +392,19 @@ public class BlockLog extends Block
 							 .getOption("Lumberjack")).getValue();
 		// Delete entire tree on block removal
 		if((!world.multiplayerWorld) && (lumberjack) && (isTree(world, i, j, k, true))) {
-			int damage = killTree(world, i, j, k, false);
-			additionalToolDamage(entityplayer,damage);
+			// Check if player is using an axe
+			ItemStack itemstack = inventory.getStackInSlot(inventory.currentItem);
+	        if(itemstack != null)
+	        {
+	            if(inventory.currentItem==271 || inventory.currentItem==275 || inventory.currentItem==279 || inventory.currentItem==286)
+	            {
+	            	int damage = killTree(world, i, j, k, false);
+	    			additionalToolDamage(entityplayer,damage);
+	            }
+	        } else
+	        {
+	        	// Do not kill tree, have no idea 'bout what code to use here, so I'll leave it up to you.
+	        }
 		}
 		//=======================
 		// END NATURE OVERHAUL
