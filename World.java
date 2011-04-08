@@ -1900,6 +1900,10 @@ public class World
     	// Number of Blocks placed per tick :
     	int UpdatePerTick = mod_Snow.SnowPerTick.getIntValue();
     	String biomeName = getBiomeName(i, j);
+    	if(worldInfo != null && worldInfo.getDimension() == -1)
+        {
+    		return false;
+        }
     	if(biomeName.equals("Hell") || (mod_Snow.SnowMode.getValue() == 0))
     		return false;	
     	if((mod_Snow.SnowMode.getValue() == 1) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
