@@ -24,7 +24,7 @@ public class mod_Snow extends BaseMod
 		ModOptions climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
 		
 		Integer keys[]  = {0,1,2};
-		String values[] = {"SnowyBiomes", "Everywhere", "Off"};
+		String values[] = {"Off", "Cold Biomes", "Everywhere"};
 		
 		SnowMode = new ModMappedMultiOption("Snowfall");
 		for(int x = 0; x < keys.length; x++) {
@@ -40,19 +40,15 @@ public class mod_Snow extends BaseMod
 		climate.addOption(SnowRate);
 		climate.addOption(SnowMode);
     	
-    	System.out.printf("SnowMod v0.5 by CJ - Loaded.\n");
-		System.out.printf("Snow Prob:" + SnowRate.getIntValue());
-		//System.out.printf("Snow Mode = %d\n", SnowMode);
-		//System.out.printf("Snow Proba = %d\n", SnowRate.getValue());
-		System.out.printf("Snow Per Tick = %d\n", SnowPerTick.getIntValue());
-		//System.out.printf("Mayhem Mode = %b\n", Mayhem);
-		//System.out.printf("Snow Layers = %d\n\n", SnowLayers);
+    	System.out.printf("SnowMod v0.6 by CJ - Loaded.\n");
+		System.out.printf("Snow Proba = %d\n", SnowRate.getIntValue());
+		System.out.printf("Snow Per Tick = %d\n\n", SnowPerTick.getIntValue());
 		
 		climate.loadValues();
     }
 
     public String Version()
     {
-        return "SnowMod v0.5 for MC 1.4_01";
+        return "SnowMod v0.6 for MC 1.4_01";
     }
 }
