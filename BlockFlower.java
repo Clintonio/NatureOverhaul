@@ -47,8 +47,9 @@ public class BlockFlower extends BlockGrowable
 			ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 				.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
 			boolean grow 	  = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
-			double growthRate = 1 /((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
+			double growthRate = 1D /((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
 			if(grow) {
+				//System.out.println("Attempting plant growth with rate " + growthRate);
 				attemptGrowth(world, i, j, k, growthRate);
 			}
 		}
