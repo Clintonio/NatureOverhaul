@@ -6,7 +6,7 @@ package net.minecraft.src;
 import java.util.Random;
 import net.minecraft.src.modoptionsapi.*;
 
-public class BlockReed extends Block implements Growable
+public class BlockReed extends BlockGrowable
 {
 
     protected BlockReed(int i, int j)
@@ -43,59 +43,21 @@ public class BlockReed extends Block implements Growable
 		// BEGIN AUTOFOREST
 		//========
 		if(!world.multiplayerWorld) {
-			attemptGrowth(world, i, j, k);
-		}
-		//========
-		// END AUTOFOREST
-		//========
-    }
-	
-	//========
-	// BEGIN AUTOFOREST
-	//========
-	/**
-	* Attempt to grow the plant
-	*/
-	private void attemptGrowth(World world, int i, int j, int k) {
-		ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-		ModBooleanOption plantsGrow = (ModBooleanOption) plants.getOption("PlantsGrow");
-		ModMappedMultiOption growthRate = (ModMappedMultiOption) plants.getOption("PlantGrowthRate");
-		// We need the block ID.
-		int id = world.getBlockId(i,j,k);
-		
-		if(plantsGrow.getValue()) {
-			if(grown(growthRate)) {
-				grow(world, i, j, k);
+			ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
+			boolean grow 	  = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
+			double growthRate = 1 /(5 * ((ModMappedMultiOption) plants
+										.getOption("PlantGrowthRate")).getValue());
+			if(grow) {
+				attemptGrowth(world, i, j, k, growthRate);
 			}
 		}
-	}
-	
-	/**
-	* Cause reed to emit a new reed item
-	*/
-	public void grow(World world, int i, int j, int k) {
-		EntityItem entityitem = new EntityItem(world, i, j, k, 
-											   new ItemStack(Item.reed));
-		world.entityJoinedWorld(entityitem);
-	}
-	
-	/**
-	* Check if the plant has grown
-	*
-	* @param	growthRate	Configured rate of growth
-	* @return	True if a plant has possibly grown
-	*/
-	private boolean grown(ModMappedMultiOption growthRate) {
-		// average time, in mins, between plant pawning.
-		int freq = growthRate.getValue() * 5; // * 5 for 5 times less for reeds
-		// Since tickRate() is 10, we only use 6 as the mult.
-		return ((Math.floor(Math.random() * freq) + 1) > (freq - 1));
-	}
+    }
+
+    protected String growthModifierType = "FlowerSpawn";
 	//========
 	// END AUTOFOREST
 	//========
-
     public boolean canPlaceBlockAt(World world, int i, int j, int k)
     {
         int l = world.getBlockId(i, j - 1, k);

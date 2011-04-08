@@ -9,7 +9,7 @@ import net.minecraft.src.modoptionsapi.ModOptions;
 import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
 import net.minecraft.src.modoptionsapi.ModBooleanOption;
 
-public class BlockFlower extends Block implements Growable
+public class BlockFlower extends BlockGrowable
 {
 
     protected BlockFlower(int i, int j)
@@ -37,67 +37,23 @@ public class BlockFlower extends Block implements Growable
         func_268_h(world, i, j, k);
     }
 
-    public void updateTick(World world, int i, int j, int k, Random random)
-    {
-		//========
-		// BEGIN AUTOFOREST
-		//========
-		if(!world.multiplayerWorld) {
-			attemptGrowth(world, i, j, k);
-		}
-		//========
-		// END AUTOFOREST
-		//========
-        func_268_h(world, i, j, k);
-    }
-	
 	//========
 	// BEGIN AUTOFOREST
 	//========
-	/**
-	* Attempt to grow the plant
-	*/
-	private void attemptGrowth(World world, int i, int j, int k) {
-		ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-		ModBooleanOption plantsGrow = (ModBooleanOption) plants.getOption("PlantsGrow");
-		ModMappedMultiOption growthRate = (ModMappedMultiOption) plants.getOption("PlantGrowthRate");
-		// We need the block ID.
-		int id = world.getBlockId(i,j,k);
-		
-		// average time, in mins, between plant pawning.
-		double freq = 1D / (double) growthRate.getValue();
-		
-		freq = (double) mod_AutoForest.applyBiomeModifier(freq, 
-						BiomeMod.FLOWER_SPAWN, world,i,k);
-		
-		if(plantsGrow.getValue()) {
-			if(grown(freq)) {
-				System.out.println("(AutoForest): PLANT " + id + " GROWN IN BIOME " + 
-				world.getBiomeName(i,k) + ". FREQ: " + freq);
+    protected String growthModifierType = "FlowerSpawn";
+	
+	public void updateTick(World world, int i, int j, int k, Random random) {
+		if(!world.multiplayerWorld) {
+			ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
+			boolean grow 	  = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
+			double growthRate = 1 /((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
+			if(grow) {
+				attemptGrowth(world, i, j, k, growthRate);
 			}
 		}
-	}
-	
-	/**
-	* Emit new flower in this location
-	*/
-	public void grow(World world, int i, int j, int k) {
-		EntityItem entityitem = new EntityItem(world, i, j, k, 
-											   new ItemStack(this));
-		world.entityJoinedWorld(entityitem);
-	}
-	
-	/**
-	* Check if the plant has grown
-	*
-	* @param	growthRate	Configured rate of growth
-	* @return	True if a plant has possibly grown
-	*/
-	private boolean grown(double freq) {
-		// Since tickRate() is 10, we only use 6 as the mult.
-		return (Math.random() < freq);
-	}
+        func_268_h(world, i, j, k);
+    }
 	//========
 	// END AUTOFOREST
 	//========

@@ -182,7 +182,11 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	/**
 	* Attempt growth for leaves
 	*/
-	private void attemptGrowth(World world, int i, int j, int k) {
+	protected boolean attemptGrowth(World world, int i, int j, int k, double prob) {
+		return attemptGrowth(world, i, j, k);
+	}
+	
+	private boolean attemptGrowth(World world, int i, int j, int k) {
 		// Mod options for autoforest
 		ModOptions mo = ModOptionsAPI.getModOptions("AutoForest");
 		// Attempt to grow a part of the forest (Sapling, apple)
@@ -202,19 +206,22 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 			if(world.getBlockId(i, j + 1, k) == 0) {
 				emitItem(world, i, j + 1, k, new ItemStack(Block.sapling, 1,
 										world.getBlockMetadata(i, j, k) % 4));
+				return true;
 			} 
 		} else if((appleGrowth) && (growth(appleFreq))) {
 			if((world.getBlockId(i, j - 1, k) == 0) && (appleCanGrow(world,i,j,k))) {
 				emitItem(world, i, j - 1, k, new ItemStack(Item.appleRed));
+				return true;
 			}
 		} else if((cocoaGrowth) && (growth(cocoaFreq))) {
 			String biomes[] = {"Rainforest"};
 			if((world.getBlockId(i, j - 1, k) == 0) && (canGrow(world,i,j,k, biomes))) {
 				System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
 				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
+				return true;
 			}
 		}
-
+		return false;
     }
 	
 	/**
@@ -284,7 +291,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @param	freq		Frequency to spawn
 	* @return	True if there is an item grown
 	*/
-	private boolean growth(double freq) {
+	protected boolean growth(double freq) {
 		// average time, in mins, between sapling pawning.
 		// Remember that each tree has between 13 and 30 leaves facing "up". 
 		// make number ~15 times larger if you want to do
@@ -327,12 +334,8 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 			freq = 9.5;
 		}
 		
-		int tmp = mod_AutoForest.getBiomeModifier(world.getBiomeName(i,k), BiomeMod.SAPLING_SPAWN);
 		
-		freq = mod_AutoForest.applyBiomeModifier(freq, BiomeMod.SAPLING_SPAWN, world,i,k);
-		
-		//System.out.println("Modifier is " + tmp + " in biome " + world.getBiomeName(i,k) + " freq now " + freq);
-		return freq;
+		return mod_AutoForest.applyBiomeModifier(freq, "SaplingSpawn", world,i,k);
 	}
 	
 	/**
@@ -347,7 +350,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 							.getOption("AppleGrowthRate");
 		double freq = (double) 1 / o.getValue();
 		
-		freq = mod_AutoForest.applyBiomeModifier(freq, BiomeMod.SAPLING_SPAWN, world,i,k);
+		freq = mod_AutoForest.applyBiomeModifier(freq, "SaplingSpawn", world,i,k);
 		
 		return freq;
 	}

@@ -139,15 +139,23 @@ public class mod_AutoForest extends BaseMod {
 	* Returns a specific set of biome modifiers
 	*
 	* @param	biomeName		Name of biome to get data for
-	* @param	index			Type of modifier to get
+	* @param	name			Type of modifier to get
 	* @return	A value of a modifier
 	*/
-	public static byte getBiomeModifier(String biomeName, BiomeMod index) {
-		byte[] biomeMod = biomeModifier.get(biomeName);
+	public static byte getBiomeModifier(String biomeName, String name) {
+		byte[] biomeMod = null;
+		Biome biome 	= null;
+		try {
+			biome = Biome.getBiomeFromString(biomeName).getBiomeFromString(biomeName);
+			biomeMod = biomeModifier.get(name);
 		
-		if(biomeMod != null) {
-			return biomeMod[index.getIndex()];
-		} else {
+			if(biomeMod != null) {
+				return biomeMod[biome.getIndex()];
+			} else {
+				System.out.println("Biome Mod Type missing: " + name);
+				return 0;
+			}
+		} catch (NullPointerException e) {
 			System.out.println("Biome missing: " + biomeName);
 			return 0;
 		}
@@ -157,28 +165,34 @@ public class mod_AutoForest extends BaseMod {
 	* Sets up the biome modifiers
 	*/
 	private void createBiomeModifiers() {
-		byte[] tmp0 = {  33,  0,  0,  20,  0,  15};
-		biomeModifier.put("Rainforest", 	tmp0);
-		byte[] tmp1 = { -10, 10,-10,  10,  3,  25};
-		biomeModifier.put("Swampland", 			tmp1);
-		byte[] tmp2 = {  15,  0,  0,  15,  1,  10};
-		biomeModifier.put("Seasonal Forest",tmp2);
-		byte[] tmp3 = {   0,  0,  0,  10,  1,  10};
-		biomeModifier.put("Forest",			tmp3);
-		byte[] tmp4 = { -90, 90,-90,   1,  5, -75};
-		biomeModifier.put("Savanna",		tmp4);
-		byte[] tmp5 = { -90, 90,  0,   5,  4,  50};
-		biomeModifier.put("Shrubland",		tmp5);
-		byte[] tmp6 = {  10, 10,  0,  10,  2,   0};
-		biomeModifier.put("Taiga",			tmp6);
-		byte[] tmp7 = {-100, 95,-90,   5, 10,-100};
-		biomeModifier.put("Desert",			tmp7);
-		byte[] tmp8 = {-100, 95,-90,   0, 10,-100};
-		biomeModifier.put("Ice Desert",		tmp8);
-		byte[] tmp9 = { -95, 95,-90,   0,  9, -90};
-		biomeModifier.put("Plains",			tmp9);
-		byte[] tmp10= { -95, 95,-90,   0, 10, -95};
-		biomeModifier.put("Tundra",			tmp10);
+		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95,-95,-100 };
+		byte[] saplingDeath = {  0, 10,  0,  0, 90, 90, 10,  95,  95, 95, 95, 100 };
+		byte[] treeDeath	= {  0,-10,  0,  0,-90,  0,  0, -90, -90,-90,-90, 100 };
+		byte[] bigTree		= { 20, 10, 15, 10,  1,  5, 10,   5,   0,  0,  0,   0 };
+		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9, 10,   0 };
+		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+		
+		biomeModifier.put("SaplingSpawn", saplingSpawn);
+		biomeModifier.put("SaplingDeath", saplingDeath);
+		biomeModifier.put("TreeDeath", treeDeath);
+		biomeModifier.put("BigTree", bigTree);
+		biomeModifier.put("TreeGap", treeGap);
+		biomeModifier.put("FlowerSpawn", flowerSpawn);
+	}
+	
+	/**
+	* Add biome modifier
+	*
+	* @throws	ArrayOutOfBoundsException
+	* @param	name	Identifier for this modifier, overwrites old ones if same name.
+	* @param	byte[]	Array of modifiers. Must be 11 long
+	*/
+	public void addBiomeModifier(String name, byte[] mods) {
+		if(mods.length != 12) {
+			throw new IndexOutOfBoundsException("Out of bounds. Length must be 11.");
+		} else {
+			biomeModifier.put(name, mods);
+		}
 	}
 	
 	/**
@@ -189,7 +203,7 @@ public class mod_AutoForest extends BaseMod {
 	* @param	world		world
 	* @return	modified int value, round up
 	*/
-	public static double applyBiomeModifier(double value, BiomeMod biomeMod, World world, int i, int k) {	
+	public static double applyBiomeModifier(double value, String biomeMod, World world, int i, int k) {	
 		boolean biomeModsEnabled = ((ModBooleanOption) climate.getOption("BiomeModifiedGrowth")).getValue();
 		// Ensure the user wants us to modify by biome
 		if(biomeModsEnabled) {

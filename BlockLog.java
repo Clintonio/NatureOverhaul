@@ -34,7 +34,7 @@ public class BlockLog extends Block
 			// Death rate per thousand per tick
 			int deathRate = ((ModMappedMultiOption) mo.getOption("DeathRate")).getValue();	 
 			// Modify the rate, higher for drying biomes
-			deathRate = (int) mod_AutoForest.applyBiomeModifier(deathRate, BiomeMod.TREE_DEATH,
+			deathRate = (int) mod_AutoForest.applyBiomeModifier(deathRate, "TreeDeath",
 														  world, i, k);
 			if((treeDeath) &&  ((deathRate <= 0) || (random.nextInt(deathRate) == 0)) && (isTree(world, i, j, k))) {
 				int lowestLogJ = getLowestLogJ(world, i, j, k);
@@ -299,7 +299,7 @@ public class BlockLog extends Block
 	private void killLog(World world, int i, int j, int k, boolean treeDeath) {
 		// For 0.9.1, temporarily stop turning to wood. Consider alternate
 		ItemStack blockWood = new ItemStack(this, 1, world.getBlockMetadata(i,j,k));
-		world.setBlock(i, j, k, 0);
+		world.setBlockWithNotify(i, j, k, 0);
 		
 		// Create a new block entity
 		EntityItem ent = new EntityItem(world, i, j, k, blockWood);

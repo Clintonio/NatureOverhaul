@@ -12,7 +12,7 @@ import net.minecraft.src.modoptionsapi.*;
 // END AUTOFOREST
 //========
 
-public class BlockPumpkin extends Block implements Growable
+public class BlockPumpkin extends BlockGrowable
 {
 
     protected BlockPumpkin(int i, int j, boolean flag)
@@ -26,50 +26,16 @@ public class BlockPumpkin extends Block implements Growable
 	//========
 	// BEGIN AUTOFOREST
 	//========
-    public void updateTick(World world, int i, int j, int k, Random random) {
-		if(!world.multiplayerWorld) {
-			attemptGrowth(world, i, j, k);
-		}
-	}
+    protected String growthModifierType = "FlowerSpawn";
 	
-	/**
-	* Attempt to grow the plant
-	*/
-	private void attemptGrowth(World world, int i, int j, int k) {
+    public void updateTick(World world, int i, int j, int k, Random random) {
 		ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-		ModBooleanOption plantsGrow = (ModBooleanOption) plants.getOption("PlantsGrow");
-		ModMappedMultiOption growthRate = (ModMappedMultiOption) plants.getOption("PlantGrowthRate");
-		
-		// Only wild pumpkins grow, not laterns.
-		// Blocktype is true if lantern
-		if((plantsGrow.getValue()) && (!blockType)){
-			// Pumpkins grow 10 times slower
-			if(grown(growthRate)) {
-				grow(world, i, j, k);
-			}
+		boolean plantsGrow = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
+		double growthRate = 1D /10 * ((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
+		if(!world.multiplayerWorld && plantsGrow) {
+			attemptGrowth(world, i, j, k, growthRate);
 		}
-	}
-	
-	/**
-	* Create an entity for this plant by "growing" it.
-	*/
-	public void grow(World world, int i, int j, int k) {
-		EntityItem entityitem = new EntityItem(world, i, j, k, 
-											   new ItemStack(this));
-		world.entityJoinedWorld(entityitem);		
-	}	
-	
-	/**
-	* Check if the plant has grown
-	*
-	* @param	growthRate	Configured rate of growth
-	* @return	True if a plant has possibly grown
-	*/
-	private boolean grown(ModMappedMultiOption growthRate) {
-		// average time, in mins, between plant pawning.
-		int freq = growthRate.getValue() * 25; // * 25 for 25 times less for pumpkin
-		return ((Math.floor(Math.random() * freq) + 1) > (freq - 1));
 	}
 	//========
 	// END AUTOFOREST
