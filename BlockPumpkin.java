@@ -32,8 +32,8 @@ public class BlockPumpkin extends BlockGrowable
 		ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
 		boolean plantsGrow = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
-		double growthRate = 1D /10 * ((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
-		if(!world.multiplayerWorld && plantsGrow) {
+		double growthRate = 1D /(10 * ((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue());
+		if(!world.multiplayerWorld && plantsGrow && !blockType) {
 			attemptGrowth(world, i, j, k, growthRate);
 		}
 	}

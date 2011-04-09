@@ -391,8 +391,8 @@ public class BlockLog extends Block
 		if((!world.multiplayerWorld) && (lumberjack) && (isTree(world, i, j, k, true))) {
 			// Check if player is using an axe
 			ItemStack itemstack = entityplayer.getCurrentEquippedItem();
-			int id = itemstack.itemID;
 	        if(itemstack != null) {
+				int id = itemstack.itemID;
 	            if(id == 271 || id == 275 || id == 279 || id == 286) {
 	            	int damage = killTree(world, i, j, k, false);
 	    			additionalToolDamage(entityplayer,damage);
