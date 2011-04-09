@@ -31,6 +31,13 @@ public class mod_AutoForest extends BaseMod {
 	public static final HashMap<String, byte[]> biomeModifier = new HashMap<String, byte[]>();
 	
 	/**
+	* Version
+	*/
+	public String Version() {
+		return "0.9.5.3";
+	}
+	
+	/**
 	* Initialises and configures all options
 	*/
 	public mod_AutoForest() {
@@ -214,12 +221,5 @@ public class mod_AutoForest extends BaseMod {
 		} 
 		
 		return value;
-	}
-	
-	/**
-	* Version
-	*/
-	public String Version() {
-		return "Beta 1.4";
 	}
 }

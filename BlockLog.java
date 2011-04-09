@@ -360,7 +360,7 @@ public class BlockLog extends Block
 		ItemStack itemstack = player.getCurrentEquippedItem();
 		if(itemstack != null) {
 			// Damage item compared to the nmber of items found
-			itemstack.func_25190_a(damage - 1, null);
+			itemstack.func_25190_a(damage - 1, player);
 			if(itemstack.stackSize == 0) {
 				player.destroyCurrentEquippedItem();
 			}
@@ -393,6 +393,7 @@ public class BlockLog extends Block
 			ItemStack itemstack = entityplayer.getCurrentEquippedItem();
 	        if(itemstack != null) {
 				int id = itemstack.itemID;
+				// Axe IDs only
 	            if(id == 271 || id == 275 || id == 279 || id == 286) {
 	            	int damage = killTree(world, i, j, k, false);
 	    			additionalToolDamage(entityplayer,damage);

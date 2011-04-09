@@ -63,8 +63,11 @@ public abstract class BlockGrowable extends Block implements Growable {
 	*/
 	public void grow(World world, int i, int j, int k) {
 		int metadata = world.getBlockMetadata(i, j, k);
-		ItemStack itemStack = new ItemStack(Item.itemsList[idDropped(metadata, world.rand)]);
-		EntityItem entityitem = new EntityItem(world, i, j, k, itemStack);
-		world.entityJoinedWorld(entityitem);
+		int id = idDropped(metadata, world.rand);
+		if((id >= 0) && (id < Item.itemsList.length)) {
+			ItemStack itemStack = new ItemStack(Item.itemsList[id]);
+			EntityItem entityitem = new EntityItem(world, i, j, k, itemStack);
+			world.entityJoinedWorld(entityitem);
+		}
 	}
 }
