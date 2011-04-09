@@ -51,6 +51,8 @@ public class BlockFlower extends BlockGrowable
 			if(grow) {
 				//System.out.println("Attempting plant growth with rate " + growthRate);
 				attemptGrowth(world, i, j, k, growthRate);
+			} else {
+				//System.out.println("Not planting with rate " +  growthRate);
 			}
 		}
         func_268_h(world, i, j, k);
