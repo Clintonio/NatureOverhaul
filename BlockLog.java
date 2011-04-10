@@ -394,7 +394,8 @@ public class BlockLog extends Block
 	        if(itemstack != null) {
 				int id = itemstack.itemID;
 				// Axe IDs only
-	            if(id == 271 || id == 275 || id == 279 || id == 286) {
+	            if((id >= 0) && (id < Item.itemsList.length) && 
+				   (Item.itemsList[id] instanceof ItemAxe)) {
 	            	int damage = killTree(world, i, j, k, false);
 	    			additionalToolDamage(entityplayer,damage);
 	            }
