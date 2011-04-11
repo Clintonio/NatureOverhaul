@@ -42,17 +42,19 @@ public class BlockFlower extends BlockGrowable
 	//========
     protected String growthModifierType = "FlowerSpawn";
 	
-	public void updateTick(World world, int i, int j, int k, Random random) {
-		if(!world.multiplayerWorld) {
-			ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-			boolean grow 	  = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
-			double growthRate = 1D /((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue();
-			if(grow) {
-				//System.out.println("Attempting plant growth with rate " + growthRate);
+	public void updateTick(World world, int i, int j, int k, Random random)
+	{
+		if(!world.multiplayerWorld)
+		{
+			ModOptions flowers = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
+			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME);
+			boolean grow = ((ModBooleanOption) flowers.getOption("FlowerGrow")).getValue();
+			if(grow)
+			{
+				double growthRate = 1D /(5D * ((ModMappedMultiOption) flowers
+						.getOption("FlowerGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
-			} else {
-				//System.out.println("Not planting with rate " +  growthRate);
 			}
 		}
         func_268_h(world, i, j, k);

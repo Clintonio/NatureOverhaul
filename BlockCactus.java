@@ -46,18 +46,21 @@ public class BlockCactus extends BlockGrowable
 		//========
 		// BEGIN AUTOFOREST
 		//========
-		if(!world.multiplayerWorld) {
-			ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-			boolean grow 	  = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
-			double growthRate = 1D /(5D * ((ModMappedMultiOption) plants
-										.getOption("PlantGrowthRate")).getValue());
-			if(grow) {
+		if(!world.multiplayerWorld)
+		{
+			ModOptions cacti = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+					.getSubOption(mod_AutoForest.CACTI_MENU_NAME);
+			boolean grow = ((ModBooleanOption) cacti.getOption("CactiGrow")).getValue();
+			if(grow)
+			{
+				double growthRate = 1D /(5D * ((ModMappedMultiOption) cacti
+						.getOption("CactiGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
 		}
     }
-    protected String growthModifierType = "FlowerSpawn";
+    protected String growthModifierType = "CactiSpawn";
 	//========
 	// END AUTOFOREST
 	//========

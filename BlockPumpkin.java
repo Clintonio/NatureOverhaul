@@ -26,15 +26,22 @@ public class BlockPumpkin extends BlockGrowable
 	//========
 	// BEGIN AUTOFOREST
 	//========
-    protected String growthModifierType = "FlowerSpawn";
+    protected String growthModifierType = "PumpkinSpawn";
 	
-    public void updateTick(World world, int i, int j, int k, Random random) {
-		ModOptions plants = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME);
-		boolean plantsGrow = ((ModBooleanOption) plants.getOption("PlantsGrow")).getValue();
-		double growthRate = 1D /(10 * ((ModMappedMultiOption) plants.getOption("PlantGrowthRate")).getValue());
-		if(!world.multiplayerWorld && plantsGrow && !blockType) {
-			attemptGrowth(world, i, j, k, growthRate);
+    public void updateTick(World world, int i, int j, int k, Random random)
+    {
+    	if(!world.multiplayerWorld)
+		{
+    		ModOptions pumpkins = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
+			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME);
+			boolean grow = ((ModBooleanOption) pumpkins.getOption("PumpkinGrow")).getValue();
+			if(grow)
+			{
+				double growthRate = 1D /(5D * ((ModMappedMultiOption) pumpkins
+						.getOption("PumpkinGrowthRate")).getValue());
+				attemptGrowth(world, i, j, k, growthRate);
+			}
 		}
 	}
 	//========

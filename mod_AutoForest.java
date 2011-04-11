@@ -21,12 +21,18 @@ public class mod_AutoForest extends BaseMod {
 	private static ModOptions climate;
 	
 	// Constants
-	public static final String PLANT_MENU_NAME	 = "Plant&Mushroom Options";
+	public static final String PLANT_MENU_NAME	 = "Plants Options";
 	public static final String SAPLING_MENU_NAME = "Sapling Options";
 	public static final String MENU_NAME 		 = "AutoForest"; 
 	public static final String TREE_MENU_NAME 	 = "Tree Options";
 	public static final String CLIMATE_MENU_NAME = "Climate Options";
 	public static final String NIGHT_MENU_NAME	 = "Day and Night Options";
+	public static final String FLOWER_MENU_NAME	 = "Flower Options";
+	public static final String CACTI_MENU_NAME	 = "Cactus Options";
+	public static final String REED_MENU_NAME	 = "Reed Options";
+	public static final String PUMPKIN_MENU_NAME = "Pumpkin Options";
+	public static final String SHROOMS_MENU_NAME = "Mushroom Options";
+	
 	
 	public static final HashMap<String, byte[]> biomeModifier = new HashMap<String, byte[]>();
 	
@@ -34,7 +40,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "0.9.5.3";
+		return "0.9.6";
 	}
 	
 	/**
@@ -50,18 +56,26 @@ public class mod_AutoForest extends BaseMod {
 	*/
 	private void setupModOptions() {
 		ModOptions ops = new ModOptions(MENU_NAME);
+		
 		// Options for saplings only
 		ModOptions saps = new ModOptions(SAPLING_MENU_NAME);
+		
 		// Options for plants (shrooms and flowers) only
 		ModOptions plants = new ModOptions(PLANT_MENU_NAME);
+		
+		// Sub options for plants
+		ModOptions flowers = new ModOptions(FLOWER_MENU_NAME);
+		ModOptions cacti = new ModOptions(CACTI_MENU_NAME);
+		ModOptions reed = new ModOptions(REED_MENU_NAME);
+		ModOptions pumpkins = new ModOptions(PUMPKIN_MENU_NAME);
+		ModOptions shrooms = new ModOptions(SHROOMS_MENU_NAME);
+		
 		// Options for trees
 		ModOptions tree = new ModOptions(TREE_MENU_NAME);
+		
 		// Options for climate/ biomes
 		climate = new ModOptions(CLIMATE_MENU_NAME);
-		
-		//climate.setSingleplayerMode(false);
-		//ops.setMultiplayerMode(true);
-		
+				
 		ops.addSubOptions(saps);
 		ops.addSubOptions(plants);
 		ops.addSubOptions(climate);
@@ -83,7 +97,7 @@ public class mod_AutoForest extends BaseMod {
 		tree.addMappedMultiOption("DeathRate", dKeys, labels);
 		tree.addToggle("TreeDeath");
 		
-		
+		// Tree drops
 		Integer[] aKeys = {3000, 1200, 250, 5, 30000, 10000};
 		tree.addMappedMultiOption("CocoaGrowthRate", aKeys, labels);
 		tree.addToggle("CocoaGrows");
@@ -92,8 +106,28 @@ public class mod_AutoForest extends BaseMod {
 		
 		// Plant related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
-		plants.addMappedMultiOption("PlantGrowthRate", pKeys, labels);
-		plants.addToggle("PlantsGrow");
+		plants.addSubOptions(flowers);
+		plants.addSubOptions(cacti);
+		plants.addSubOptions(reed);
+		plants.addSubOptions(pumpkins);
+		plants.addSubOptions(shrooms);
+		
+		// Plant submenus
+		flowers.addToggle("AutoFlower");
+		flowers.addMappedMultiOption("FlowerGrowthRate", pKeys, labels);
+		flowers.addToggle("FlowerGrow");
+		cacti.addToggle("AutoCacti");
+		cacti.addMappedMultiOption("CactiGrowthRate", pKeys, labels);
+		cacti.addToggle("CactiGrow");
+		reed.addToggle("AutoReed");
+		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
+		reed.addToggle("ReedGrow");
+		pumpkins.addToggle("AutoPumpkin");
+		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
+		pumpkins.addToggle("PumpkinGrow");
+		shrooms.addToggle("AutoShroom");
+		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
+		shrooms.addToggle("ShroomGrow");
 		
 		// Climate related
 		climate.addToggle("BiomeModifiedGrowth");
@@ -103,6 +137,11 @@ public class mod_AutoForest extends BaseMod {
 		ops.addToggle("ForestGrowth");
 		
 		// Handle display
+		flowers.setWideOption("AutoFlower");
+		cacti.setWideOption("AutoCacti");
+		reed.setWideOption("AutoReed");
+		pumpkins.setWideOption("AutoPumpkin");
+		shrooms.setWideOption("AutoShroom");
 		tree.setWideOption("TreeGrowthRate");
 		ops.setWideOption("ForestGrowth");
 		climate.setWideOption("BiomeModifiedGrowth");
@@ -153,7 +192,8 @@ public class mod_AutoForest extends BaseMod {
 		byte[] biomeMod = null;
 		Biome biome 	= null;
 		try {
-			biome = Biome.getBiomeFromString(biomeName).getBiomeFromString(biomeName);
+			Biome.getBiomeFromString(biomeName);
+			biome = Biome.getBiomeFromString(biomeName);
 			biomeMod = biomeModifier.get(name);
 		
 			if(biomeMod != null) {
@@ -178,6 +218,10 @@ public class mod_AutoForest extends BaseMod {
 		byte[] bigTree		= { 20, 10, 15, 10,  1,  5, 10,   5,   0,  0,  0,   0 };
 		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9, 10,   0 };
 		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+		byte[] cactiSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+		byte[] reedSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
 		
 		biomeModifier.put("SaplingSpawn", saplingSpawn);
 		biomeModifier.put("SaplingDeath", saplingDeath);
@@ -185,6 +229,10 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("BigTree", bigTree);
 		biomeModifier.put("TreeGap", treeGap);
 		biomeModifier.put("FlowerSpawn", flowerSpawn);
+		biomeModifier.put("CactiSpawn", cactiSpawn);
+		biomeModifier.put("ReedSpawn", reedSpawn);
+		biomeModifier.put("PumpkinSpawn", pumpkinSpawn);
+		biomeModifier.put("ShroomSpawn", shroomSpawn);
 	}
 	
 	/**
