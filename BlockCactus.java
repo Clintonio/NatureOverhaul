@@ -54,7 +54,7 @@ public class BlockCactus extends BlockGrowable
 			boolean grow = ((ModBooleanOption) cacti.getOption("CactiiGrow")).getValue();
 			if(grow)
 			{
-				double growthRate = 1D /(5D * ((ModMappedMultiOption) cacti
+				double growthRate = 1D /(((ModMappedMultiOption) cacti
 						.getOption("CactiiGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}

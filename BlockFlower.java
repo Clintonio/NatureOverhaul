@@ -49,7 +49,7 @@ public class BlockFlower extends BlockGrowable
 				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME);
 			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
 			if(grow) {
-				double growthRate = 1D /(5D * ((ModMappedMultiOption) flowers
+				double growthRate = 1D /(((ModMappedMultiOption) flowers
 						.getOption("FlowerGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}

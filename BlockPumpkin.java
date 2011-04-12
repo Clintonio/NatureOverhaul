@@ -28,17 +28,14 @@ public class BlockPumpkin extends BlockGrowable
 	//========
     protected String growthModifierType = "PumpkinSpawn";
 	
-    public void updateTick(World world, int i, int j, int k, Random random)
-    {
-    	if(!world.multiplayerWorld)
-		{
+    public void updateTick(World world, int i, int j, int k, Random random) {
+    	if(!world.multiplayerWorld){
     		ModOptions pumpkins = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME);
 			boolean grow = ((ModBooleanOption) pumpkins.getOption("PumpkinsGrow")).getValue();
-			if(grow)
-			{
-				double growthRate = 1D /(5D * ((ModMappedMultiOption) pumpkins
+			if(grow){
+				double growthRate = 1D /(((ModMappedMultiOption) pumpkins
 						.getOption("PumpkinGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}

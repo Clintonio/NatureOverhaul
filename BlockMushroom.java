@@ -46,7 +46,7 @@ public class BlockMushroom extends BlockFlower
 			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomsGrow")).getValue();
 			if(grow)
 			{
-				double growthRate = 1D /(5D * ((ModMappedMultiOption) shrooms
+				double growthRate = 1D /(((ModMappedMultiOption) shrooms
 						.getOption("ShroomGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
