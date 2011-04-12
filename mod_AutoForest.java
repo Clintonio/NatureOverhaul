@@ -84,7 +84,6 @@ public class mod_AutoForest extends BaseMod {
 		// Sapling related
 		String[] labels = {"AVERAGE", "FAST", "SUPERFAST", "INSANE", "SUPERSLOW", "SLOW"};
 		saps.addToggle("AutoSapling");
-		saps.addToggle("FastSapling");
 		saps.addToggle("SaplingDeath");
 		saps.addMultiOption("GrowthRate", labels);
 		
@@ -113,21 +112,16 @@ public class mod_AutoForest extends BaseMod {
 		plants.addSubOptions(shrooms);
 		
 		// Plant submenus
-		flowers.addToggle("AutoFlower");
 		flowers.addMappedMultiOption("FlowerGrowthRate", pKeys, labels);
-		flowers.addToggle("FlowerGrow");
-		cacti.addToggle("AutoCacti");
-		cacti.addMappedMultiOption("CactiGrowthRate", pKeys, labels);
-		cacti.addToggle("CactiGrow");
-		reed.addToggle("AutoReed");
+		flowers.addToggle("FlowersGrow");
+		cacti.addMappedMultiOption("CactiiGrowthRate", pKeys, labels);
+		cacti.addToggle("CactiiGrow");
 		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
-		reed.addToggle("ReedGrow");
-		pumpkins.addToggle("AutoPumpkin");
+		reed.addToggle("ReedsGrow");
 		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
-		pumpkins.addToggle("PumpkinGrow");
-		shrooms.addToggle("AutoShroom");
+		pumpkins.addToggle("PumpkinsGrow");
 		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
-		shrooms.addToggle("ShroomGrow");
+		shrooms.addToggle("ShroomsGrow");
 		
 		// Climate related
 		climate.addToggle("BiomeModifiedGrowth");
@@ -137,17 +131,19 @@ public class mod_AutoForest extends BaseMod {
 		ops.addToggle("ForestGrowth");
 		
 		// Handle display
-		flowers.setWideOption("AutoFlower");
-		cacti.setWideOption("AutoCacti");
-		reed.setWideOption("AutoReed");
-		pumpkins.setWideOption("AutoPumpkin");
-		shrooms.setWideOption("AutoShroom");
 		tree.setWideOption("TreeGrowthRate");
 		ops.setWideOption("ForestGrowth");
 		climate.setWideOption("BiomeModifiedGrowth");
 		
-		// Set the custom sapling item
+		// Set the custom items
 		Item.itemsList[Block.sapling.blockID] = (new ItemSapling(Block.sapling.blockID - 256)).setItemName("Sapling");
+		Item.itemsList[Block.mushroomBrown.blockID] = (new ItemMushroom(Block.mushroomBrown.blockID - 256)).setItemName("Mushroom");
+		Item.itemsList[Block.mushroomRed.blockID] = (new ItemMushroom(Block.mushroomRed.blockID - 256)).setItemName("Mushroom");
+		Item.itemsList[Block.plantYellow.blockID] = (new ItemFlower(Block.plantYellow.blockID - 256)).setItemName("Flower");
+		Item.itemsList[Block.plantRed.blockID] = (new ItemFlower(Block.plantRed.blockID - 256)).setItemName("Flower");
+		Item.itemsList[Block.cactus.blockID] = (new ItemCactus(Block.cactus.blockID - 256)).setItemName("Cactus");
+		Item.itemsList[Block.pumpkin.blockID] = (new ItemPumpkin(Block.pumpkin.blockID - 256)).setItemName("Pumpkin");
+		
 		// Add the two new sapling names
 		ModLoader.AddLocalization("birchsapling.name", "Birch Sapling");
 		ModLoader.AddLocalization("pinesapling.name", "PineSapling");

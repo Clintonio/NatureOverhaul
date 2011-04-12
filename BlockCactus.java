@@ -51,11 +51,11 @@ public class BlockCactus extends BlockGrowable
 			ModOptions cacti = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 					.getSubOption(mod_AutoForest.CACTI_MENU_NAME);
-			boolean grow = ((ModBooleanOption) cacti.getOption("CactiGrow")).getValue();
+			boolean grow = ((ModBooleanOption) cacti.getOption("CactiiGrow")).getValue();
 			if(grow)
 			{
 				double growthRate = 1D /(5D * ((ModMappedMultiOption) cacti
-						.getOption("CactiGrowthRate")).getValue());
+						.getOption("CactiiGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
 		}

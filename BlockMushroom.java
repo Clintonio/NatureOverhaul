@@ -43,7 +43,7 @@ public class BlockMushroom extends BlockFlower
 			ModOptions shrooms = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME);
-			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomGrow")).getValue();
+			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomsGrow")).getValue();
 			if(grow)
 			{
 				double growthRate = 1D /(5D * ((ModMappedMultiOption) shrooms

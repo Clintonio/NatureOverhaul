@@ -42,16 +42,13 @@ public class BlockFlower extends BlockGrowable
 	//========
     protected String growthModifierType = "FlowerSpawn";
 	
-	public void updateTick(World world, int i, int j, int k, Random random)
-	{
-		if(!world.multiplayerWorld)
-		{
+	public void updateTick(World world, int i, int j, int k, Random random) {
+		if(!world.multiplayerWorld) {
 			ModOptions flowers = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME);
-			boolean grow = ((ModBooleanOption) flowers.getOption("FlowerGrow")).getValue();
-			if(grow)
-			{
+			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
+			if(grow) {
 				double growthRate = 1D /(5D * ((ModMappedMultiOption) flowers
 						.getOption("FlowerGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);

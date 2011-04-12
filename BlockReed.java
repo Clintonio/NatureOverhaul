@@ -47,7 +47,7 @@ public class BlockReed extends BlockGrowable
         	ModOptions reed = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 				.getSubOption(mod_AutoForest.REED_MENU_NAME);
-			boolean grow = ((ModBooleanOption) reed.getOption("ReedGrow")).getValue();
+			boolean grow = ((ModBooleanOption) reed.getOption("ReedsGrow")).getValue();
 			if(grow)
 			{
 				double growthRate = 1D /(5D * ((ModMappedMultiOption) reed

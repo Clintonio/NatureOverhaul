@@ -94,7 +94,6 @@ public class EntityItem extends Entity
         {
             f = 0.5880001F;
             int i = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ));
-            int j = worldObj.getBlockId(MathHelper.floor_double(posX), MathHelper.floor_double(boundingBox.minY) - 1, MathHelper.floor_double(posZ) - 1);
             if(i > 0)
             {
                 f = Block.blocksList[i].slipperiness * 0.98F;
@@ -103,12 +102,8 @@ public class EntityItem extends Entity
 			//========
 			// BEGIN AUTOFOREST
 			//========
-			// Saplings - Flowers - Cactii - Reeds
-			if((!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) 
-				&& ((item.itemID == 6) || ((item.itemID >= 37) && (item.itemID <= 40)) 
-				|| (item.itemID == 81) || (item.itemID == Item.reed.shiftedIndex)
-				|| (item.itemID == Block.pumpkin.blockID))) {
-				attemptPlant(i, j);
+			if(!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) {
+				attemptPlant(i);
 			}
 			//========
 			// END AUTOSAPLING
@@ -132,36 +127,41 @@ public class EntityItem extends Entity
 	//========
 	// BEGIN AUTOFOREST
 	//========
-	
-	boolean saplingGrow = ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.SAPLING_MENU_NAME).
-			getOption("AutoSapling")).getValue();
-	
-	boolean flowerGrow 	= ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-			getSubOption(mod_AutoForest.FLOWER_MENU_NAME).
-			getOption("FlowerGrow")).getValue();
-	
-	boolean cactiGrow 	= ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-			getSubOption(mod_AutoForest.CACTI_MENU_NAME).
-			getOption("CactiGrow")).getValue();
-	
-	boolean reedGrow 	= ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-			getSubOption(mod_AutoForest.REED_MENU_NAME).
-			getOption("ReedGrow")).getValue();
-	
-	boolean pumpkinGrow = ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-			getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME).
-			getOption("PumpkinGrow")).getValue();
-	
-	boolean shroomGrow 	= ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-			getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-			getSubOption(mod_AutoForest.SHROOMS_MENU_NAME).
-			getOption("ShroomGrow")).getValue();
     
+	private ModBooleanOption saplingGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
+				.getOption("AutoSapling");
+	
+	private ModBooleanOption pumpkinGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME)
+				.getOption("PumpkinsGrow");
+	
+	private ModBooleanOption flowerGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME)
+				.getOption("FlowersGrow");
+	
+	private ModBooleanOption shroomGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME)
+				.getOption("ShroomsGrow");
+	
+	private ModBooleanOption reedGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.REED_MENU_NAME)
+				.getOption("ReedsGrow");
+				
+	private ModBooleanOption cactiGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.CACTI_MENU_NAME)
+				.getOption("CactiiGrow");
 	/**
 	* Set initial speed of items
 	*/
@@ -170,56 +170,44 @@ public class EntityItem extends Entity
 		int i = item.itemID;
 
 		// Special motion for sapling
-		if(saplingGrow && (i == 6))
-		{
+		if((saplingGrow.getValue()) && (i == 6)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 2);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else
-			// Brown Mushrooms (Ring Spread)
-			if(shroomGrow && (i == 39)) {
+		// Brown Mushrooms (Ring Spread)
+		} else if((shroomGrow.getValue()) && (i == 39)) {
 			double circleDist = baseSpeed * 2;
 			motionX = (float) (circleDist - (Math.random() * circleDist)) * randSign();
 			motionY = (float) baseSpeed * 3;
 			motionZ = (float) (Math.pow(circleDist, 2) - Math.pow(motionX, 2)) * randSign();
-		} else
 			// Red Shroom (Flower Spread)
-			if(shroomGrow && (i == 40))
+		} else if((shroomGrow.getValue()) && (i == 40))
 			{
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else
 			// Flowers
-			if(flowerGrow && (i == 37 || i == 38))
-			{
+		} else if((flowerGrow.getValue()) && (i == 37 || i == 38)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else
 			// Reeds
-			if(reedGrow && (i == 256 + 82))
-			{
+		} else if((reedGrow.getValue()) && (i == 256 + 82)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();	
-		} else
 			// Pumpkins
-			if(pumpkinGrow && (i == 86))
-			{
+		} else if((pumpkinGrow.getValue()) && (i == 86)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else
 			// Cacti
-			if(cactiGrow && (i == 81))
-			{
+		} else if((cactiGrow.getValue()) && (i == 81)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 3);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else
 		// Other items
-		{
+		} else {
 			motionX = (float)(Math.random() * baseSpeed - baseSpeed / 2);
 			motionY = baseSpeed;
 			motionZ = (float)(Math.random() * baseSpeed - baseSpeed / 2);
@@ -242,37 +230,32 @@ public class EntityItem extends Entity
 	private void setNextYSpeed(int id) {
 		// Terminal speed for saplings
 		int i = item.itemID;
-		if(saplingGrow && (i == 6))
+		if((saplingGrow.getValue()) && (i == 6))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-		} else
 		// Terminal speed for flowers
-		if(flowerGrow && (i == 37 || i == 38))
+		} else if((flowerGrow.getValue()) && (i == 37 || i == 38))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-		} else
 		// Terminal speed for flowers
-		if(shroomGrow && (i == 39 || i == 40))
+		} else if((shroomGrow.getValue()) && (i == 39 || i == 40))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-		} else
 		// Terminal speed for reeds
-		if(reedGrow && (i == 256 + 82))
+		} else if((reedGrow.getValue()) && (i == 256 + 82))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-		} else
 		// Terminal speed for pumpkins
-		if(pumpkinGrow && (i == 86))
+		} else if((pumpkinGrow.getValue()) && (i == 86))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-		} else
 		// Terminal speed for cacti
-		if(cactiGrow && (i == 81))
+		} else if((cactiGrow.getValue()) && (i == 81))
 		{
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
@@ -284,109 +267,22 @@ public class EntityItem extends Entity
 	/**
 	* Attempt to plant the current plant item
 	*
+	* @param	world		World object
 	* @param	belowID		ID of block below
-	* @param 	below2ID 	ID 2 blocks below
 	*/
-	private void attemptPlant(int belowID, int below2ID) {
+	private void attemptPlant(int belowID) {
 		int i = MathHelper.floor_double(posX);
 		int j = MathHelper.floor_double(boundingBox.minY);
 		int k = MathHelper.floor_double(posZ);
 		// Get block id the entity is occupying
 		int curBlockID = worldObj.getBlockId(i, j, k);
 		
-		// Plants can only plant on the ground, shrooms have extra rules
-		if((age > 1200) && (curBlockID == 0)) {
-			switch(item.itemID) {
-				// Saplings
-				case 6:
-					if(saplingGrow && ((belowID == 2) || (belowID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-					else if (saplingGrow && belowID == 78 && ((below2ID == 2) || (below2ID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-				break; 
-				
-				// Flowers
-				case 37:
-				case 38:
-					if(flowerGrow && ((belowID == 2) || (belowID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-					else if (flowerGrow && belowID == 78 && ((below2ID == 2) || (below2ID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-				break;
-				
-				// Shrooms
-				case 39:
-				case 40:
-					if((shroomGrow) && shroomPlant(belowID))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-				break;
-				// Pumpkin
-				case 86:
-					if(pumpkinGrow && ((belowID == 2) || (belowID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-					else if (pumpkinGrow && belowID == 78 && ((below2ID == 2) || (below2ID == 3)))
-					{
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-						setEntityDead();
-					}
-				break;
-				
-				// Cactus
-				case 81: 
-					if((cactiGrow) && (belowID == 12) && (!worldObj.getBlockMaterial(i - 1, j, k).isSolid()) &&
-						(!worldObj.getBlockMaterial(i + 1, j, k).isSolid()) && 
-						(!worldObj.getBlockMaterial(i, j, k - 1).isSolid()) && 
-						(!worldObj.getBlockMaterial(i, j, k + 1).isSolid()))
-					{
-						worldObj.setBlockWithNotify(i, j, k, item.itemID);
-						setEntityDead();
-					}
-				break;
-				
-				case 256 + 82: // Reed item = 82, shifted by 256
-					if((reedGrow) && (((belowID == 2) || (belowID == 3)) &&
-					  ((worldObj.getBlockMaterial(i - 1, j - 1, k) == Material.water) ||
-					   (worldObj.getBlockMaterial(i + 1, j - 1, k) == Material.water) ||
-					   (worldObj.getBlockMaterial(i, j - 1, k - 1) == Material.water) ||
-					   (worldObj.getBlockMaterial(i, j - 1, k + 1) == Material.water)))) {
-						worldObj.setBlockWithNotify(i, j, k, Block.reed.blockID);
-						setEntityDead();
-					}
-				break;
-			}
-		}
-	}
-	
-	/**
-	* Check if the current plant is a shroom and whether it should plant
-	* Shrooms can only not plant on grass or in daylight
-	*
-	* @param	belowID		ID of below block
-	* @return	true if can plant and is shroom
-	*/
-	private boolean shroomPlant(int belowID) {
-		if((item.itemID == 39) || (item.itemID == 40)) {
-			return ((belowID != Block.glass.blockID) && (belowID != Block.ice.blockID));
-		} else {
-			return false;
+		// Api-able plantable interface
+		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID)) 
+			&& (Item.itemsList[item.itemID] instanceof Plantable)
+			&& (((Plantable) Item.itemsList[item.itemID]).plantable(worldObj, i, j, k, belowID, age))) {
+			worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
+			setEntityDead();
 		}
 	}
 	

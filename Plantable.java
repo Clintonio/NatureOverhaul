@@ -12,7 +12,8 @@ public interface Plantable {
 	* block with the idBelow at i, j, k
 	*
 	* @param	idBelow		ID of block below
+	* @param	age			Age of item
 	* @return 	True when plantable
 	*/
-	public plantable(World world, int i, int j, int k, int idBelow);
+	public boolean plantable(World world, int i, int j, int k, int idBelow, int age);
 }
