@@ -8,7 +8,9 @@ import net.minecraft.src.modoptionsapi.*;
 
 public class EntityItem extends Entity
 {
-
+	public boolean bIsLight;
+	public PlayerTorch itemtorch;
+	
     public EntityItem(World world, double d, double d1, double d2, 
             ItemStack itemstack)
     {
@@ -36,8 +38,6 @@ public class EntityItem extends Entity
 		// END AUTOFOREST
 		//========
 		
-		// START MERGE
-		
 		int brightness = PlayerTorchArray.GetItemBrightnessValue(item.itemID);
 		if (brightness > 0)
 		{
@@ -48,7 +48,6 @@ public class EntityItem extends Entity
 			itemtorch.SetTorchRange(PlayerTorchArray.GetItemLightRangeValue(item.itemID));
 			itemtorch.setTorchState(worldObj, true);
 		}
-		// END MERGE
     }
 
     protected boolean canTriggerWalking()
@@ -101,14 +100,12 @@ public class EntityItem extends Entity
             motionZ = (rand.nextFloat() - rand.nextFloat()) * 0.2F;
             worldObj.playSoundAtEntity(this, "random.fizz", 0.4F, 2.0F + rand.nextFloat() * 0.4F);
         }
-		
-		// START MERGE
+        
 		if (bIsLight)
 		{
 			this.itemtorch.setTorchPos(worldObj, (float)this.posX, (float)this.posY, (float)this.posZ);
 		}
-		// END MERGE
-		
+        
         func_466_g(posX, posY, posZ);
         moveEntity(motionX, motionY, motionZ);
         float f = 0.98F;
@@ -124,11 +121,7 @@ public class EntityItem extends Entity
 			//========
 			// BEGIN AUTOFOREST
 			//========
-			// Saplings - Flowers - Cactii - Reeds
-			if((!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) 
-				&& ((item.itemID == 6) || ((item.itemID >= 37) && (item.itemID <= 40)) 
-				|| (item.itemID == 81) || (item.itemID == Item.reed.shiftedIndex)
-				|| (item.itemID == Block.pumpkin.blockID))) {
+			if(!ModLoader.getMinecraftInstance().theWorld.multiplayerWorld) {
 				attemptPlant(i);
 			}
 			//========
@@ -146,55 +139,95 @@ public class EntityItem extends Entity
         age++;
         if(age >= 6000)
         {
-            // START MERGE
-			if (bIsLight)
+        	if (bIsLight)
 				PlayerTorchArray.RemoveTorchFromArray(worldObj, itemtorch);
-			// END MERGE
-			setEntityDead();
+        	setEntityDead();
         }
     }
 	
 	//========
 	// BEGIN AUTOFOREST
 	//========
+    
+	private ModBooleanOption saplingGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
+				.getOption("AutoSapling");
 	
+	private ModBooleanOption pumpkinGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME)
+				.getOption("PumpkinsGrow");
+	
+	private ModBooleanOption flowerGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME)
+				.getOption("FlowersGrow");
+	
+	private ModBooleanOption shroomGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME)
+				.getOption("ShroomsGrow");
+	
+	private ModBooleanOption reedGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.REED_MENU_NAME)
+				.getOption("ReedsGrow");
+				
+	private ModBooleanOption cactiGrow = (ModBooleanOption) ModOptionsAPI
+				.getModOptions(mod_AutoForest.MENU_NAME)
+				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
+				.getSubOption(mod_AutoForest.CACTI_MENU_NAME)
+				.getOption("CactiiGrow");
 	/**
 	* Set initial speed of items
 	*/
 	private void setInitialVelocity() {
 		double baseSpeed = 0.20000000298023224D;
 		int i = item.itemID;
-		
-		ModBooleanOption o = (ModBooleanOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
-							.getOption("FastSapling");
-		ModBooleanOption pGrowth = (ModBooleanOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-							.getOption("PlantsGrow");
+
 		// Special motion for sapling
-		if((o.getValue()) && (i == 6)) {
+		if((saplingGrow.getValue()) && (i == 6)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 2);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else if((pGrowth.getValue()) && (i == 39)) {
-			// Brown mushrooms will form fairy rings at 5 blocks away
+		// Brown Mushrooms (Ring Spread)
+		} else if((shroomGrow.getValue()) && (i == 39)) {
 			double circleDist = baseSpeed * 2;
 			motionX = (float) (circleDist - (Math.random() * circleDist)) * randSign();
 			motionY = (float) baseSpeed * 3;
 			motionZ = (float) (Math.pow(circleDist, 2) - Math.pow(motionX, 2)) * randSign();
-		// All flowers but brown shrooms
-		} else if((pGrowth.getValue()) && (((i >= 37) && (i <= 40)) 
-											|| (i == Item.reed.shiftedIndex) 
-											|| (i == Block.pumpkin.blockID))) {
+			// Red Shroom (Flower Spread)
+		} else if((shroomGrow.getValue()) && (i == 40))
+			{
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		} else if((pGrowth.getValue()) && (i == 81)) {
+			// Flowers
+		} else if((flowerGrow.getValue()) && (i == 37 || i == 38)) {
+			motionX = (float)(Math.random() * baseSpeed) * randSign();
+			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
+			motionZ = (float)(Math.random() * baseSpeed) * randSign();
+			// Reeds
+		} else if((reedGrow.getValue()) && (i == 256 + 82)) {
+			motionX = (float)(Math.random() * baseSpeed) * randSign();
+			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
+			motionZ = (float)(Math.random() * baseSpeed) * randSign();	
+			// Pumpkins
+		} else if((pumpkinGrow.getValue()) && (i == 86)) {
+			motionX = (float)(Math.random() * baseSpeed) * randSign();
+			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
+			motionZ = (float)(Math.random() * baseSpeed) * randSign();
+			// Cacti
+		} else if((cactiGrow.getValue()) && (i == 81)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 3);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();
+		// Other items
 		} else {
 			motionX = (float)(Math.random() * baseSpeed - baseSpeed / 2);
 			motionY = baseSpeed;
@@ -216,37 +249,37 @@ public class EntityItem extends Entity
 	* @param	id	Item id
 	*/
 	private void setNextYSpeed(int id) {
-		ModBooleanOption o = (ModBooleanOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
-							.getOption("FastSapling");
-		ModBooleanOption pGrowth = (ModBooleanOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-							.getOption("PlantsGrow");
-		
 		// Terminal speed for saplings
-		if((o.getValue()) && (item.itemID == 6)) {
-			if(motionY > (-0.039999999105930328D * 10)) {
+		int i = item.itemID;
+		if((saplingGrow.getValue()) && (i == 6))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
-			}
-		// Terminal speed for plants
-		} else if(pGrowth.getValue()) {
-			switch(item.itemID) {
-				case 37:
-				case 38:
-				case 39:
-				case 40:
-				case 81:
-				case 86:
-				case 256 + 82: // Reed item = 82, shifted by 256
-					if(motionY > (-0.039999999105930328D * 10)) {
-						motionY -= 0.039999999105930328D;
-					}
-				
-				default:
-					motionY -= 0.039999999105930328D;
-			}
+		// Terminal speed for flowers
+		} else if((flowerGrow.getValue()) && (i == 37 || i == 38))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
+				motionY -= 0.039999999105930328D;
+		// Terminal speed for flowers
+		} else if((shroomGrow.getValue()) && (i == 39 || i == 40))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
+				motionY -= 0.039999999105930328D;
+		// Terminal speed for reeds
+		} else if((reedGrow.getValue()) && (i == 256 + 82))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
+				motionY -= 0.039999999105930328D;
+		// Terminal speed for pumpkins
+		} else if((pumpkinGrow.getValue()) && (i == 86))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
+				motionY -= 0.039999999105930328D;
+		// Terminal speed for cacti
+		} else if((cactiGrow.getValue()) && (i == 81))
+		{
+			if(motionY > (-0.039999999105930328D * 10))
+				motionY -= 0.039999999105930328D;
 		} else {
 			motionY -= 0.039999999105930328D;
 		}
@@ -255,6 +288,7 @@ public class EntityItem extends Entity
 	/**
 	* Attempt to plant the current plant item
 	*
+	* @param	world		World object
 	* @param	belowID		ID of block below
 	*/
 	private void attemptPlant(int belowID) {
@@ -263,75 +297,13 @@ public class EntityItem extends Entity
 		int k = MathHelper.floor_double(posZ);
 		// Get block id the entity is occupying
 		int curBlockID = worldObj.getBlockId(i, j, k);
-		boolean plantsGrow = ((ModBooleanOption) ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).
-								getSubOption(mod_AutoForest.PLANT_MENU_NAME).
-								getOption("PlantsGrow")).getValue();
-		// Plants can only plant on the ground, shrooms have extra rules
-		if((age > 1200) && (curBlockID == 0)) {
-			switch(item.itemID) {
-				// Saplings
-				case 6:
-					if((((ModBooleanOption)ModOptionsAPI.
-						getModOptions(mod_AutoForest.MENU_NAME).
-						getSubOption(mod_AutoForest.SAPLING_MENU_NAME).
-						getOption("AutoSapling")).getValue()) &&
-						((belowID == 2) || (belowID == 3))) {
-						
-						worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, 
-															   item.getItemDamage());
-						setEntityDead();
-					}	
-				break; 
-				
-				// Shrooms and flowers
-				case 37:
-				case 38:
-				case 39:
-				case 40:
-				// Pumpkin
-				case 86:
-					if((plantsGrow) && ((belowID == 2) || (belowID == 3) || shroomPlant(belowID))) {
-						worldObj.setBlockWithNotify(i, j, k, item.itemID);
-						setEntityDead();
-					} 
-				break;
-				
-				// Cactus
-				case 81: 
-					if((plantsGrow) && (belowID == 12) && (!worldObj.getBlockMaterial(i - 1, j, k).isSolid()) &&
-						(!worldObj.getBlockMaterial(i + 1, j, k).isSolid()) && 
-						(!worldObj.getBlockMaterial(i, j, k - 1).isSolid()) &&
-						(!worldObj.getBlockMaterial(i, j, k + 1).isSolid())) {
-						worldObj.setBlockWithNotify(i, j, k, item.itemID);
-						setEntityDead();
-					}
-				break;
-				
-				case 256 + 82: // Reed item = 82, shifted by 256
-					if((plantsGrow) && (((belowID == Block.grass.blockID) || (belowID == Block.dirt.blockID)) &&
-					  ((worldObj.getBlockMaterial(i - 1, j - 1, k) == Material.water) ||
-					   (worldObj.getBlockMaterial(i + 1, j - 1, k) == Material.water) ||
-					   (worldObj.getBlockMaterial(i, j - 1, k - 1) == Material.water) ||
-					   (worldObj.getBlockMaterial(i, j - 1, k + 1) == Material.water)))) {
-						worldObj.setBlockWithNotify(i, j, k, Block.reed.blockID);
-						setEntityDead();
-					}
-			}
-		}
-	}
-	
-	/**
-	* Check if the current plant is a shroom and whether it should plant
-	* Shrooms can only not plant on grass or in daylight
-	*
-	* @param	belowID		ID of below block
-	* @return	true if can plant and is shroom
-	*/
-	private boolean shroomPlant(int belowID) {
-		if((item.itemID == 39) || (item.itemID == 40)) {
-			return ((belowID != Block.glass.blockID) && (belowID != Block.ice.blockID));
-		} else {
-			return false;
+		
+		// Api-able plantable interface
+		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID)) 
+			&& (Item.itemsList[item.itemID] instanceof Plantable)
+			&& (((Plantable) Item.itemsList[item.itemID]).plantable(worldObj, i, j, k, belowID, age))) {
+			worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
+			setEntityDead();
 		}
 	}
 	
@@ -432,10 +404,8 @@ public class EntityItem extends Entity
         health -= i;
         if(health <= 0)
         {
-            // START MERGE
-			if (bIsLight)
+        	if (bIsLight)
 				PlayerTorchArray.RemoveTorchFromArray(worldObj, itemtorch);;
-			// END MERGE
 			setEntityDead();
         }
         return false;
@@ -467,19 +437,12 @@ public class EntityItem extends Entity
         {
             worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
             entityplayer.onItemPickup(this, i);
-			
-			// START MERGE
-			if (bIsLight)
-				PlayerTorchArray.RemoveTorchFromArray(worldObj, itemtorch);;
-			// END MERGE
-			
+        	if (bIsLight)
+				PlayerTorchArray.RemoveTorchFromArray(worldObj, itemtorch);
             setEntityDead();
         }
     }
-	//START MERGE
-	public boolean bIsLight;
-	public PlayerTorch itemtorch;
-	//END MERGE
+
     public ItemStack item;
     private int field_803_e;
     public int age;
