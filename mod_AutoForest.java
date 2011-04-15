@@ -208,16 +208,17 @@ public class mod_AutoForest extends BaseMod {
 	* Sets up the biome modifiers
 	*/
 	private void createBiomeModifiers() {
-		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95,-95,-100 };
-		byte[] saplingDeath = {  0, 10,  0,  0, 90, 90, 10,  95,  95, 95, 95, 100 };
-		byte[] treeDeath	= {  0,-10,  0,  0,-90,  0,  0, -90, -90,-90,-90, 100 };
-		byte[] bigTree		= { 20, 10, 15, 10,  1,  5, 10,   5,   0,  0,  0,   0 };
-		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9, 10,   0 };
-		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
-		byte[] cactiSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
-		byte[] reedSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
-		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
-		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90, 95,-100 };
+							  // 0   1   2   3   4   5   6    7    8   9  10   11
+		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95, -95,-100 };
+		byte[] saplingDeath = {  0, 10,  0,  0, 90, 90, 10,  95,  95, 95,  95, 100 };
+		byte[] treeDeath	= {  0,-10,  0,  0,-90,  0,  0, -90, -90,-90, -90, 100 };
+		byte[] bigTree		= { 20, 10, 15, 10,  1,  5, 10,   5,   0,  0,   0,   0 };
+		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9,  10,   0 };
+		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
+		byte[] cactiSpawn	= {  0,-25,  0,  0, 50, 75,-75,  20,-100,-90,   0,-100 };
+		byte[] reedSpawn	= { 25, 50, 15, 10,-75,  0,-90,-100,-100,-10,-100,-100 };
+		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
+		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0, -95,-100,-90,  95,-100 };
 		
 		biomeModifier.put("SaplingSpawn", saplingSpawn);
 		biomeModifier.put("SaplingDeath", saplingDeath);
