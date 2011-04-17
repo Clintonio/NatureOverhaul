@@ -92,6 +92,15 @@ public class ItemReed extends Item implements Plantable
 				  || (world.getBlockMaterial(i, j - 1, k - 1) == Material.water) 
 				  || (world.getBlockMaterial(i, j - 1, k + 1) == Material.water))));
 	}
+	
+	/**
+	* Get plant ID
+	*
+	* @return	ID of block to plant
+	*/
+	public int getPlantBlockID() {
+		return field_320_a;
+	}
 	//========
 	// END AUTOFOREST
 	//========

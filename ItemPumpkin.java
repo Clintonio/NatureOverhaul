@@ -8,7 +8,7 @@ import net.minecraft.src.modoptionsapi.*;
 * @author	Clinton Alexander
 * @version	1.0.0.0
 */
-public class ItemPumpkin extends ItemBlock implements Plantable {
+public class ItemPumpkin extends ItemPlantable implements Plantable {
 	
     public ItemPumpkin(int i)
     {

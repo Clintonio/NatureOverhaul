@@ -279,10 +279,13 @@ public class EntityItem extends Entity
 		
 		// Api-able plantable interface
 		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID)) 
-			&& (Item.itemsList[item.itemID] instanceof Plantable)
-			&& (((Plantable) Item.itemsList[item.itemID]).plantable(worldObj, i, j, k, belowID, age))) {
-			worldObj.setBlockAndMetadataWithNotify(i, j, k, item.itemID, item.getItemDamage());
-			setEntityDead();
+			&& (Item.itemsList[item.itemID] instanceof Plantable)) {
+			Plantable pItem = (Plantable) Item.itemsList[item.itemID];
+			if(pItem.plantable(worldObj, i, j, k, belowID, age)) {
+				worldObj.setBlockAndMetadataWithNotify(i, j, k, 
+						pItem.getPlantBlockID(), item.getItemDamage());
+				setEntityDead();
+			}
 		}
 	}
 	

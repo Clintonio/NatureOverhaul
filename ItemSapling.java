@@ -8,7 +8,7 @@ import net.minecraft.src.modoptionsapi.*;
 * @author	Clinton Alexander
 * @version	1.0.0.0
 */
-public class ItemSapling extends ItemBlock implements Plantable {
+public class ItemSapling extends ItemPlantable implements Plantable {
 	
     public ItemSapling(int i)
     {

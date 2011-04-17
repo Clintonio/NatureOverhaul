@@ -16,4 +16,11 @@ public interface Plantable {
 	* @return 	True when plantable
 	*/
 	public boolean plantable(World world, int i, int j, int k, int idBelow, int age);
+	
+	/**
+	* Get the block ID of the plantable item
+	*
+	* @return	Block ID of the plant to make
+	*/
+	public int getPlantBlockID();
 }

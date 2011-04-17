@@ -8,7 +8,7 @@ import net.minecraft.src.modoptionsapi.*;
 * @author	Clinton Alexander
 * @version	1.0.0.0
 */
-public class ItemFlower extends ItemBlock implements Plantable {
+public class ItemFlower extends ItemPlantable implements Plantable {
 	
     public ItemFlower(int i)
     {
