@@ -9,7 +9,7 @@ import net.minecraft.src.modoptionsapi.ModOptions;
 import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
 import net.minecraft.src.modoptionsapi.ModBooleanOption;
 
-public class BlockFlower extends BlockGrowable
+public class BlockFlower extends BlockMortal
 {
 
     protected BlockFlower(int i, int j)
@@ -41,20 +41,34 @@ public class BlockFlower extends BlockGrowable
 	// BEGIN AUTOFOREST
 	//========
     protected String growthModifierType = "FlowerSpawn";
+	protected String deathModifierName  = "StandardDeath";
 	
 	public void updateTick(World world, int i, int j, int k, Random random) {
 		if(!world.multiplayerWorld) {
-			ModOptions flowers = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME);
+			// ATTEMPT REPRODUCTION
+			ModOptions flowers = mod_AutoForest.flowers;
 			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
 			if(grow) {
 				double growthRate = 1D /(((ModMappedMultiOption) flowers
 						.getOption("FlowerGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
+			
+			// ATTEMPT DEATH
+			boolean death = mod_AutoForest.flowerDeath.getValue();
+			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) flowers
+						.getOption("FlowerDeathRate")).getValue()));
+			if(death && hasDied(world, i, j, k, deathProb)) {
+				System.out.println("FLOWER DIED");
+				death(world, i, j, k);
+			} else {
+				System.out.println(deathProb);
+			}
 		}
-        func_268_h(world, i, j, k);
+		
+		if(world.getBlockId(i, j, k) != 0) {
+			func_268_h(world, i, j, k);
+		}
     }
 	//========
 	// END AUTOFOREST

@@ -15,11 +15,6 @@ import java.util.HashMap;
 * @since	0.6
 */
 public class mod_AutoForest extends BaseMod {
-	// Objects
-	private static ModOptions darkerNights;
-	private static ModOptions options;
-	private static ModOptions climate;
-	
 	// Constants
 	public static final String PLANT_MENU_NAME	 = "Plants Options";
 	public static final String SAPLING_MENU_NAME = "Sapling Options";
@@ -33,14 +28,43 @@ public class mod_AutoForest extends BaseMod {
 	public static final String PUMPKIN_MENU_NAME = "Pumpkin Options";
 	public static final String SHROOMS_MENU_NAME = "Mushroom Options";
 	
+	// General option menus
 	
-	public static final HashMap<String, byte[]> biomeModifier = new HashMap<String, byte[]>();
+	public static ModOptions options = new ModOptions(MENU_NAME);
+	
+	// Options for saplings only
+	public static ModOptions saps = new ModOptions(SAPLING_MENU_NAME);
+	
+	// Options for trees
+	public static ModOptions tree = new ModOptions(TREE_MENU_NAME);
+	
+	// Options for plants
+	public static ModOptions 		plants		= new ModOptions(PLANT_MENU_NAME);
+	public static ModOptions 		flowers 	= new ModOptions(FLOWER_MENU_NAME);
+	public static ModOptions 		cactii 		= new ModOptions(CACTI_MENU_NAME);
+	public static ModOptions 		reed 		= new ModOptions(REED_MENU_NAME);
+	public static ModOptions 		pumpkins 	= new ModOptions(PUMPKIN_MENU_NAME);
+	public static ModOptions 		shrooms 	= new ModOptions(SHROOMS_MENU_NAME);
+	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die");
+	public static ModBooleanOption shroomDeath 	= new ModBooleanOption("Shrooms Die");
+	
+	// Objects
+	public static ModOptions darkerNights 	= new ModOptions(NIGHT_MENU_NAME);
+	public static ModOptions climate		= new ModOptions(CLIMATE_MENU_NAME);
+	
+	// Default labels
+	private static String[] labels = {"AVERAGE", "FAST", 
+									  "SUPERFAST", "INSANE", 
+									  "SUPERSLOW", "SLOW"};
+	
+	
+	private static final HashMap<String, byte[]> biomeModifier = new HashMap<String, byte[]>();
 	
 	/**
 	* Version
 	*/
 	public String Version() {
-		return "0.9.6";
+		return "0.9.7";
 	}
 	
 	/**
@@ -55,34 +79,15 @@ public class mod_AutoForest extends BaseMod {
 	* Sets up the mod options for this mod
 	*/
 	private void setupModOptions() {
-		ModOptions ops = new ModOptions(MENU_NAME);
+		options.addSubOptions(saps);
+		options.addSubOptions(plants);
+		options.addSubOptions(climate);
+		options.addSubOptions(tree);
 		
-		// Options for saplings only
-		ModOptions saps = new ModOptions(SAPLING_MENU_NAME);
-		
-		// Options for plants (shrooms and flowers) only
-		ModOptions plants = new ModOptions(PLANT_MENU_NAME);
-		
-		// Sub options for plants
-		ModOptions flowers = new ModOptions(FLOWER_MENU_NAME);
-		ModOptions cacti = new ModOptions(CACTI_MENU_NAME);
-		ModOptions reed = new ModOptions(REED_MENU_NAME);
-		ModOptions pumpkins = new ModOptions(PUMPKIN_MENU_NAME);
-		ModOptions shrooms = new ModOptions(SHROOMS_MENU_NAME);
-		
-		// Options for trees
-		ModOptions tree = new ModOptions(TREE_MENU_NAME);
-		
-		// Options for climate/ biomes
-		climate = new ModOptions(CLIMATE_MENU_NAME);
-				
-		ops.addSubOptions(saps);
-		ops.addSubOptions(plants);
-		ops.addSubOptions(climate);
-		ops.addSubOptions(tree);
+		// Forest related
+		options.addToggle("ForestGrowth");
 		
 		// Sapling related
-		String[] labels = {"AVERAGE", "FAST", "SUPERFAST", "INSANE", "SUPERSLOW", "SLOW"};
 		saps.addToggle("AutoSapling");
 		saps.addToggle("SaplingDeath");
 		saps.addMultiOption("GrowthRate", labels);
@@ -96,43 +101,22 @@ public class mod_AutoForest extends BaseMod {
 		tree.addMappedMultiOption("DeathRate", dKeys, labels);
 		tree.addToggle("TreeDeath");
 		
-		// Tree drops
+		// Tree droptions
 		Integer[] aKeys = {3000, 1200, 250, 5, 30000, 10000};
 		tree.addMappedMultiOption("CocoaGrowthRate", aKeys, labels);
 		tree.addToggle("CocoaGrows");
 		tree.addMappedMultiOption("AppleGrowthRate", aKeys, labels);
 		tree.addToggle("ApplesGrow");
 		
-		// Plant related
-		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
-		plants.addSubOptions(flowers);
-		plants.addSubOptions(cacti);
-		plants.addSubOptions(reed);
-		plants.addSubOptions(pumpkins);
-		plants.addSubOptions(shrooms);
-		
-		// Plant submenus
-		flowers.addMappedMultiOption("FlowerGrowthRate", pKeys, labels);
-		flowers.addToggle("FlowersGrow");
-		cacti.addMappedMultiOption("CactiiGrowthRate", pKeys, labels);
-		cacti.addToggle("CactiiGrow");
-		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
-		reed.addToggle("ReedsGrow");
-		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
-		pumpkins.addToggle("PumpkinsGrow");
-		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
-		shrooms.addToggle("ShroomsGrow");
+		addFlowers();
 		
 		// Climate related
 		climate.addToggle("BiomeModifiedGrowth");
 		addDarkerNights(climate);
 		
-		// Forest related
-		ops.addToggle("ForestGrowth");
-		
 		// Handle display
 		tree.setWideOption("TreeGrowthRate");
-		ops.setWideOption("ForestGrowth");
+		options.setWideOption("ForestGrowth");
 		climate.setWideOption("BiomeModifiedGrowth");
 		
 		// Set the custom items
@@ -149,18 +133,44 @@ public class mod_AutoForest extends BaseMod {
 		ModLoader.AddLocalization("pinesapling.name", "PineSapling");
 		ModLoader.AddLocalization("sapling.name", "Sapling");
 		
-		ops.loadValues();
-		ModOptionsAPI.addMod(ops);
+		options.loadValues();
+		ModOptionsAPI.addMod(options);
+	}
 		
-		// Set up instancevar
-		options = ops;
+	private void addFlowers() {
+		// Plant related
+		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
+		plants.addSubOptions(flowers);
+		plants.addSubOptions(cactii);
+		plants.addSubOptions(reed);
+		plants.addSubOptions(pumpkins);
+		plants.addSubOptions(shrooms);
+		
+		// Plant submenus
+		flowers.addMappedMultiOption("FlowerDeathRate", pKeys, labels);
+		flowers.addOption(flowerDeath);
+		flowers.addMappedMultiOption("FlowerGrowthRate", pKeys, labels);
+		flowers.addToggle("FlowersGrow");
+		
+		cactii.addMappedMultiOption("CactiiGrowthRate", pKeys, labels);
+		cactii.addToggle("CactiiGrow");
+		
+		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
+		reed.addToggle("ReedsGrow");
+		
+		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
+		pumpkins.addToggle("PumpkinsGrow");
+		
+		shrooms.addMappedMultiOption("ShroomDeathRate", pKeys, labels);
+		shrooms.addOption(shroomDeath);
+		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
+		shrooms.addToggle("ShroomsGrow");
 	}
 	
 	/**
 	* Adds the darker nights mod
 	*/
 	private void addDarkerNights(ModOptions parent) {
-		darkerNights = new ModOptions(NIGHT_MENU_NAME);
 		String[] options = {"Bright","Light","Mild","Dim","Dark"};
 		Integer[] values = {11,12,13,14,15};
 		darkerNights.addMappedMultiOption("Moonlight", values, options);
@@ -208,6 +218,10 @@ public class mod_AutoForest extends BaseMod {
 	* Sets up the biome modifiers
 	*/
 	private void createBiomeModifiers() {
+		
+		//=====
+		// NATURE OVERHAUL SPECIFIC BIOME MODIFIERS
+		//=====
 							  // 0   1   2   3   4   5   6    7    8   9  10   11
 		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95, -95,-100 };
 		byte[] saplingDeath = {  0, 10,  0,  0, 90, 90, 10,  95,  95, 95,  95, 100 };
@@ -219,6 +233,7 @@ public class mod_AutoForest extends BaseMod {
 		byte[] reedSpawn	= { 25, 50, 15, 10,-75,  0,-90,-100,-100,-10,-100,-100 };
 		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
 		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0, -95,-100,-90,  95,-100 };
+		byte[] shroomDeath  = {-15,-25,-10,-10, 75, 50,  0,  95, 100, 90, -95, 100 };
 		
 		biomeModifier.put("SaplingSpawn", saplingSpawn);
 		biomeModifier.put("SaplingDeath", saplingDeath);
@@ -230,6 +245,14 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("ReedSpawn", reedSpawn);
 		biomeModifier.put("PumpkinSpawn", pumpkinSpawn);
 		biomeModifier.put("ShroomSpawn", shroomSpawn);
+		biomeModifier.put("ShroomDeath", shroomDeath);
+		
+		//=====
+		// STANDARD BIOME MODIFIERS - Don't edit
+		//=====
+		byte[] standardDeath = { -25, -5, -15, -10, 10, 5, 5, 100, 100, 50, 100, 100};
+		
+		biomeModifier.put("StandardDeath", standardDeath);
 	}
 	
 	/**

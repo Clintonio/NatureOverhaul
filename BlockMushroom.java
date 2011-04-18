@@ -35,6 +35,7 @@ public class BlockMushroom extends BlockFlower
 	// BEGIN AUTOFOREST
 	//========
     protected String growthModifierType = "ShroomSpawn";
+	protected String deathModifierName  = "ShroomDeath";
 	
 	public void updateTick(World world, int i, int j, int k, Random random)
 	{
@@ -49,6 +50,17 @@ public class BlockMushroom extends BlockFlower
 				double growthRate = 1D /(((ModMappedMultiOption) shrooms
 						.getOption("ShroomGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
+			}
+			
+			// ATTEMPT DEATH
+			boolean death = mod_AutoForest.shroomDeath.getValue();
+			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) shrooms
+						.getOption("ShroomDeathRate")).getValue()));
+			if(death && hasDied(world, i, j, k, deathProb)) {
+				System.out.println("SHROOM DIED");
+				death(world, i, j, k);
+			} else {
+				System.out.println(deathProb);
 			}
 		}
         func_268_h(world, i, j, k);
