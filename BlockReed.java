@@ -6,7 +6,7 @@ package net.minecraft.src;
 import java.util.Random;
 import net.minecraft.src.modoptionsapi.*;
 
-public class BlockReed extends BlockGrowable
+public class BlockReed extends BlockMortal
 {
 
     protected BlockReed(int i, int j)
@@ -43,19 +43,50 @@ public class BlockReed extends BlockGrowable
 		// BEGIN AUTOFOREST
 		//========
         if(!world.multiplayerWorld) {
-        	ModOptions reed = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.REED_MENU_NAME);
+        	ModOptions reed = mod_AutoForest.reed;
 			boolean grow = ((ModBooleanOption) reed.getOption("ReedsGrow")).getValue();
 			if(grow) {
 				double growthRate = 1D /(((ModMappedMultiOption) reed
 						.getOption("ReedGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
+			
+			// ATTEMPT DEATH
+			boolean death = mod_AutoForest.reedDeath.getValue();
+			// 4.5D instead of 1.5D due to reeds being 3 high
+			double deathProb = 1D / (4.5D * (((ModMappedMultiOption) reed
+						.getOption("ReedDeathRate")).getValue()));
+			if(death && hasDied(world, i, j, k, deathProb)) {
+				death(world, i, j, k);
+			}
 		}
     }
-
+	
     protected String growthModifierType = "ReedSpawn";
+	protected String deathModifierName  = "ReedDeath";
+	
+	/**
+	* Death action; remove all reeds above and below
+	*
+	* @param	world
+	* @param	i
+	* @param	j
+	* @param	k
+	*/
+	public void death(World world, int i, int j, int k) {
+		int y = j;
+		// Put y to the top so to avoid any reeds being dropped
+		// since this is deat
+		while(world.getBlockId(i, y + 1, k) == blockID) {
+			y = y + 1;
+		}
+		// Now scan back down and delete
+		while(world.getBlockId(i, y, k) == blockID) {
+			world.setBlockWithNotify(i, y, k, 0);
+			y--;
+		}
+	}
+
 	//========
 	// END AUTOFOREST
 	//========

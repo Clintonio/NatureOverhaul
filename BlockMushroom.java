@@ -57,10 +57,7 @@ public class BlockMushroom extends BlockFlower
 			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) shrooms
 						.getOption("ShroomDeathRate")).getValue()));
 			if(death && hasDied(world, i, j, k, deathProb)) {
-				System.out.println("SHROOM DIED");
 				death(world, i, j, k);
-			} else {
-				System.out.println(deathProb);
 			}
 		}
         func_268_h(world, i, j, k);

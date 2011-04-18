@@ -59,10 +59,7 @@ public class BlockFlower extends BlockMortal
 			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) flowers
 						.getOption("FlowerDeathRate")).getValue()));
 			if(death && hasDied(world, i, j, k, deathProb)) {
-				System.out.println("FLOWER DIED");
 				death(world, i, j, k);
-			} else {
-				System.out.println(deathProb);
 			}
 		}
 		

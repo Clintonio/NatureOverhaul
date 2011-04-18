@@ -13,7 +13,7 @@ import net.minecraft.src.modoptionsapi.*;
 // END AUTOFOREST
 //========
 
-public class BlockCactus extends BlockGrowable
+public class BlockCactus extends BlockMortal
 {
 
     protected BlockCactus(int i, int j)
@@ -48,19 +48,49 @@ public class BlockCactus extends BlockGrowable
 		//========
 		if(!world.multiplayerWorld)
 		{
-			ModOptions cacti = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-					.getSubOption(mod_AutoForest.CACTI_MENU_NAME);
-			boolean grow = ((ModBooleanOption) cacti.getOption("CactiiGrow")).getValue();
+			ModOptions cactii = mod_AutoForest.cactii;
+			boolean grow = ((ModBooleanOption) cactii.getOption("CactiiGrow")).getValue();
 			if(grow)
 			{
-				double growthRate = 1D /(((ModMappedMultiOption) cacti
+				double growthRate = 1D /(((ModMappedMultiOption) cactii
 						.getOption("CactiiGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
 			}
+			
+			// ATTEMPT DEATH
+			boolean death = mod_AutoForest.cactiiDeath.getValue();
+			// 4.5D instead of 1.5D due to reeds being 3 high
+			double deathProb = 1D / (4.5D * (((ModMappedMultiOption) cactii
+						.getOption("CactiiDeathRate")).getValue()));
+			if(death && hasDied(world, i, j, k, deathProb)) {
+				death(world, i, j, k);
+			}
 		}
     }
-    protected String growthModifierType = "CactiSpawn";
+    protected String growthModifierType = "CactiiSpawn";
+	protected String deathModifierName  = "CactiiDeath";
+	
+	/**
+	* Death action; remove all reeds above and below
+	*
+	* @param	world
+	* @param	i
+	* @param	j
+	* @param	k
+	*/
+	public void death(World world, int i, int j, int k) {
+		int y = j;
+		// Put y to the top so to avoid any reeds being dropped
+		// since this is deat
+		while(world.getBlockId(i, y + 1, k) == blockID) {
+			y = y + 1;
+		}
+		// Now scan back down and delete
+		while(world.getBlockId(i, y, k) == blockID) {
+			world.setBlockWithNotify(i, y, k, 0);
+			y--;
+		}
+	}
 	//========
 	// END AUTOFOREST
 	//========

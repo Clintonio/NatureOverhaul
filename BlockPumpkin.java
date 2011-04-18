@@ -12,7 +12,7 @@ import net.minecraft.src.modoptionsapi.*;
 // END AUTOFOREST
 //========
 
-public class BlockPumpkin extends BlockGrowable
+public class BlockPumpkin extends BlockMortal
 {
 
     protected BlockPumpkin(int i, int j, boolean flag)
@@ -30,14 +30,20 @@ public class BlockPumpkin extends BlockGrowable
 	
     public void updateTick(World world, int i, int j, int k, Random random) {
     	if(!world.multiplayerWorld){
-    		ModOptions pumpkins = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME);
+    		ModOptions pumpkins = mod_AutoForest.pumpkins;
 			boolean grow = ((ModBooleanOption) pumpkins.getOption("PumpkinsGrow")).getValue();
 			if(grow){
 				double growthRate = 1D /(((ModMappedMultiOption) pumpkins
 						.getOption("PumpkinGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);
+			}
+			
+			// ATTEMPT DEATH
+			boolean death = mod_AutoForest.pumpkinDeath.getValue();
+			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) pumpkins
+						.getOption("PumpkinDeathRate")).getValue()));
+			if(death && hasDied(world, i, j, k, deathProb)) {
+				death(world, i, j, k);
 			}
 		}
 	}

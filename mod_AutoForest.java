@@ -45,8 +45,12 @@ public class mod_AutoForest extends BaseMod {
 	public static ModOptions 		reed 		= new ModOptions(REED_MENU_NAME);
 	public static ModOptions 		pumpkins 	= new ModOptions(PUMPKIN_MENU_NAME);
 	public static ModOptions 		shrooms 	= new ModOptions(SHROOMS_MENU_NAME);
+	
 	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die");
 	public static ModBooleanOption shroomDeath 	= new ModBooleanOption("Shrooms Die");
+	public static ModBooleanOption pumpkinDeath = new ModBooleanOption("Pumkins Die");
+	public static ModBooleanOption reedDeath 	= new ModBooleanOption("Reeds Die");
+	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
 	
 	// Objects
 	public static ModOptions darkerNights 	= new ModOptions(NIGHT_MENU_NAME);
@@ -152,12 +156,18 @@ public class mod_AutoForest extends BaseMod {
 		flowers.addMappedMultiOption("FlowerGrowthRate", pKeys, labels);
 		flowers.addToggle("FlowersGrow");
 		
+		cactii.addMappedMultiOption("CactiiDeathRate", pKeys, labels);
+		cactii.addOption(cactiiDeath);
 		cactii.addMappedMultiOption("CactiiGrowthRate", pKeys, labels);
 		cactii.addToggle("CactiiGrow");
 		
+		reed.addMappedMultiOption("ReedDeathRate", pKeys, labels);
+		reed.addOption(reedDeath);
 		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
 		reed.addToggle("ReedsGrow");
 		
+		pumpkins.addMappedMultiOption("PumpkinDeathRate", pKeys, labels);
+		pumpkins.addOption(pumpkinDeath);
 		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
 		pumpkins.addToggle("PumpkinsGrow");
 		
@@ -230,7 +240,9 @@ public class mod_AutoForest extends BaseMod {
 		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9,  10,   0 };
 		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
 		byte[] cactiSpawn	= {  0,-25,  0,  0, 50, 75,-75,  20,-100,-90,   0,-100 };
-		byte[] reedSpawn	= { 25, 50, 15, 10,-75,  0,-90,-100,-100,-10,-100,-100 };
+		byte[] cactiiDeath	= {  0, 25,  0,  0,-50,-75, 75, -20, 100, 90,   0, 100 };
+		byte[] reedSpawn	= { 25, 50, 15, 10,-75,  0,-90, -90,-100,-10,-100,-100 };
+		byte[] reedDeath	= {-90,-50,-30,-20, 10,  0,  5,  10, 100,  0, 100, 100 };
 		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
 		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0, -95,-100,-90,  95,-100 };
 		byte[] shroomDeath  = {-15,-25,-10,-10, 75, 50,  0,  95, 100, 90, -95, 100 };
@@ -241,8 +253,10 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("BigTree", bigTree);
 		biomeModifier.put("TreeGap", treeGap);
 		biomeModifier.put("FlowerSpawn", flowerSpawn);
-		biomeModifier.put("CactiSpawn", cactiSpawn);
+		biomeModifier.put("CactiiSpawn", cactiSpawn);
+		biomeModifier.put("DeathSpawn", cactiiDeath);
 		biomeModifier.put("ReedSpawn", reedSpawn);
+		biomeModifier.put("ReedDeath", reedDeath);
 		biomeModifier.put("PumpkinSpawn", pumpkinSpawn);
 		biomeModifier.put("ShroomSpawn", shroomSpawn);
 		biomeModifier.put("ShroomDeath", shroomDeath);
