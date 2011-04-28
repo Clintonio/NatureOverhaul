@@ -66,19 +66,19 @@ public class BlockPumpkin extends BlockMortal
         {
             k++;
         }
-        if(j == 0 && i == 2)
+        if(j == 2 && i == 2)
         {
             return k;
         }
-        if(j == 1 && i == 5)
+        if(j == 3 && i == 5)
         {
             return k;
         }
-        if(j == 2 && i == 3)
+        if(j == 0 && i == 3)
         {
             return k;
         }
-        if(j == 3 && i == 4)
+        if(j == 1 && i == 4)
         {
             return k;
         } else
@@ -114,12 +114,12 @@ public class BlockPumpkin extends BlockMortal
     public boolean canPlaceBlockAt(World world, int i, int j, int k)
     {
         int l = world.getBlockId(i, j, k);
-        return (l == 0 || Block.blocksList[l].blockMaterial.getIsLiquid()) && world.isBlockOpaqueCube(i, j - 1, k);
+        return (l == 0 || Block.blocksList[l].blockMaterial.func_27283_g()) && world.isBlockOpaqueCube(i, j - 1, k);
     }
 
     public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
     {
-        int l = MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 0.5D) & 3;
+        int l = MathHelper.floor_double((double)((entityliving.rotationYaw * 4F) / 360F) + 2.5D) & 3;
         world.setBlockMetadataWithNotify(i, j, k, l);
     }
 

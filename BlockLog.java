@@ -379,7 +379,6 @@ public class BlockLog extends Block
     public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
     {
         super.harvestBlock(world, entityplayer, i, j, k, l);
-        entityplayer.func_25058_a(AchievementList.field_25198_c, 1);
 		//=======================
 		// START NATURE OVERHAUL
 		//=======================
@@ -424,9 +423,9 @@ public class BlockLog extends Block
                             continue;
                         }
                         int i2 = world.getBlockMetadata(i + i1, j + j1, k + k1);
-                        if((i2 & 4) == 0)
+                        if((i2 & 8) == 0)
                         {
-                            world.setBlockMetadata(i + i1, j + j1, k + k1, i2 | 4);
+                            world.setBlockMetadata(i + i1, j + j1, k + k1, i2 | 8);
                         }
                     }
 

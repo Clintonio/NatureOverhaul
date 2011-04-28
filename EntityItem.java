@@ -13,7 +13,6 @@ public class EntityItem extends Entity
             ItemStack itemstack)
     {
         super(world);
-		
         age = 0;
         health = 5;
         field_804_d = (float)(Math.random() * 3.1415926535897931D * 2D);
@@ -63,7 +62,6 @@ public class EntityItem extends Entity
         {
             delayBeforeCanPickup--;
         }
-		
         prevPosX = posX;
         prevPosY = posY;
         prevPosZ = posZ;
@@ -415,6 +413,14 @@ public class EntityItem extends Entity
         int i = item.stackSize;
         if(delayBeforeCanPickup == 0 && entityplayer.inventory.addItemStackToInventory(item))
         {
+            if(item.itemID == Block.wood.blockID)
+            {
+                entityplayer.func_27026_a(AchievementList.field_25198_c);
+            }
+            if(item.itemID == Item.leather.shiftedIndex)
+            {
+                entityplayer.func_27026_a(AchievementList.field_27376_t);
+            }
             worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
             entityplayer.onItemPickup(this, i);
             setEntityDead();

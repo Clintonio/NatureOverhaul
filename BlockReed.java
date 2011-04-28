@@ -57,7 +57,10 @@ public class BlockReed extends BlockMortal
 			double deathProb = 1D / (4.5D * (((ModMappedMultiOption) reed
 						.getOption("ReedDeathRate")).getValue()));
 			if(death && hasDied(world, i, j, k, deathProb)) {
+				System.out.println("Reed died");
 				death(world, i, j, k);
+			} else {
+				System.out.println("Reed didn't die, prob: " + deathProb);
 			}
 		}
     }

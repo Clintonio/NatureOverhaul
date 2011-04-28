@@ -14,10 +14,10 @@ public class ItemDye extends Item
         setMaxDamage(0);
     }
 
-    public int getIconIndex(ItemStack itemstack)
+    public int func_27009_a(int i)
     {
-        int i = itemstack.getItemDamage();
-        return iconIndex + (i % 8) * 16 + i / 8;
+        int j = i;
+        return iconIndex + (j % 8) * 16 + j / 8;
     }
 
     public String getItemNameIS(ItemStack itemstack)
@@ -30,7 +30,8 @@ public class ItemDye extends Item
         if(itemstack.getItemDamage() == 15)
         {
             int i1 = world.getBlockId(i, j, k);
-            if(i1 == Block.sapling.blockID) {
+            if(i1 == Block.sapling.blockID)
+            {
                 ((BlockSapling)Block.sapling).growTree(world, i, j, k, world.rand);
                 itemstack.stackSize--;
                 return true;
@@ -41,36 +42,10 @@ public class ItemDye extends Item
                 itemstack.stackSize--;
                 return true;
             }
-			//====================
-			// START NATURE OVERHAUL
-			//====================
-			if(applyBonemeal(world, i, j, k, i1)) {
-				itemstack.stackSize--;
-				return true;
-			}
-			//====================
-			// END NATURE OVERHAUL
-			//====================
         }
         return false;
     }
-	
-	/**
-	* Apply bonemeal to the item clicked
-	* 
-	* @param	id 	Item ID
-	* @return	true if item is applied
-	*/
-	private boolean applyBonemeal(World world, int i, int j, int k, int id) {
-		// Items affected; cactii, reeds, leaves, flowers and shrooms
-		if(Block.blocksList[id] instanceof Growable) {
-			((Growable) Block.blocksList[id]).grow(world, i, j, k);
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+
     public void saddleEntity(ItemStack itemstack, EntityLiving entityliving)
     {
         if(entityliving instanceof EntitySheep)

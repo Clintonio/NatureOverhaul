@@ -38,11 +38,27 @@ public class BlockSapling extends BlockFlower
 			// Add 4 each time to avoid breaking the sapling
 			// specific growth
             if((l < 13) && (bound > 0)) {
-                world.setBlockMetadataWithNotify(i, j, k, l + 3);
+                world.setBlockMetadataWithNotify(i, j, k, l | 8);
             } else {
                 growTree(world, i, j, k, random, false);
             }
-		}
+        }
+    }
+
+    public int getBlockTextureFromSideAndMetadata(int i, int j)
+    {
+        j &= 3;
+        if(j == 1)
+        {
+            return 63;
+        }
+        if(j == 2)
+        {
+            return 79;
+        } else
+        {
+            return super.getBlockTextureFromSideAndMetadata(i, j);
+        }
     }
 	
 	/**
@@ -68,7 +84,7 @@ public class BlockSapling extends BlockFlower
 							"BigTree");
 		
 		// Choose a generator
-		Object obj = new WorldGenTrees();
+		Object obj = null;
 		
 		//%3 as the meta data is on a %3 basis, where the 0th, 1st and 2nd index 
 		// are for type, the rest is for timing tree growth
@@ -83,6 +99,8 @@ public class BlockSapling extends BlockFlower
 			obj = new WorldGenForest();
 		} else if(random.nextInt(100) < bigTreeRate) {
 			obj = new WorldGenBigTree();
+		} else {
+			obj = new WorldGenTrees();
 		}
 		
         world.setBlockWithNotify(i, j, k, 0); 
@@ -99,6 +117,12 @@ public class BlockSapling extends BlockFlower
 			world.setBlock(i, j, k, blockID);
         }
     }
+
+    protected int damageDropped(int i)
+    {
+        return i & 3;
+    }
+
 	
 	/**
 	* Check if a sapling is starved by it's neighbours

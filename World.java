@@ -33,10 +33,13 @@ public class World
         scheduledTickSet = new HashSet();
         loadedTileEntityList = new ArrayList();
         playerEntities = new ArrayList();
+        field_27173_e = new ArrayList();
         field_1019_F = 0xffffffL;
         skylightSubtracted = 0;
         field_9437_g = (new Random()).nextInt();
         field_9436_h = 0x3c6ef35f;
+        field_27168_F = 0;
+        field_27172_i = 0;
         editingBlocks = false;
         lockTimestamp = System.currentTimeMillis();
         autosavePeriod = 40;
@@ -57,6 +60,7 @@ public class World
         worldprovider.registerWorld(this);
         chunkProvider = getChunkProvider();
         calculateInitialSkylight();
+        func_27163_E();
     }
 
     public World(World world, WorldProvider worldprovider)
@@ -69,10 +73,13 @@ public class World
         scheduledTickSet = new HashSet();
         loadedTileEntityList = new ArrayList();
         playerEntities = new ArrayList();
+        field_27173_e = new ArrayList();
         field_1019_F = 0xffffffL;
         skylightSubtracted = 0;
         field_9437_g = (new Random()).nextInt();
         field_9436_h = 0x3c6ef35f;
+        field_27168_F = 0;
+        field_27172_i = 0;
         editingBlocks = false;
         lockTimestamp = System.currentTimeMillis();
         autosavePeriod = 40;
@@ -94,6 +101,7 @@ public class World
         worldprovider.registerWorld(this);
         chunkProvider = getChunkProvider();
         calculateInitialSkylight();
+        func_27163_E();
     }
 
     public World(ISaveHandler isavehandler, String s, long l)
@@ -111,10 +119,13 @@ public class World
         scheduledTickSet = new HashSet();
         loadedTileEntityList = new ArrayList();
         playerEntities = new ArrayList();
+        field_27173_e = new ArrayList();
         field_1019_F = 0xffffffL;
         skylightSubtracted = 0;
         field_9437_g = (new Random()).nextInt();
         field_9436_h = 0x3c6ef35f;
+        field_27168_F = 0;
+        field_27172_i = 0;
         editingBlocks = false;
         lockTimestamp = System.currentTimeMillis();
         autosavePeriod = 40;
@@ -159,6 +170,7 @@ public class World
             func_25098_c();
         }
         calculateInitialSkylight();
+        func_27163_E();
     }
 
     protected IChunkProvider getChunkProvider()
@@ -932,6 +944,12 @@ public class World
 
     }
 
+    public boolean func_27159_a(Entity entity)
+    {
+        field_27173_e.add(entity);
+        return true;
+    }
+
     public boolean entityJoinedWorld(Entity entity)
     {
         int i = MathHelper.floor_double(entity.posX / 16D);
@@ -1060,6 +1078,15 @@ public class World
 	private static boolean  isDay = false;
 	private static boolean	isNight = false;
 	private static int		extraDark = 3;
+    
+    public String getBiomeName(int i, int j)
+    {
+        getWorldChunkManager().func_4069_a(i, j, 1, 1);
+        double temp = getWorldChunkManager().temperature[0];
+        double humi = getWorldChunkManager().humidity[0];
+        BiomeGenBase base = BiomeGenBase.getBiomeFromLookup(temp, humi);
+        return base.biomeName;
+    }
 	//=======================
 	// END NATURE OVERHAUL
 	//=======================
@@ -1131,6 +1158,36 @@ public class World
         f4 *= f2;
         f5 *= f2;
         f6 *= f2;
+        float f7 = func_27162_g(f);
+        if(f7 > 0.0F)
+        {
+            float f8 = (f4 * 0.3F + f5 * 0.59F + f6 * 0.11F) * 0.6F;
+            float f10 = 1.0F - f7 * 0.75F;
+            f4 = f4 * f10 + f8 * (1.0F - f10);
+            f5 = f5 * f10 + f8 * (1.0F - f10);
+            f6 = f6 * f10 + f8 * (1.0F - f10);
+        }
+        float f9 = func_27166_f(f);
+        if(f9 > 0.0F)
+        {
+            float f11 = (f4 * 0.3F + f5 * 0.59F + f6 * 0.11F) * 0.2F;
+            float f13 = 1.0F - f9 * 0.75F;
+            f4 = f4 * f13 + f11 * (1.0F - f13);
+            f5 = f5 * f13 + f11 * (1.0F - f13);
+            f6 = f6 * f13 + f11 * (1.0F - f13);
+        }
+        if(field_27172_i > 0)
+        {
+            float f12 = (float)field_27172_i - f;
+            if(f12 > 1.0F)
+            {
+                f12 = 1.0F;
+            }
+            f12 *= 0.45F;
+            f4 = f4 * (1.0F - f12) + 0.8F * f12;
+            f5 = f5 * (1.0F - f12) + 0.8F * f12;
+            f6 = f6 * (1.0F - f12) + 1.0F * f12;
+        }
         return Vec3D.createVector(f4, f5, f6);
     }
 
@@ -1154,9 +1211,27 @@ public class World
         float f3 = (float)(field_1019_F >> 16 & 255L) / 255F;
         float f4 = (float)(field_1019_F >> 8 & 255L) / 255F;
         float f5 = (float)(field_1019_F & 255L) / 255F;
+        float f6 = func_27162_g(f);
+        if(f6 > 0.0F)
+        {
+            float f7 = (f3 * 0.3F + f4 * 0.59F + f5 * 0.11F) * 0.6F;
+            float f9 = 1.0F - f6 * 0.95F;
+            f3 = f3 * f9 + f7 * (1.0F - f9);
+            f4 = f4 * f9 + f7 * (1.0F - f9);
+            f5 = f5 * f9 + f7 * (1.0F - f9);
+        }
         f3 *= f2 * 0.9F + 0.1F;
         f4 *= f2 * 0.9F + 0.1F;
         f5 *= f2 * 0.85F + 0.15F;
+        float f8 = func_27166_f(f);
+        if(f8 > 0.0F)
+        {
+            float f10 = (f3 * 0.3F + f4 * 0.59F + f5 * 0.11F) * 0.2F;
+            float f11 = 1.0F - f8 * 0.95F;
+            f3 = f3 * f11 + f10 * (1.0F - f11);
+            f4 = f4 * f11 + f10 * (1.0F - f11);
+            f5 = f5 * f11 + f10 * (1.0F - f11);
+        }
         return Vec3D.createVector(f3, f4, f5);
     }
 
@@ -1169,14 +1244,13 @@ public class World
     public int findTopSolidBlock(int i, int j)
     {
         Chunk chunk = getChunkFromBlockCoords(i, j);
-        int k;
-        for(k = 127; getBlockMaterial(i, k, j).getIsSolid() && k > 0; k--) { }
+        int k = 127;
         i &= 0xf;
         j &= 0xf;
         while(k > 0) 
         {
             int l = chunk.getBlockID(i, k, j);
-            if(l == 0 || !Block.blocksList[l].blockMaterial.getIsSolid() && !Block.blocksList[l].blockMaterial.getIsLiquid())
+            if(l == 0 || !Block.blocksList[l].blockMaterial.getIsSolid())
             {
                 k--;
             } else
@@ -1185,11 +1259,6 @@ public class World
             }
         }
         return -1;
-    }
-
-    public int func_696_e(int i, int j)
-    {
-        return getChunkFromBlockCoords(i, j).getHeightValue(i & 0xf, j & 0xf);
     }
 
     public float getStarBrightness(float f)
@@ -1239,57 +1308,67 @@ public class World
 
     public void func_633_c()
     {
-        loadedEntityList.removeAll(unloadedEntityList);
-        for(int i = 0; i < unloadedEntityList.size(); i++)
+        for(int i = 0; i < field_27173_e.size(); i++)
         {
-            Entity entity = (Entity)unloadedEntityList.get(i);
-            int i1 = entity.chunkCoordX;
-            int k1 = entity.chunkCoordZ;
-            if(entity.addedToChunk && chunkExists(i1, k1))
+            Entity entity = (Entity)field_27173_e.get(i);
+            entity.onUpdate();
+            if(entity.isDead)
             {
-                getChunkFromChunkCoords(i1, k1).func_1015_b(entity);
+                field_27173_e.remove(i--);
             }
         }
 
+        loadedEntityList.removeAll(unloadedEntityList);
         for(int j = 0; j < unloadedEntityList.size(); j++)
         {
-            releaseEntitySkin((Entity)unloadedEntityList.get(j));
-        }
-
-        unloadedEntityList.clear();
-        for(int k = 0; k < loadedEntityList.size(); k++)
-        {
-            Entity entity1 = (Entity)loadedEntityList.get(k);
-            if(entity1.ridingEntity != null)
-            {
-                if(!entity1.ridingEntity.isDead && entity1.ridingEntity.riddenByEntity == entity1)
-                {
-                    continue;
-                }
-                entity1.ridingEntity.riddenByEntity = null;
-                entity1.ridingEntity = null;
-            }
-            if(!entity1.isDead)
-            {
-                updateEntity(entity1);
-            }
-            if(!entity1.isDead)
-            {
-                continue;
-            }
+            Entity entity1 = (Entity)unloadedEntityList.get(j);
             int j1 = entity1.chunkCoordX;
             int l1 = entity1.chunkCoordZ;
             if(entity1.addedToChunk && chunkExists(j1, l1))
             {
                 getChunkFromChunkCoords(j1, l1).func_1015_b(entity1);
             }
-            loadedEntityList.remove(k--);
-            releaseEntitySkin(entity1);
         }
 
-        for(int l = 0; l < loadedTileEntityList.size(); l++)
+        for(int k = 0; k < unloadedEntityList.size(); k++)
         {
-            TileEntity tileentity = (TileEntity)loadedTileEntityList.get(l);
+            releaseEntitySkin((Entity)unloadedEntityList.get(k));
+        }
+
+        unloadedEntityList.clear();
+        for(int l = 0; l < loadedEntityList.size(); l++)
+        {
+            Entity entity2 = (Entity)loadedEntityList.get(l);
+            if(entity2.ridingEntity != null)
+            {
+                if(!entity2.ridingEntity.isDead && entity2.ridingEntity.riddenByEntity == entity2)
+                {
+                    continue;
+                }
+                entity2.ridingEntity.riddenByEntity = null;
+                entity2.ridingEntity = null;
+            }
+            if(!entity2.isDead)
+            {
+                updateEntity(entity2);
+            }
+            if(!entity2.isDead)
+            {
+                continue;
+            }
+            int k1 = entity2.chunkCoordX;
+            int i2 = entity2.chunkCoordZ;
+            if(entity2.addedToChunk && chunkExists(k1, i2))
+            {
+                getChunkFromChunkCoords(k1, i2).func_1015_b(entity2);
+            }
+            loadedEntityList.remove(l--);
+            releaseEntitySkin(entity2);
+        }
+
+        for(int i1 = 0; i1 < loadedTileEntityList.size(); i1++)
+        {
+            TileEntity tileentity = (TileEntity)loadedTileEntityList.get(i1);
             tileentity.updateEntity();
         }
 
@@ -1486,7 +1565,7 @@ public class World
                     {
                         continue;
                     }
-                    double d1 = (float)(l1 + 1) - BlockFluids.setFluidHeight(getBlockMetadata(k1, l1, i2));
+                    double d1 = (float)(l1 + 1) - BlockFluid.getPercentAir(getBlockMetadata(k1, l1, i2));
                     if((double)l >= d1)
                     {
                         flag = true;
@@ -1501,7 +1580,7 @@ public class World
         if(vec3d.lengthVector() > 0.0D)
         {
             vec3d = vec3d.normalize();
-            double d = 0.0040000000000000001D;
+            double d = 0.014D;
             entity.motionX += vec3d.xCoord * d;
             entity.motionY += vec3d.yCoord * d;
             entity.motionZ += vec3d.zCoord * d;
@@ -1587,7 +1666,7 @@ public class World
         Explosion explosion = new Explosion(this, entity, d, d1, d2, f);
         explosion.field_12257_a = flag;
         explosion.doExplosionA();
-        explosion.doExplosionB();
+        explosion.doExplosionB(true);
         return explosion;
     }
 
@@ -1819,6 +1898,7 @@ public class World
 
     public void tick()
     {
+        func_27165_m();
         if(isAllPlayersFullyAsleep())
         {
             boolean flag = false;
@@ -1853,125 +1933,109 @@ public class World
         worldInfo.setWorldTime(l1);
         TickUpdates(false);
         updateBlocksAndPlayCaveSounds();
-        
-		//=======================
-		// START NATURE OVERHAUL
-		//=======================
-        DoSnowBlockPlacement();
     }
-    
-    private void DoSnowBlockPlacement()
+
+    private void func_27163_E()
     {
-    	if(multiplayerWorld)
+        if(worldInfo.func_27397_o())
         {
-            return;
-        }
-        
-        int i = 0;
-        for(int j = 0; j < playerEntities.size(); j++)
-        {
-            EntityPlayer entityplayer = (EntityPlayer)playerEntities.get(j);
-            int k = MathHelper.floor_double(entityplayer.posX / 16D);
-            int l = MathHelper.floor_double(entityplayer.posZ / 16D);
-            byte byte0 = 9;
-            for(int i1 = -byte0; i1 <= byte0; i1++)
+            field_27171_C = 1.0F;
+            if(worldInfo.func_27396_m())
             {
-                for(int j1 = -byte0; j1 <= byte0; j1++)
-                {
-                	//Probability of updates per tick :
-                    if(rand.nextInt(mod_Snow.SnowRate.getIntValue()) != 0 || !chunkExists(i1 + k, j1 + l))
-                    //if(rand.nextInt(8) != 0 || !chunkExists(i1 + k, j1 + l))
-                    {
-                        continue;
-                    }
-                    int k1 = (k + i1) * 16 + rand.nextInt(16);
-                    int l1 = (l + j1) * 16 + rand.nextInt(16);
-                    if(SnowBlockPlacement(k1, l1))
-                    {
-                        i++;
-                    }
-                }
+                field_27169_E = 1.0F;
             }
         }
     }
-    
-    public boolean SnowBlockPlacement(int i, int j)
+
+    protected void func_27165_m()
     {
-    	// Number of Blocks placed per tick :
-    	int UpdatePerTick = mod_Snow.SnowPerTick.getIntValue();
-    	String biomeName = getBiomeName(i, j);
-    	if(worldInfo != null && worldInfo.getDimension() == -1)
+        if(worldProvider.field_6478_e)
         {
-    		return false;
+            return;
         }
-    	if(biomeName.equals("Hell") || (mod_Snow.SnowMode.getValue() == 0))
-    		return false;	
-    	if((mod_Snow.SnowMode.getValue() == 1) && !((biomeName.equals("Taiga")) || (biomeName.equals("Ice Desert")) || (biomeName.equals("Tundra"))))
-            return false;
-        //prevent placement on non solid blocks
-        int k = findTopSolidBlock(i, j);
-        if(k < 0)
+        if(field_27168_F > 0)
         {
-            k = 0;
+            field_27168_F--;
         }
-    	
-        int cb = getBlockId(i, k, j);
-        int bb = getBlockId(i, k - 1, j);
-        int ab = getBlockId(i, k + 1 ,j);
-        
-        if(cb != 0)
+        int i = worldInfo.func_27400_n();
+        if(i <= 0)
         {
-            return false;
-        }
-        
-        // Ice placement algo
-        if (bb == Block.waterStill.blockID && getBlockMetadata(i, k - 1, j) == 0)
+            if(worldInfo.func_27396_m())
+            {
+                worldInfo.func_27399_e(rand.nextInt(12000) + 3600);
+            } else
+            {
+                worldInfo.func_27399_e(rand.nextInt(0x29040) + 12000);
+            }
+        } else
         {
-        	{
-        		//Preventing placement of ice on heated water blocks
-        		if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-    			{
-    				return false;
-    			}
-    			setBlockWithNotify(i, k - 1, j, Block.ice.blockID);
-    			//System.out.println("Placing an ice block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
-    			UpdatePerTick--;
-    			return true;
-    		}
+            i--;
+            worldInfo.func_27399_e(i);
+            if(i <= 0)
+            {
+                worldInfo.func_27398_a(!worldInfo.func_27396_m());
+            }
         }
-        
-        // Snow Layers placement algo
-        if(bb != 0 && Block.blocksList[bb].isOpaqueCube())
+        int j = worldInfo.func_27393_p();
+        if(j <= 0)
         {
-        	//Preventing placement on non-solid blocks 
-        	if(!getBlockMaterial(i, k - 1, j).getIsSolid())
-        	{
-        		return false;
-        	}
-	        if(getSavedLightValue(EnumSkyBlock.Block, i, k, j) > 9)
-	        {
-	        	return false;
-	        }
-	        setBlockWithNotify(i, k, j, Block.snow.blockID);
-			//System.out.println("Placing a snow block in biome " + getBiomeName(i,k) + " at coordinates " + i + "," + k + "," + j);
-	        UpdatePerTick--;
-	        return true;
+            if(worldInfo.func_27397_o())
+            {
+                worldInfo.func_27395_f(rand.nextInt(12000) + 12000);
+            } else
+            {
+                worldInfo.func_27395_f(rand.nextInt(0x29040) + 12000);
+            }
+        } else
+        {
+            j--;
+            worldInfo.func_27395_f(j);
+            if(j <= 0)
+            {
+                worldInfo.func_27394_b(!worldInfo.func_27397_o());
+            }
         }
-        return true;
+        field_26901_B = field_27171_C;
+        if(worldInfo.func_27397_o())
+        {
+            field_27171_C += 0.01D;
+        } else
+        {
+            field_27171_C -= 0.01D;
+        }
+        if(field_27171_C < 0.0F)
+        {
+            field_27171_C = 0.0F;
+        }
+        if(field_27171_C > 1.0F)
+        {
+            field_27171_C = 1.0F;
+        }
+        field_27170_D = field_27169_E;
+        if(worldInfo.func_27396_m())
+        {
+            field_27169_E += 0.01D;
+        } else
+        {
+            field_27169_E -= 0.01D;
+        }
+        if(field_27169_E < 0.0F)
+        {
+            field_27169_E = 0.0F;
+        }
+        if(field_27169_E > 1.0F)
+        {
+            field_27169_E = 1.0F;
+        }
     }
-    
-    public String getBiomeName(int i, int j)
+
+    private void func_27164_F()
     {
-        getWorldChunkManager().func_4069_a(i, j, 1, 1);
-        double temp = getWorldChunkManager().temperature[0];
-        double humi = getWorldChunkManager().humidity[0];
-        MobSpawnerBase mobspawnerbase = MobSpawnerBase.getBiomeFromLookup(temp, humi);
-        return mobspawnerbase.biomeName;
+        worldInfo.func_27395_f(0);
+        worldInfo.func_27394_b(false);
+        worldInfo.func_27399_e(0);
+        worldInfo.func_27398_a(false);
     }
-    
-	//=======================
-	// END NATURE OVERHAUL
-	//=======================
 
     protected void updateBlocksAndPlayCaveSounds()
     {
@@ -1984,9 +2048,9 @@ public class World
             byte byte0 = 9;
             for(int j1 = -byte0; j1 <= byte0; j1++)
             {
-                for(int i2 = -byte0; i2 <= byte0; i2++)
+                for(int k2 = -byte0; k2 <= byte0; k2++)
                 {
-                    field_9427_K.add(new ChunkCoordIntPair(j1 + j, i2 + l));
+                    field_9427_K.add(new ChunkCoordIntPair(j1 + j, k2 + l));
                 }
 
             }
@@ -2007,36 +2071,70 @@ public class World
             {
                 field_9437_g = field_9437_g * 3 + field_9436_h;
                 int k1 = field_9437_g >> 2;
-                int j2 = k1 & 0xf;
-                int l2 = k1 >> 8 & 0xf;
-                int j3 = k1 >> 16 & 0x7f;
-                int l3 = chunk.getBlockID(j2, j3, l2);
-                j2 += k;
-                l2 += i1;
-                if(l3 == 0 && getBlockLightValue(j2, j3, l2) <= rand.nextInt(8) && getSavedLightValue(EnumSkyBlock.Sky, j2, j3, l2) <= 0)
+                int l2 = k1 & 0xf;
+                int l3 = k1 >> 8 & 0xf;
+                int l4 = k1 >> 16 & 0x7f;
+                int l5 = chunk.getBlockID(l2, l4, l3);
+                l2 += k;
+                l3 += i1;
+                if(l5 == 0 && getBlockLightValue(l2, l4, l3) <= rand.nextInt(8) && getSavedLightValue(EnumSkyBlock.Sky, l2, l4, l3) <= 0)
                 {
-                    EntityPlayer entityplayer1 = getClosestPlayer((double)j2 + 0.5D, (double)j3 + 0.5D, (double)l2 + 0.5D, 8D);
-                    if(entityplayer1 != null && entityplayer1.getDistanceSq((double)j2 + 0.5D, (double)j3 + 0.5D, (double)l2 + 0.5D) > 4D)
+                    EntityPlayer entityplayer1 = getClosestPlayer((double)l2 + 0.5D, (double)l4 + 0.5D, (double)l3 + 0.5D, 8D);
+                    if(entityplayer1 != null && entityplayer1.getDistanceSq((double)l2 + 0.5D, (double)l4 + 0.5D, (double)l3 + 0.5D) > 4D)
                     {
-                        playSoundEffect((double)j2 + 0.5D, (double)j3 + 0.5D, (double)l2 + 0.5D, "ambient.cave.cave", 0.7F, 0.8F + rand.nextFloat() * 0.2F);
+                        playSoundEffect((double)l2 + 0.5D, (double)l4 + 0.5D, (double)l3 + 0.5D, "ambient.cave.cave", 0.7F, 0.8F + rand.nextFloat() * 0.2F);
                         field_9426_L = rand.nextInt(12000) + 6000;
                     }
                 }
             }
-            int l1 = 0;
-            while(l1 < 80) 
+            if(rand.nextInt(0x186a0) == 0 && func_27161_C() && func_27160_B())
             {
                 field_9437_g = field_9437_g * 3 + field_9436_h;
-                int k2 = field_9437_g >> 2;
-                int i3 = k2 & 0xf;
-                int k3 = k2 >> 8 & 0xf;
-                int i4 = k2 >> 16 & 0x7f;
-                int j4 = chunk.blocks[i3 << 11 | k3 << 7 | i4] & 0xff;
-                if(Block.tickOnLoad[j4])
+                int l1 = field_9437_g >> 2;
+                int i3 = k + (l1 & 0xf);
+                int i4 = i1 + (l1 >> 8 & 0xf);
+                int i5 = findTopSolidBlock(i3, i4);
+                if(func_27167_r(i3, i5, i4))
                 {
-                    Block.blocksList[j4].updateTick(this, i3 + k, i4, k3 + i1, rand);
+                    func_27159_a(new EntityLightningBolt(this, i3, i5, i4));
+                    field_27168_F = 2;
                 }
-                l1++;
+            }
+            if(rand.nextInt(16) == 0 && func_27161_C())
+            {
+                field_9437_g = field_9437_g * 3 + field_9436_h;
+                int i2 = field_9437_g >> 2;
+                int j3 = i2 & 0xf;
+                int j4 = i2 >> 8 & 0xf;
+                int j5 = findTopSolidBlock(j3 + k, j4 + i1);
+                if(getWorldChunkManager().func_4073_a(j3 + k, j4 + i1).func_27078_c() && j5 >= 0 && j5 < 128 && chunk.getSavedLightValue(EnumSkyBlock.Block, j3, j5, j4) < 10)
+                {
+                    int i6 = chunk.getBlockID(j3, j5 - 1, j4);
+                    int k6 = chunk.getBlockID(j3, j5, j4);
+                    if(k6 == 0 && Block.snow.canPlaceBlockAt(this, j3 + k, j5, j4 + i1) && i6 != 0 && i6 != Block.ice.blockID && Block.blocksList[i6].blockMaterial.getIsSolid())
+                    {
+                        setBlockWithNotify(j3 + k, j5, j4 + i1, Block.snow.blockID);
+                    }
+                    if(i6 == Block.waterStill.blockID && chunk.getBlockMetadata(j3, j5 - 1, j4) == 0)
+                    {
+                        setBlockWithNotify(j3 + k, j5 - 1, j4 + i1, Block.ice.blockID);
+                    }
+                }
+            }
+            int j2 = 0;
+            while(j2 < 80) 
+            {
+                field_9437_g = field_9437_g * 3 + field_9436_h;
+                int k3 = field_9437_g >> 2;
+                int k4 = k3 & 0xf;
+                int k5 = k3 >> 8 & 0xf;
+                int j6 = k3 >> 16 & 0x7f;
+                int l6 = chunk.blocks[k4 << 11 | k5 << 7 | j6] & 0xff;
+                if(Block.tickOnLoad[l6])
+                {
+                    Block.blocksList[l6].updateTick(this, k4 + k, j6, k5 + i1, rand);
+                }
+                j2++;
             }
         }
 
@@ -2208,7 +2306,7 @@ public class World
         }
         if(block == Block.waterMoving || block == Block.waterStill || block == Block.lavaMoving || block == Block.lavaStill || block == Block.fire || block == Block.snow)
         {
-            return true;
+            block = null;
         }
         return i > 0 && block == null && block1.canPlaceBlockAt(this, j, k, l);
     }
@@ -2574,6 +2672,7 @@ public class World
                 entityplayer.wakeUpPlayer(false, false, true);
             }
         } while(true);
+        func_27164_F();
     }
 
     public boolean isAllPlayersFullyAsleep()
@@ -2596,6 +2695,56 @@ public class World
         }
     }
 
+    public float func_27166_f(float f)
+    {
+        return (field_27170_D + (field_27169_E - field_27170_D) * f) * func_27162_g(f);
+    }
+
+    public float func_27162_g(float f)
+    {
+        return field_26901_B + (field_27171_C - field_26901_B) * f;
+    }
+
+    public void func_27158_h(float f)
+    {
+        field_26901_B = f;
+        field_27171_C = f;
+    }
+
+    public boolean func_27160_B()
+    {
+        return (double)func_27166_f(1.0F) > 0.90000000000000002D;
+    }
+
+    public boolean func_27161_C()
+    {
+        return (double)func_27162_g(1.0F) > 0.20000000000000001D;
+    }
+
+    public boolean func_27167_r(int i, int j, int k)
+    {
+        if(!func_27161_C())
+        {
+            return false;
+        }
+        if(!canBlockSeeTheSky(i, j, k))
+        {
+            return false;
+        }
+        if(findTopSolidBlock(i, k) > j)
+        {
+            return false;
+        }
+        BiomeGenBase biomegenbase = getWorldChunkManager().func_4073_a(i, k);
+        if(biomegenbase.func_27078_c())
+        {
+            return false;
+        } else
+        {
+            return biomegenbase.func_27077_d();
+        }
+    }
+
     public boolean scheduledUpdatesAreImmediate;
     private List field_1051_z;
     public List loadedEntityList;
@@ -2604,10 +2753,17 @@ public class World
     private Set scheduledTickSet;
     public List loadedTileEntityList;
     public List playerEntities;
+    public List field_27173_e;
     private long field_1019_F;
     public int skylightSubtracted;
     protected int field_9437_g;
     protected int field_9436_h;
+    private float field_26901_B;
+    private float field_27171_C;
+    private float field_27170_D;
+    private float field_27169_E;
+    private int field_27168_F;
+    public int field_27172_i;
     public boolean editingBlocks;
     private long lockTimestamp;
     protected int autosavePeriod;

@@ -58,7 +58,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
                         if(i2 == Block.leaves.blockID)
                         {
                             int j2 = world.getBlockMetadata(i + j1, j + k1, k + l1);
-                            world.setBlockMetadata(i + j1, j + k1, k + l1, j2 | 4);
+                            world.setBlockMetadata(i + j1, j + k1, k + l1, j2 | 8);
                         }
                     }
 
@@ -76,7 +76,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
             return;
         }
         int l = world.getBlockMetadata(i, j, k);
-        if((l & 4) != 0)
+        if((l & 8) != 0)
         {
             byte byte0 = 4;
             int i1 = byte0 + 1;
@@ -162,7 +162,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
             int j2 = adjacentTreeBlocks[k1 * j1 + k1 * byte1 + k1];
             if(j2 >= 0)
             {
-                world.setBlockMetadataWithNotify(i, j, k, l & -5);
+                world.setBlockMetadataWithNotify(i, j, k, l & -9);
             } else
             {
                 removeLeaves(world, i, j, k);
@@ -411,12 +411,17 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 
     public int quantityDropped(Random random)
     {
-        return random.nextInt(16) != 0 ? 0 : 1;
+        return random.nextInt(20) != 0 ? 0 : 1;
     }
 
     public int idDropped(int i, Random random)
     {
         return Block.sapling.blockID;
+    }
+
+    protected int damageDropped(int i)
+    {
+        return i & 3;
     }
 
     public boolean isOpaqueCube()

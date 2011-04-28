@@ -1,4 +1,7 @@
 package net.minecraft.src;
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) braces deadcode 
 
 import net.minecraft.src.modoptionsapi.*;
 
@@ -22,16 +25,9 @@ public class ItemSapling extends ItemPlantable implements Plantable {
         return i;
     }
 
-    public String getItemNameIS(ItemStack itemstack) {
-		int dmg = itemstack.getItemDamage();
-		
-		if(dmg == 1) {
-			return "pinesapling"; 
-		} else if(dmg == 2) {
-			return "birchsapling";
-		} else {
-			return "sapling";
-		}
+    public int func_27009_a(int i)
+    {
+        return Block.sapling.getBlockTextureFromSideAndMetadata(0, i);
     }
 	
 	/**
