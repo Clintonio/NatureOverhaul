@@ -23,6 +23,7 @@ public class mod_Snow extends BaseMod
 		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME);
 		ModOptions climate = mo.getSubOption(mod_AutoForest.CLIMATE_MENU_NAME);
 		
+		/*
 		Integer keys[]  = {0,1,2};
 		String values[] = {"Off", "Cold Biomes", "Everywhere"};
 		
@@ -44,6 +45,7 @@ public class mod_Snow extends BaseMod
 		System.out.printf("Snow Proba = %d\n", SnowRate.getIntValue());
 		System.out.printf("Snow Per Tick = %d\n\n", SnowPerTick.getIntValue());
 		
+		*/
 		climate.loadValues();
     }
 
