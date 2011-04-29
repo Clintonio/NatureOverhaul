@@ -32,12 +32,13 @@ public class BlockSapling extends BlockFlower
 		// bound is *3 because metadata is now 3 times smaller
 		// due to type addition
         if((world.getBlockLightValue(i, j + 1, k) >= 9) && 
-			((bound == 0) || (random.nextInt(bound * 3) == 0))) { 
+			((bound == 0) || (random.nextInt(bound * 6) == 0))) { 
             int l = world.getBlockMetadata(i, j, k);
 			// Added bound > 0 to ensure INSTANT is instant
 			// Add 4 each time to avoid breaking the sapling
 			// specific growth
-            if((l < 13) && (bound > 0)) {
+			System.out.println(l);
+            if((((l & 8) == 0)) && (bound > 0)) {
                 world.setBlockMetadataWithNotify(i, j, k, l | 8);
             } else {
                 growTree(world, i, j, k, random, false);
@@ -143,7 +144,7 @@ public class BlockSapling extends BlockFlower
 			for(int x = i - dist; x <= dist + i; x++) {
 				for(int z = k - dist; z <= dist + k; z++) {
 					if(world.getBlockId(x, j, z) == Block.wood.blockID) {
-						System.out.println("STARVED SAPLING IN BIOME: " + world.getBiomeName(i,k) + ". DIST: " + dist);
+						//System.out.println("STARVED SAPLING IN BIOME: " + world.getBiomeName(i,k) + ". DIST: " + dist);
 						return true;
 					}
 				}
@@ -167,7 +168,7 @@ public class BlockSapling extends BlockFlower
 		
 		// This means that a sapling with a death rate of X will die x% of the time
 		if((sapDeathOp) && (random.nextInt(100) >= 100 - deathRate)) {
-			System.out.println("SAPLING RANDOM DEATH IN BIOME: "+ biomeName + " AT RATE " + deathRate);
+			//System.out.println("SAPLING RANDOM DEATH IN BIOME: "+ biomeName + " AT RATE " + deathRate);
 			return true;
 		}
 		
