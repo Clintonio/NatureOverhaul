@@ -29,22 +29,50 @@ public class ItemDye extends Item
     {
         if(itemstack.getItemDamage() == 15)
         {
+			//====================
+			// START NATURE OVERHAUL
+			//====================
             int i1 = world.getBlockId(i, j, k);
-            if(i1 == Block.sapling.blockID)
-            {
+            if(i1 == Block.sapling.blockID) {
                 ((BlockSapling)Block.sapling).growTree(world, i, j, k, world.rand);
                 itemstack.stackSize--;
                 return true;
-            }
-            if(i1 == Block.crops.blockID)
-            {
+            } else if(i1 == Block.crops.blockID) {
                 ((BlockCrops)Block.crops).fertilize(world, i, j, k);
                 itemstack.stackSize--;
                 return true;
-            }
+            } else if(applyBonemeal(world, i, j, k, i1)) {
+				itemstack.stackSize--;
+				return true;
+			}
+			//====================
+			// END NATURE OVERHAUL
+			//====================
         }
         return false;
     }
+	
+	//====================
+	// START NATURE OVERHAUL
+	//====================
+	/**
+	* Apply bonemeal to the item clicked
+	* 
+	* @param	id 	Item ID
+	* @return	true if item is applied
+	*/
+	private boolean applyBonemeal(World world, int i, int j, int k, int id) {
+		// Items affected; cactii, reeds, leaves, flowers and shrooms
+		if(Block.blocksList[id] instanceof Growable) {
+			((Growable) Block.blocksList[id]).grow(world, i, j, k);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//====================
+	// END NATURE OVERHAUL
+	//====================
 
     public void saddleEntity(ItemStack itemstack, EntityLiving entityliving)
     {

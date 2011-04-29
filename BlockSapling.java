@@ -108,13 +108,13 @@ public class BlockSapling extends BlockFlower
 		// Ignore death of saplings
 		if(ignoreDeath) {
 			if(!((WorldGenerator) (obj)).generate(world, random, i, j, k)) {
-				world.setBlock(i, j, k, blockID);
+				world.setBlockAndMetadata(i, j, k, blockID, type);
 			}
 		// Sapling has a random chance of dying instead of growing
         } else if((!starvedSapling(world, i, j, k)) && (!randomDeath(world, i, j, k, random)) 
 			&& (!((WorldGenerator) (obj)).generate(world, random, i, j, k))
 			&& (!sapDeathOp.getValue())) {
-			world.setBlock(i, j, k, blockID);
+			world.setBlockAndMetadata(i, j, k, blockID, type);
         }
     }
 
