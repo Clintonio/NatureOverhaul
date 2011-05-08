@@ -53,7 +53,6 @@ public class mod_AutoForest extends BaseMod {
 	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
 	
 	// Objects
-	public static ModOptions darkerNights 	= new ModOptions(NIGHT_MENU_NAME);
 	public static ModOptions climate		= new ModOptions(CLIMATE_MENU_NAME);
 	
 	// Default labels
@@ -68,14 +67,14 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "0.9.7.3";
+		return "1.0.0.0";
 	}
 	
 	/**
 	* Initialises and configures all options
 	*/
 	public mod_AutoForest() {
-		createBiomeModifiers();
+		createbiomeModifiers();
 		setupModOptions();
 	}
 	
@@ -116,12 +115,11 @@ public class mod_AutoForest extends BaseMod {
 		
 		// Climate related
 		climate.addToggle("BiomeModifiedGrowth");
-		addDarkerNights(climate);
 		
 		// Handle display
 		tree.setWideOption("TreeGrowthRate");
 		options.setWideOption("ForestGrowth");
-		climate.setWideOption("BiomeModifiedGrowth");
+		climate.setWideOption("biomeModifiedGrowth");
 		
 		// Set the custom items
 		Item.itemsList[Block.sapling.blockID] = (new ItemSapling(Block.sapling.blockID - 256)).setItemName("Sapling");
@@ -178,26 +176,6 @@ public class mod_AutoForest extends BaseMod {
 	}
 	
 	/**
-	* Adds the darker nights mod
-	*/
-	private void addDarkerNights(ModOptions parent) {
-		String[] options = {"Bright","Light","Mild","Dim","Dark"};
-		Integer[] values = {11,12,13,14,15};
-		darkerNights.addMappedMultiOption("Moonlight", values, options);
-		darkerNights.addToggle("VaryingMoonlight");
-		darkerNights.setOptionValue("VaryingMoonlight", false);
-		
-		parent.addSubOptions(darkerNights);
-	}
-	
-	/**
-	* Return the darker nights object
-	*/
-	public static ModOptions getDarkerNights() {
-		return darkerNights;
-	}
-	
-	/**
 	* Returns a specific set of biome modifiers
 	*
 	* @param	biomeName		Name of biome to get data for
@@ -208,18 +186,18 @@ public class mod_AutoForest extends BaseMod {
 		byte[] biomeMod = null;
 		Biome biome 	= null;
 		try {
-			Biome.getBiomeFromString(biomeName);
-			biome = Biome.getBiomeFromString(biomeName);
+			biome.getBiomeFromString(biomeName);
+			biome = biome.getBiomeFromString(biomeName);
 			biomeMod = biomeModifier.get(name);
 		
 			if(biomeMod != null) {
 				return biomeMod[biome.getIndex()];
 			} else {
-				System.out.println("Biome Mod Type missing: " + name);
+				System.out.println("biome Mod Type missing: " + name);
 				return 0;
 			}
 		} catch (NullPointerException e) {
-			System.out.println("Biome missing: " + biomeName);
+			System.out.println("biome missing: " + biomeName);
 			return 0;
 		}
 	}
@@ -227,10 +205,10 @@ public class mod_AutoForest extends BaseMod {
 	/**
 	* Sets up the biome modifiers
 	*/
-	private void createBiomeModifiers() {
+	private void createbiomeModifiers() {
 		
 		//=====
-		// NATURE OVERHAUL SPECIFIC BIOME MODIFIERS
+		// NATURE OVERHAUL SPECIFIC biome MODIFIERS
 		//=====
 							  // 0   1   2   3   4   5   6    7    8   9  10   11
 		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95, -95,-100 };
@@ -262,7 +240,7 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("ShroomDeath", shroomDeath);
 		
 		//=====
-		// STANDARD BIOME MODIFIERS - Don't edit
+		// STANDARD biome MODIFIERS - Don't edit
 		//=====
 		byte[] standardDeath = { -25, -5, -15, -10, 10, 5, 5, 100, 100, 50, 100, 100};
 		
@@ -276,7 +254,7 @@ public class mod_AutoForest extends BaseMod {
 	* @param	name	Identifier for this modifier, overwrites old ones if same name.
 	* @param	byte[]	Array of modifiers. Must be 11 long
 	*/
-	public void addBiomeModifier(String name, byte[] mods) {
+	public void addbiomeModifier(String name, byte[] mods) {
 		if(mods.length != 12) {
 			throw new IndexOutOfBoundsException("Out of bounds. Length must be 11.");
 		} else {
@@ -296,12 +274,29 @@ public class mod_AutoForest extends BaseMod {
 		boolean biomeModsEnabled = ((ModBooleanOption) climate.getOption("BiomeModifiedGrowth")).getValue();
 		// Ensure the user wants us to modify by biome
 		if(biomeModsEnabled) {
-			// Get Biome info
-			String name = world.getBiomeName(i,k);
+			// Get biome info
+			String name = mod_AutoForest.getBiomeName(i,k);
 			
 			value = (value + (value * 0.01 * getBiomeModifier(name, biomeMod)));
 		} 
 		
 		return value;
 	}
+	
+	/**
+	* Get the biome name
+	*
+	* @param	i coord
+	* @param	j coord
+	* @return	Name of biome
+	*/
+    public static String getBiomeName(int i, int j) {
+		WorldChunkManager cm = ModLoader.getMinecraftInstance().theWorld
+										.getWorldChunkManager();
+        cm.func_4069_a(i, j, 1, 1);
+        double temp = cm.temperature[0];
+        double humi = cm.humidity[0];
+        BiomeGenBase base = BiomeGenBase.getBiomeFromLookup(temp, humi);
+        return base.biomeName;
+    }
 }

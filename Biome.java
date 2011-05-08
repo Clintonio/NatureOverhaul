@@ -3,7 +3,7 @@ package net.minecraft.src;
 import java.util.HashMap;
 
 /**
-* An enum for abstracting the type of biome being used
+* An enum for abstracting the type of Biome being used
 *
 * @author	Clinton Alexander
 */
@@ -22,7 +22,7 @@ public enum Biome {
 	TUNDRA			(10),
 	HELL			(11);
 	
-	private static HashMap<String, Biome> biomeTranslate 
+	private static HashMap<String, Biome> BiomeTranslate 
 									= new HashMap<String, Biome>();
 	
 	private int i;
@@ -36,31 +36,31 @@ public enum Biome {
 	}
 	
 	/**
-	* Get a biome object from a string
+	* Get a Biome object from a string
 	*
-	* @param	name	Name of biome
+	* @param	name	Name of Biome
 	* @return	Biome object
 	*/
 	public static Biome getBiomeFromString(String name) {
-		if(!biomeTranslate.containsKey(name)) {
-			throw new NullPointerException("No such biome " + name);
+		if(!BiomeTranslate.containsKey(name)) {
+			throw new NullPointerException("No such Biome " + name);
 		} else {
-			return biomeTranslate.get(name);
+			return BiomeTranslate.get(name);
 		}
 	}
 	
 	static {
-		biomeTranslate.put("Rainforest", Biome.RAINFOREST);
-		biomeTranslate.put("Swampland", Biome.SWAMPLAND);
-		biomeTranslate.put("Seasonal Forest", Biome.SEASONAL_FOREST);
-		biomeTranslate.put("Forest", Biome.FOREST);
-		biomeTranslate.put("Savanna", Biome.SAVANNA);
-		biomeTranslate.put("Shrubland", Biome.SHRUBLAND);
-		biomeTranslate.put("Taiga", Biome.TAIGA);
-		biomeTranslate.put("Desert", Biome.DESERT);
-		biomeTranslate.put("Ice Desert", Biome.ICE_DESERT);
-		biomeTranslate.put("Plains", Biome.PLAINS);
-		biomeTranslate.put("Tundra", Biome.TUNDRA);
-		biomeTranslate.put("Hell", Biome.HELL);
+		BiomeTranslate.put("Rainforest", Biome.RAINFOREST);
+		BiomeTranslate.put("Swampland", Biome.SWAMPLAND);
+		BiomeTranslate.put("Seasonal Forest", Biome.SEASONAL_FOREST);
+		BiomeTranslate.put("Forest", Biome.FOREST);
+		BiomeTranslate.put("Savanna", Biome.SAVANNA);
+		BiomeTranslate.put("Shrubland", Biome.SHRUBLAND);
+		BiomeTranslate.put("Taiga", Biome.TAIGA);
+		BiomeTranslate.put("Desert", Biome.DESERT);
+		BiomeTranslate.put("Ice Desert", Biome.ICE_DESERT);
+		BiomeTranslate.put("Plains", Biome.PLAINS);
+		BiomeTranslate.put("Tundra", Biome.TUNDRA);
+		BiomeTranslate.put("Hell", Biome.HELL);
 	}
 }

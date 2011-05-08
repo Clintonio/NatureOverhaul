@@ -230,7 +230,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @param item	Item to emit
 	*/
 	private void emitItem(World world, int i, int j, int k, ItemStack item) {
-		EntityItem entityitem = new EntityItem(world, i, j, k, item);
+		EntityItem entityitem = new EntityItem(world, i, j, k, item, true);
 		world.entityJoinedWorld(entityitem);
 	}
 	
@@ -259,9 +259,9 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @return	true if can
 	*/
 	private boolean canGrow(World world, int i, int j, int k, String[] biomes) {
-		String curBiome = world.getBiomeName(i,k);
+		String curbiome = mod_AutoForest.getBiomeName(i,k);
 		for(String biome : biomes) {
-			if(curBiome.equals(biome)) {
+			if(curbiome.equals(biome)) {
 				return true;
 			}
 		}
@@ -279,8 +279,8 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @return	True if it can
 	*/
 	private boolean appleCanGrow(World world, int i, int j, int k) {
-		// Get Biome info
-		String biome = world.getBiomeName(i,k);
+		// Get biome info
+		String biome = mod_AutoForest.getBiomeName(i,k);
 		// Apples can grow in the named biomes
 		return (biome.equals("Forest") || biome.equals("Swampland") || biome.equals("Rainforest")
 				|| biome.equals("Seasonal Forest") || biome.equals("Shrubland"));

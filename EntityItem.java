@@ -8,10 +8,22 @@ import net.minecraft.src.modoptionsapi.*;
 
 public class EntityItem extends Entity
 {
-
+	
+	//========
+	// BEGIN AUTOFOREST
+	//========
     public EntityItem(World world, double d, double d1, double d2, 
-            ItemStack itemstack)
-    {
+            ItemStack itemstack) {
+		this(world, d, d1, d2, itemstack, false);
+    }
+	
+	/**
+	* Constructor
+	*
+	* @param	grown	If true, the item will fly further than usual
+	*/
+    public EntityItem(World world, double d, double d1, double d2, 
+            ItemStack itemstack, boolean grown) {
         super(world);
         age = 0;
         health = 5;
@@ -25,16 +37,14 @@ public class EntityItem extends Entity
         motionY = 0.20000000298023224D;
         motionZ = (float)(Math.random() * 0.20000000298023224D - 0.10000000149011612D);
 		
-		//========
-		// BEGIN AUTOFOREST
-		//========
-		if(!world.multiplayerWorld) {
+		// Set initial velocity if not punched and only grown
+		if((!world.multiplayerWorld) && (grown)) {
 			setInitialVelocity();
 		}
-		//======== 
-		// END AUTOFOREST
-		//========
-    }
+	}
+	//======== 
+	// END AUTOFOREST
+	//========
 
     protected boolean canTriggerWalking()
     {
