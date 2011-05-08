@@ -44,7 +44,7 @@ public class BlockFlower extends BlockMortal
 	protected String deathModifierName  = "StandardDeath";
 	
 	public void updateTick(World world, int i, int j, int k, Random random) {
-		if(!world.multiplayerWorld) {
+		if((!world.multiplayerWorld) && (!(this instanceof BlockCrops))) {
 			// ATTEMPT REPRODUCTION
 			ModOptions flowers = mod_AutoForest.flowers;
 			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
