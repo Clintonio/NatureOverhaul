@@ -14,7 +14,7 @@ public class ItemDye extends Item
         setMaxDamage(0);
     }
 
-    public int func_27009_a(int i)
+    public int getIconFromDamage(int i)
     {
         int j = i;
         return iconIndex + (j % 8) * 16 + j / 8;

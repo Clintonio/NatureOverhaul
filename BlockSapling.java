@@ -4,14 +4,14 @@ package net.minecraft.src;
 // Decompiler options: packimports(3) braces deadcode 
 
 import java.util.Random;
+//====================
+// BEGIN AUTOFOREST
+//====================
 import net.minecraft.src.modoptionsapi.ModOptionsAPI;
 import net.minecraft.src.modoptionsapi.ModOptions;
 import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
 import net.minecraft.src.modoptionsapi.ModBooleanOption;
 
-//====================
-// BEGIN AUTOFOREST
-//====================
 public class BlockSapling extends BlockFlower
 {
 

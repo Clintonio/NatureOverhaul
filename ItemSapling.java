@@ -25,7 +25,7 @@ public class ItemSapling extends ItemPlantable implements Plantable {
         return i;
     }
 
-    public int func_27009_a(int i)
+    public int getIconFromDamage(int i)
     {
         return Block.sapling.getBlockTextureFromSideAndMetadata(0, i);
     }

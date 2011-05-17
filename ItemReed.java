@@ -63,7 +63,7 @@ public class ItemReed extends Item implements Plantable
             {
                 Block.blocksList[field_320_a].onBlockPlaced(world, i, j, k, l);
                 Block.blocksList[field_320_a].onBlockPlacedBy(world, i, j, k, entityplayer);
-                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.func_1145_d(), (block.stepSound.func_1147_b() + 1.0F) / 2.0F, block.stepSound.func_1144_c() * 0.8F);
+                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.func_1145_d(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
                 itemstack.stackSize--;
             }
         }

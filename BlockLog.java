@@ -4,11 +4,11 @@ package net.minecraft.src;
 // Decompiler options: packimports(3) braces deadcode 
 
 import java.util.Random;
-import java.util.HashSet;
 //=======================
 // START NATURE OVERHAUL
 //=======================
 import net.minecraft.src.modoptionsapi.*;
+import java.util.HashSet;
 //=======================
 // END NATURE OVERHAUL
 //=======================
@@ -360,7 +360,7 @@ public class BlockLog extends Block
 		ItemStack itemstack = player.getCurrentEquippedItem();
 		if(itemstack != null) {
 			// Damage item compared to the nmber of items found
-			itemstack.func_25190_a(damage - 1, player);
+			itemstack.damageItem(damage - 1, player);
 			if(itemstack.stackSize == 0) {
 				player.destroyCurrentEquippedItem();
 			}

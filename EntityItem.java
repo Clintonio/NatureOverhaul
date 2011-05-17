@@ -130,6 +130,8 @@ public class EntityItem extends Entity
         {
             setEntityDead();
         }
+		
+		//setEntityDead();
     }
 	
 	//========
@@ -425,12 +427,13 @@ public class EntityItem extends Entity
         {
             if(item.itemID == Block.wood.blockID)
             {
-                entityplayer.func_27026_a(AchievementList.field_25198_c);
+                entityplayer.triggerAchievement(AchievementList.mineWood);
             }
             if(item.itemID == Item.leather.shiftedIndex)
             {
-                entityplayer.func_27026_a(AchievementList.field_27376_t);
+                entityplayer.triggerAchievement(AchievementList.killCow);
             }
+            ModLoader.OnItemPickup(entityplayer, item);
             worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
             entityplayer.onItemPickup(this, i);
             setEntityDead();
