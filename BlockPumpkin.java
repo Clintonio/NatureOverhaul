@@ -1,13 +1,17 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
+
+package net.minecraft.src;
 
 //========
 // BEGIN AUTOFOREST
 //========
 import java.util.Random;
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModMappedMultiOption;
 //========
 // END AUTOFOREST
 //========
@@ -114,7 +118,7 @@ public class BlockPumpkin extends BlockMortal
     public boolean canPlaceBlockAt(World world, int i, int j, int k)
     {
         int l = world.getBlockId(i, j, k);
-        return (l == 0 || Block.blocksList[l].blockMaterial.func_27283_g()) && world.isBlockOpaqueCube(i, j - 1, k);
+        return (l == 0 || Block.blocksList[l].blockMaterial.getIsGroundCover()) && world.func_28100_h(i, j - 1, k);
     }
 
     public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)

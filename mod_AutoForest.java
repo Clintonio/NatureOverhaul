@@ -1,9 +1,10 @@
 package net.minecraft.src;
 
-import net.minecraft.src.modoptionsapi.ModOptionsAPI;
-import net.minecraft.src.modoptionsapi.ModOption;
-import net.minecraft.src.modoptionsapi.ModBooleanOption;
-import net.minecraft.src.modoptionsapi.ModOptions;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModOption;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModMappedMultiOption;
 
 import java.util.HashMap;
 
@@ -18,7 +19,7 @@ public class mod_AutoForest extends BaseMod {
 	// Constants
 	public static final String PLANT_MENU_NAME	 = "Plants Options";
 	public static final String SAPLING_MENU_NAME = "Sapling Options";
-	public static final String MENU_NAME 		 = "AutoForest"; 
+	public static final String MENU_NAME 		 = "NatureOverhaul"; 
 	public static final String TREE_MENU_NAME 	 = "Tree Options";
 	public static final String CLIMATE_MENU_NAME = "Climate Options";
 	public static final String NIGHT_MENU_NAME	 = "Day and Night Options";
@@ -27,6 +28,8 @@ public class mod_AutoForest extends BaseMod {
 	public static final String REED_MENU_NAME	 = "Reed Options";
 	public static final String PUMPKIN_MENU_NAME = "Pumpkin Options";
 	public static final String SHROOMS_MENU_NAME = "Mushroom Options";
+	private static final String GRASS_MENU_NAME  = "Grass Options";
+	private static final String MISC_MENU_NAME  = "Misc Options";
 	
 	// General option menus
 	
@@ -45,12 +48,23 @@ public class mod_AutoForest extends BaseMod {
 	public static ModOptions 		reed 		= new ModOptions(REED_MENU_NAME);
 	public static ModOptions 		pumpkins 	= new ModOptions(PUMPKIN_MENU_NAME);
 	public static ModOptions 		shrooms 	= new ModOptions(SHROOMS_MENU_NAME);
+	public static ModOptions		grass		= new ModOptions(GRASS_MENU_NAME);
+	public static ModOptions		misc		= new ModOptions(MISC_MENU_NAME);
 	
 	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die");
 	public static ModBooleanOption shroomDeath 	= new ModBooleanOption("Shrooms Die");
 	public static ModBooleanOption pumpkinDeath = new ModBooleanOption("Pumkins Die");
 	public static ModBooleanOption reedDeath 	= new ModBooleanOption("Reeds Die");
 	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
+	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies");
+	
+	// Options for saplings
+	public static ModMappedMultiOption growthType;
+	
+	// Options for moss
+	public static ModBooleanOption		mossGrows		= new ModBooleanOption("Moss Grows");
+	public static ModMappedMultiOption	mossGrowthRate;
+	public static ModBooleanOption		infiniteFire	= new ModBooleanOption("Infinite Fire Spread");
 	
 	// Objects
 	public static ModOptions climate		= new ModOptions(CLIMATE_MENU_NAME);
@@ -67,8 +81,12 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "1.0.0.1";
+		return "1.1";
 	}
+	
+	//=====================
+	// SETUP METHODS
+	//=====================
 	
 	/**
 	* Initialises and configures all options
@@ -86,17 +104,50 @@ public class mod_AutoForest extends BaseMod {
 		options.addSubOptions(plants);
 		options.addSubOptions(climate);
 		options.addSubOptions(tree);
-		
-		// Forest related
-		options.addToggle("ForestGrowth");
+		options.addSubOptions(misc);
 		
 		// Sapling related
+		setupSaplings();
+		// Tree options
+		setupTreeOptions();
+		// Set up flower options
+		addFlowers();
+		
+		// Climate related
+		climate.addToggle("BiomeModifiedGrowth");
+		climate.setWideOption("biomeModifiedGrowth");
+		
+		// Add misc options
+		addMiscOptions();
+		// Set the custom items
+		setupItemsAndBlocks();
+		
+		options.loadValues();
+		ModOptionsAPI.addMod(options);
+	}
+	
+	/**
+	* Setup sapling options
+	*/
+	private void setupSaplings() {
+		String[] 	growthLabels = {"Both", "Decay", "Growth", "Neither"};
+		Integer[]	growthValues = {3, 2, 1, 0};
+		
 		saps.addToggle("AutoSapling");
 		saps.addToggle("SaplingDeath");
 		saps.addMultiOption("GrowthRate", labels);
+		saps.addMappedMultiOption("Growth Occurs On", growthValues, 
+								  growthLabels);
+		growthType = (ModMappedMultiOption) saps.getOption("Growth Occurs On");
 		
-		// Tree options
-		Integer[] dKeys = {5000, 2500, 250, 5, 20000, 10000};
+		saps.setWideOption("Growth Occurs On");
+	}
+	
+	/**
+	* Setup tree options
+	*/
+	private void setupTreeOptions() {
+		Integer[] dKeys 	= {5000, 2500, 250, 5, 20000, 10000};
 		Integer[] keys 		= {5, 3, 1, 0, 9, 7};
 		String[]  values 	= {"DEFAULT/AVERAGE", "FAST", "VERY FAST", "INSTANT", "VERY SLOW", "SLOW"};
 		tree.addMappedMultiOption("TreeGrowthRate", keys, values);
@@ -111,34 +162,12 @@ public class mod_AutoForest extends BaseMod {
 		tree.addMappedMultiOption("AppleGrowthRate", aKeys, labels);
 		tree.addToggle("ApplesGrow");
 		
-		addFlowers();
-		
-		// Climate related
-		climate.addToggle("BiomeModifiedGrowth");
-		
-		// Handle display
 		tree.setWideOption("TreeGrowthRate");
-		options.setWideOption("ForestGrowth");
-		climate.setWideOption("biomeModifiedGrowth");
-		
-		// Set the custom items
-		Item.itemsList[Block.sapling.blockID] = (new ItemSapling(Block.sapling.blockID - 256)).setItemName("Sapling");
-		Item.itemsList[Block.mushroomBrown.blockID] = (new ItemMushroom(Block.mushroomBrown.blockID - 256)).setItemName("Mushroom");
-		Item.itemsList[Block.mushroomRed.blockID] = (new ItemMushroom(Block.mushroomRed.blockID - 256)).setItemName("Mushroom");
-		Item.itemsList[Block.plantYellow.blockID] = (new ItemFlower(Block.plantYellow.blockID - 256)).setItemName("Flower");
-		Item.itemsList[Block.plantRed.blockID] = (new ItemFlower(Block.plantRed.blockID - 256)).setItemName("Flower");
-		Item.itemsList[Block.cactus.blockID] = (new ItemCactus(Block.cactus.blockID - 256)).setItemName("Cactus");
-		Item.itemsList[Block.pumpkin.blockID] = (new ItemPumpkin(Block.pumpkin.blockID - 256)).setItemName("Pumpkin");
-		
-		// Add the two new sapling names
-		ModLoader.AddLocalization("birchsapling.name", "Birch Sapling");
-		ModLoader.AddLocalization("pinesapling.name", "PineSapling");
-		ModLoader.AddLocalization("sapling.name", "Sapling");
-		
-		options.loadValues();
-		ModOptionsAPI.addMod(options);
 	}
-		
+	
+	/**
+	* Set up flower options
+	*/
 	private void addFlowers() {
 		// Plant related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
@@ -147,6 +176,7 @@ public class mod_AutoForest extends BaseMod {
 		plants.addSubOptions(reed);
 		plants.addSubOptions(pumpkins);
 		plants.addSubOptions(shrooms);
+		plants.addSubOptions(grass);
 		
 		// Plant submenus
 		flowers.addMappedMultiOption("FlowerDeathRate", pKeys, labels);
@@ -173,7 +203,52 @@ public class mod_AutoForest extends BaseMod {
 		shrooms.addOption(shroomDeath);
 		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
 		shrooms.addToggle("ShroomsGrow");
+		
+		grass.addMappedMultiOption("GrassDeathRate", pKeys, labels);
+		grass.addOption(grassDeath);
+		grass.addMappedMultiOption("GrassGrowthRate", pKeys, labels);
+		grass.addToggle("GrassGrows");
 	}
+	
+	/**
+	* Set up misc options
+	*/
+	private void addMiscOptions() {
+		// Mossy cobble growth speed related
+		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
+		misc.addOption(infiniteFire);
+		infiniteFire.setGlobalValue(false);
+		misc.addMappedMultiOption("MossGrowthRate", pKeys, labels);
+		misc.addOption(mossGrows);
+		
+		mossGrowthRate = (ModMappedMultiOption) misc.getOption("MossGrowthRate");
+	}
+	
+	/**
+	* Add custom items
+	*/
+	private void setupItemsAndBlocks() {
+		Item.itemsList[Block.sapling.blockID] 		= (new ItemSapling(Block.sapling.blockID - 256)).setItemName("Sapling");
+		Item.itemsList[Block.mushroomBrown.blockID] = (new ItemMushroom(Block.mushroomBrown.blockID - 256)).setItemName("Mushroom");
+		Item.itemsList[Block.mushroomRed.blockID] 	= (new ItemMushroom(Block.mushroomRed.blockID - 256)).setItemName("Mushroom");
+		Item.itemsList[Block.plantYellow.blockID]	= (new ItemFlower(Block.plantYellow.blockID - 256)).setItemName("Flower");
+		Item.itemsList[Block.plantRed.blockID] 		= (new ItemFlower(Block.plantRed.blockID - 256)).setItemName("Flower");
+		Item.itemsList[Block.cactus.blockID] 		= (new ItemCactus(Block.cactus.blockID - 256)).setItemName("Cactus");
+		Item.itemsList[Block.pumpkin.blockID] 		= (new ItemPumpkin(Block.pumpkin.blockID - 256)).setItemName("Pumpkin");
+		
+		// Put the cobblestone mossy into the blocklist
+		BlockCobblestoneMossy.createInBlockList();
+		Block.blocksList[Block.cobblestoneMossy.blockID].preRenderSlimeSize();
+		
+		Item tmp = new ItemBlock(Block.cobblestoneMossy.blockID - 256);;
+		Item.itemsList[Block.cobblestoneMossy.blockID] = tmp;
+		Item.itemsList[Block.cobblestoneMossy.blockID + 92] = tmp;
+		
+	}
+	
+	//=====================
+	// ACTION METHODS
+	//=====================
 	
 	/**
 	* Returns a specific set of biome modifiers
@@ -224,6 +299,7 @@ public class mod_AutoForest extends BaseMod {
 		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
 		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0, -95,-100,-90,  95,-100 };
 		byte[] shroomDeath  = {-15,-25,-10,-10, 75, 50,  0,  95, 100, 90, -95, 100 };
+		byte[] mossGrowth 	= {100,100, 50, 50,-75,  0,-90,-100,-100,-90,-100,-100 };
 		
 		biomeModifier.put("SaplingSpawn", saplingSpawn);
 		biomeModifier.put("SaplingDeath", saplingDeath);
@@ -238,6 +314,8 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("PumpkinSpawn", pumpkinSpawn);
 		biomeModifier.put("ShroomSpawn", shroomSpawn);
 		biomeModifier.put("ShroomDeath", shroomDeath);
+		biomeModifier.put("GrassSpawn", flowerSpawn);
+		biomeModifier.put("MossGrowth", mossGrowth);
 		
 		//=====
 		// STANDARD biome MODIFIERS - Don't edit

@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModBooleanOption;
 
 /**
 * Pumpkin Item Representation for pumpkin growth.

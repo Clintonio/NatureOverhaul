@@ -1,14 +1,19 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
+
+package net.minecraft.src;
 
 import java.util.Random;
 
 //========
 // BEGIN AUTOFOREST
 //========
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModMultiOption;
+import modoptionsapi.ModMappedMultiOption;
+import modoptionsapi.ModOptionsAPI;
 //========
 // END AUTOFOREST
 //========
@@ -21,6 +26,21 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
         super(i, j, Material.leaves, false);
         baseIndexInPNG = j;
         setTickOnLoad(true);
+    }
+
+    public int func_31030_b(int i)
+    {
+        if((i & 1) == 1)
+        {
+            return ColorizerFoliage.getFoliageColorPine();
+        }
+        if((i & 2) == 2)
+        {
+            return ColorizerFoliage.getFoliageColorBirch();
+        } else
+        {
+            return ColorizerFoliage.func_31073_c();
+        }
     }
 
     public int colorMultiplier(IBlockAccess iblockaccess, int i, int j, int k)
@@ -162,7 +182,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
             int j2 = adjacentTreeBlocks[k1 * j1 + k1 * byte1 + k1];
             if(j2 >= 0)
             {
-                world.setBlockMetadataWithNotify(i, j, k, l & -9);
+                world.setBlockMetadata(i, j, k, l & -9);
             } else
             {
                 removeLeaves(world, i, j, k);
@@ -188,27 +208,30 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	
 	private boolean attemptGrowth(World world, int i, int j, int k) {
 		// Mod options for autoforest
-		ModOptions mo = ModOptionsAPI.getModOptions("AutoForest");
-		// Attempt to grow a part of the forest (Sapling, apple)
-		ModBooleanOption o = (ModBooleanOption) mo.getOption("ForestGrowth");
+		ModOptions mo = mod_AutoForest.options;
+		
+		// The values for BOTH and GROWTH are odd
+		boolean growSaps 	= (((int) mod_AutoForest.growthType.getValue() % 2) == 1);
 		boolean appleGrowth = ((ModBooleanOption) mo.getSubOption(mod_AutoForest.TREE_MENU_NAME)
 								.getOption("ApplesGrow")).getValue();
 		boolean cocoaGrowth = ((ModBooleanOption) mo.getSubOption(mod_AutoForest.TREE_MENU_NAME)
 								.getOption("CocoaGrows")).getValue();
+								
 		// Sapling growth frequency
-		double freq = getSaplingFreq(world, i, j, k);
+		double sapFreq 		= getSaplingFreq(world, i, j, k);
 		// Apple growth frequency
-		double appleFreq = getAppleFreq(world, i, j, k);
+		double appleFreq 	= getAppleFreq(world, i, j, k);
 		// Cocoa frequency
-		double cocoaFreq = getCocoaFreq(world, i, j, k);
-		if((o.getValue()) && (growth(freq))) {
+		double cocoaFreq 	= getCocoaFreq(world, i, j, k);
+		
+		if(growSaps && growth(sapFreq)) {
 			// Try to emit a sapling
 			if(world.getBlockId(i, j + 1, k) == 0) {
 				emitItem(world, i, j + 1, k, new ItemStack(Block.sapling, 1,
 										world.getBlockMetadata(i, j, k) % 4));
 				return true;
 			} 
-		} else if((appleGrowth) && (growth(appleFreq))) {
+		} else if(appleGrowth && growth(appleFreq)) {
 			if((world.getBlockId(i, j - 1, k) == 0) && (appleCanGrow(world,i,j,k))) {
 				emitItem(world, i, j - 1, k, new ItemStack(Item.appleRed));
 				return true;
@@ -216,7 +239,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		} else if((cocoaGrowth) && (growth(cocoaFreq))) {
 			String biomes[] = {"Rainforest"};
 			if((world.getBlockId(i, j - 1, k) == 0) && (canGrow(world,i,j,k, biomes))) {
-				System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
+				//System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
 				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
 				return true;
 			}
@@ -239,9 +262,11 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* Will emit either sapling, apple or cocoa
 	*/
 	public void grow(World world, int i, int j, int k) {
-		Random rand = new Random();			
+		Random rand 	= new Random();	
+		int randInt 	= rand.nextInt(100);	
+		// Biomes for apples
 		String biomes[] = {"Rainforest"};
-		int randInt = rand.nextInt(100);
+		
 		if((canGrow(world,i,j,k, biomes)) && (randInt < 10)) {
 			emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
 		} else if((appleCanGrow(world,i,j,k)) && (randInt < 25)) {
@@ -376,24 +401,22 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	*/
     private void removeLeaves(World world, int i, int j, int k) {
 		if(!world.multiplayerWorld) {
-			boolean forestGrowth = ((ModBooleanOption) ModOptionsAPI
-								.getModOptions(mod_AutoForest.MENU_NAME)
-								.getOption("ForestGrowth")).getValue();
 			boolean appleGrowth = ((ModBooleanOption) ModOptionsAPI
 									.getModOptions(mod_AutoForest.MENU_NAME)
 									.getSubOption(mod_AutoForest.TREE_MENU_NAME)
 									.getOption("ApplesGrow")).getValue();
-			if(forestGrowth) {
+			// The values for BOTH and DECAY are the higher ones
+			boolean growSaps 	= (((int) mod_AutoForest.growthType.getValue() % 2) > 1);
+			
+			if(growSaps) {
 				// Use increased growth rate here
 				if(growth(getSaplingFreq(world, i, j, k) * 120)) {
 					emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
 											 world.getBlockMetadata(i, j, k) % 4));
 				}
-			} else {
-				dropBlockAsItem(world, i, j, k, world.getBlockMetadata(i, j, k));
 			}
 			
-			// Apples grow independently
+			// Check if apples grow
 			if(appleGrowth) {
 				if(growth(getAppleFreq(world, i, j, k))) {
 					emitItem(world, i, j, k, new ItemStack(Item.appleRed));
@@ -417,6 +440,18 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
     public int idDropped(int i, Random random)
     {
         return Block.sapling.blockID;
+    }
+
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        if(!world.multiplayerWorld && entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.field_31001_bc.shiftedIndex)
+        {
+            entityplayer.addStat(StatList.mineBlockStatArray[blockID], 1);
+            func_31027_a(world, i, j, k, new ItemStack(Block.leaves.blockID, 1, l & 3));
+        } else
+        {
+            super.harvestBlock(world, entityplayer, i, j, k, l);
+        }
     }
 
     protected int damageDropped(int i)

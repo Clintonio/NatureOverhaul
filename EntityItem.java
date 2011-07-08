@@ -1,10 +1,21 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
 
+package net.minecraft.src;
+
 import java.util.Random;
-import net.minecraft.src.modoptionsapi.*;
+
+//========
+// BEGIN AUTOFOREST
+//========
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModMappedMultiOption;
+//========
+// END AUTOFOREST
+//========
 
 public class EntityItem extends Entity
 {
@@ -90,12 +101,12 @@ public class EntityItem extends Entity
 		
         if(worldObj.getBlockMaterial(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)) == Material.lava)
         {
-            motionY = 0.20000000298023224D;
+            motionY = 0.20000000298023221D;
             motionX = (rand.nextFloat() - rand.nextFloat()) * 0.2F;
             motionZ = (rand.nextFloat() - rand.nextFloat()) * 0.2F;
             worldObj.playSoundAtEntity(this, "random.fizz", 0.4F, 2.0F + rand.nextFloat() * 0.4F);
         }
-        func_466_g(posX, posY, posZ);
+        pushOutOfBlocks(posX, (boundingBox.minY + boundingBox.maxY) / 2D, posZ);
         moveEntity(motionX, motionY, motionZ);
         float f = 0.98F;
         if(onGround)
@@ -288,7 +299,8 @@ public class EntityItem extends Entity
 		int curBlockID = worldObj.getBlockId(i, j, k);
 		
 		// Api-able plantable interface
-		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID)) 
+		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID) 
+							|| (curBlockID == Block.grass.blockID)) 
 			&& (Item.itemsList[item.itemID] instanceof Plantable)) {
 			Plantable pItem = (Plantable) Item.itemsList[item.itemID];
 			if(pItem.plantable(worldObj, i, j, k, belowID, age)) {
@@ -306,83 +318,6 @@ public class EntityItem extends Entity
     public boolean handleWaterMovement()
     {
         return worldObj.handleMaterialAcceleration(boundingBox, Material.water, this);
-    }
-
-    private boolean func_466_g(double d, double d1, double d2)
-    {
-        int i = MathHelper.floor_double(d);
-        int j = MathHelper.floor_double(d1);
-        int k = MathHelper.floor_double(d2);
-        double d3 = d - (double)i;
-        double d4 = d1 - (double)j;
-        double d5 = d2 - (double)k;
-        if(Block.opaqueCubeLookup[worldObj.getBlockId(i, j, k)])
-        {
-            boolean flag = !Block.opaqueCubeLookup[worldObj.getBlockId(i - 1, j, k)];
-            boolean flag1 = !Block.opaqueCubeLookup[worldObj.getBlockId(i + 1, j, k)];
-            boolean flag2 = !Block.opaqueCubeLookup[worldObj.getBlockId(i, j - 1, k)];
-            boolean flag3 = !Block.opaqueCubeLookup[worldObj.getBlockId(i, j + 1, k)];
-            boolean flag4 = !Block.opaqueCubeLookup[worldObj.getBlockId(i, j, k - 1)];
-            boolean flag5 = !Block.opaqueCubeLookup[worldObj.getBlockId(i, j, k + 1)];
-            byte byte0 = -1;
-            double d6 = 9999D;
-            if(flag && d3 < d6)
-            {
-                d6 = d3;
-                byte0 = 0;
-            }
-            if(flag1 && 1.0D - d3 < d6)
-            {
-                d6 = 1.0D - d3;
-                byte0 = 1;
-            }
-            if(flag2 && d4 < d6)
-            {
-                d6 = d4;
-                byte0 = 2;
-            }
-            if(flag3 && 1.0D - d4 < d6)
-            {
-                d6 = 1.0D - d4;
-                byte0 = 3;
-            }
-            if(flag4 && d5 < d6)
-            {
-                d6 = d5;
-                byte0 = 4;
-            }
-            if(flag5 && 1.0D - d5 < d6)
-            {
-                double d7 = 1.0D - d5;
-                byte0 = 5;
-            }
-            float f = rand.nextFloat() * 0.2F + 0.1F;
-            if(byte0 == 0)
-            {
-                motionX = -f;
-            }
-            if(byte0 == 1)
-            {
-                motionX = f;
-            }
-            if(byte0 == 2)
-            {
-                motionY = -f;
-            }
-            if(byte0 == 3)
-            {
-                motionY = f;
-            }
-            if(byte0 == 4)
-            {
-                motionZ = -f;
-            }
-            if(byte0 == 5)
-            {
-                motionZ = f;
-            }
-        }
-        return false;
     }
 
     protected void dealFireDamage(int i)
@@ -436,7 +371,10 @@ public class EntityItem extends Entity
             ModLoader.OnItemPickup(entityplayer, item);
             worldObj.playSoundAtEntity(this, "random.pop", 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
             entityplayer.onItemPickup(this, i);
-            setEntityDead();
+            if(item.stackSize <= 0)
+            {
+                setEntityDead();
+            }
         }
     }
 

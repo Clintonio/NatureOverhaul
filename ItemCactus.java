@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptionsAPI;
 
 /**
 * Cactus Item Representation for varied cactii

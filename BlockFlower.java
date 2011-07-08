@@ -1,13 +1,14 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
 
+package net.minecraft.src;
+
 import java.util.Random;
-import net.minecraft.src.modoptionsapi.ModOptionsAPI;
-import net.minecraft.src.modoptionsapi.ModOptions;
-import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
-import net.minecraft.src.modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModMappedMultiOption;
+import modoptionsapi.ModBooleanOption;
 
 public class BlockFlower extends BlockMortal
 {
@@ -23,7 +24,7 @@ public class BlockFlower extends BlockMortal
 
     public boolean canPlaceBlockAt(World world, int i, int j, int k)
     {
-        return canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+        return super.canPlaceBlockAt(world, i, j, k) && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
     }
 
     protected boolean canThisPlantGrowOnThisBlockID(int i)
@@ -41,7 +42,6 @@ public class BlockFlower extends BlockMortal
 	// BEGIN AUTOFOREST
 	//========
     protected String growthModifierType = "FlowerSpawn";
-	protected String deathModifierName  = "StandardDeath";
 	
 	public void updateTick(World world, int i, int j, int k, Random random) {
 		if((!world.multiplayerWorld) && (!(this instanceof BlockCrops))) {
@@ -82,7 +82,7 @@ public class BlockFlower extends BlockMortal
 
     public boolean canBlockStay(World world, int i, int j, int k)
     {
-        return (world.getBlockLightValue(i, j, k) >= 8 || world.canBlockSeeTheSky(i, j, k)) && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+        return (world.getFullBlockLightValue(i, j, k) >= 8 || world.canBlockSeeTheSky(i, j, k)) && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
     }
 
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k)

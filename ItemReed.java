@@ -1,12 +1,14 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
 
+package net.minecraft.src;
+
 //========
 // START AUTOFOREST
 //========
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModBooleanOption;
 //========
 // END AUTOFOREST
 //========
@@ -56,7 +58,7 @@ public class ItemReed extends Item implements Plantable
         {
             return false;
         }
-        if(world.canBlockBePlacedAt(field_320_a, i, j, k, false))
+        if(world.canBlockBePlacedAt(field_320_a, i, j, k, false, l))
         {
             Block block = Block.blocksList[field_320_a];
             if(world.setBlockWithNotify(i, j, k, field_320_a))

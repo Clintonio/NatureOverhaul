@@ -1,14 +1,17 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
+
+package net.minecraft.src;
 
 import java.util.Random;
 
 //========
 // BEGIN AUTOFOREST
 //========
-import net.minecraft.src.modoptionsapi.*;
+import modoptionsapi.ModMappedMultiOption;
+import modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptions;
 //========
 // END AUTOFOREST
 //========
@@ -46,12 +49,10 @@ public class BlockCactus extends BlockMortal
 		//========
 		// BEGIN AUTOFOREST
 		//========
-		if(!world.multiplayerWorld)
-		{
+		if(!world.multiplayerWorld) {
 			ModOptions cactii = mod_AutoForest.cactii;
 			boolean grow = ((ModBooleanOption) cactii.getOption("CactiiGrow")).getValue();
-			if(grow)
-			{
+			if(grow) {
 				double growthRate = 1D /(((ModMappedMultiOption) cactii
 						.getOption("CactiiGrowthRate")).getValue());
 				attemptGrowth(world, i, j, k, growthRate);

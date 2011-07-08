@@ -1,16 +1,17 @@
-package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
+
+package net.minecraft.src;
 
 import java.util.Random;
 //====================
 // BEGIN AUTOFOREST
 //====================
-import net.minecraft.src.modoptionsapi.ModOptionsAPI;
-import net.minecraft.src.modoptionsapi.ModOptions;
-import net.minecraft.src.modoptionsapi.ModMappedMultiOption;
-import net.minecraft.src.modoptionsapi.ModBooleanOption;
+import modoptionsapi.ModOptionsAPI;
+import modoptionsapi.ModOptions;
+import modoptionsapi.ModMappedMultiOption;
+import modoptionsapi.ModBooleanOption;
 
 public class BlockSapling extends BlockFlower
 {
@@ -23,6 +24,10 @@ public class BlockSapling extends BlockFlower
     }
 
     public void updateTick(World world, int i, int j, int k, Random random) {
+        if(world.multiplayerWorld)
+        {
+            return;
+        }
 		ModOptions options = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).getSubOption(mod_AutoForest.TREE_MENU_NAME);
 		ModMappedMultiOption mo = (ModMappedMultiOption) options.getOption("TreeGrowthRate");
 		
