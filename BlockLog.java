@@ -42,7 +42,7 @@ public class BlockLog extends Block
 														  world, i, k);
 			if((treeDeath) &&  ((deathRate <= 0) || (random.nextInt(deathRate) == 0)) && (isTree(world, i, j, k))) {
 				int lowestLogJ = getLowestLogJ(world, i, j, k);
-				System.out.println("KILLING A TREE IN biome " + mod_AutoForest.getBiomeName(i,k) + ". WITH RATE: " + deathRate);
+				//System.out.println("KILLING A TREE IN biome " + mod_AutoForest.getBiomeName(i,k) + ". WITH RATE: " + deathRate);
 				killTree(world, i, lowestLogJ, k);
 			}
 		}
@@ -160,7 +160,7 @@ public class BlockLog extends Block
 			j++;
 		}
 	
-		System.out.println("Killing tree from ("+i+","+j+","+k+") with height " + treeHeight);
+		//System.out.println("Killing tree from ("+i+","+j+","+k+") with height " + treeHeight);
 		// Kill first log to avoid downscanning
 		killLog(world, i, j ,k, true);
 		
