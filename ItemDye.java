@@ -66,7 +66,7 @@ label0:
                             k1 += itemRand.nextInt(3) - 1;
                             l1 += ((itemRand.nextInt(3) - 1) * itemRand.nextInt(3)) / 2;
                             i2 += itemRand.nextInt(3) - 1;
-                            if(world.getBlockId(k1, l1 - 1, i2) != Block.grass.blockID || world.func_28100_h(k1, l1, i2))
+                            if(world.getBlockId(k1, l1 - 1, i2) != Block.grass.blockID || world.isBlockNormalCube(k1, l1, i2))
                             {
                                 continue label0;
                             }

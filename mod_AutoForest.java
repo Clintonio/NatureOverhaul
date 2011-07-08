@@ -238,7 +238,7 @@ public class mod_AutoForest extends BaseMod {
 		
 		// Put the cobblestone mossy into the blocklist
 		BlockCobblestoneMossy.createInBlockList();
-		Block.blocksList[Block.cobblestoneMossy.blockID].preRenderSlimeSize();
+		Block.blocksList[Block.cobblestoneMossy.blockID].initializeBlock();
 		
 		Item tmp = new ItemBlock(Block.cobblestoneMossy.blockID - 256);;
 		Item.itemsList[Block.cobblestoneMossy.blockID] = tmp;

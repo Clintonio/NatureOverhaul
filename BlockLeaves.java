@@ -28,7 +28,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
         setTickOnLoad(true);
     }
 
-    public int func_31030_b(int i)
+    public int getRenderColor(int i)
     {
         if((i & 1) == 1)
         {
@@ -444,10 +444,10 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 
     public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
     {
-        if(!world.multiplayerWorld && entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.field_31001_bc.shiftedIndex)
+        if(!world.multiplayerWorld && entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.shears.shiftedIndex)
         {
             entityplayer.addStat(StatList.mineBlockStatArray[blockID], 1);
-            func_31027_a(world, i, j, k, new ItemStack(Block.leaves.blockID, 1, l & 3));
+            dropBlockAsItem_do(world, i, j, k, new ItemStack(Block.leaves.blockID, 1, l & 3));
         } else
         {
             super.harvestBlock(world, entityplayer, i, j, k, l);

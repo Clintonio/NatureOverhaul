@@ -118,7 +118,7 @@ public class BlockPumpkin extends BlockMortal
     public boolean canPlaceBlockAt(World world, int i, int j, int k)
     {
         int l = world.getBlockId(i, j, k);
-        return (l == 0 || Block.blocksList[l].blockMaterial.getIsGroundCover()) && world.func_28100_h(i, j - 1, k);
+        return (l == 0 || Block.blocksList[l].blockMaterial.getIsGroundCover()) && world.isBlockNormalCube(i, j - 1, k);
     }
 
     public void onBlockPlacedBy(World world, int i, int j, int k, EntityLiving entityliving)
