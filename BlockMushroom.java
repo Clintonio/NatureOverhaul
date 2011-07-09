@@ -39,7 +39,11 @@ public class BlockMushroom extends BlockFlower
 
     public void updateTick(World world, int i, int j, int k, Random random)
     {
-        if(random.nextInt(100) == 0)
+		//========
+		// BEGIN AUTOFOREST
+		//========
+		boolean keepDefaultSpread = mod_AutoForest.defaultShroomSpread.getValue();
+        if(keepDefaultSpread && random.nextInt(100) == 0)
         {
             int l = (i + random.nextInt(3)) - 1;
             int i1 = (j + random.nextInt(2)) - random.nextInt(2);
@@ -54,17 +58,15 @@ public class BlockMushroom extends BlockFlower
                 }
             }
         }
-		if(!world.multiplayerWorld)
-		{
+		
+		if(!world.multiplayerWorld) {
 			ModOptions shrooms = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
 				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME);
 			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomsGrow")).getValue();
-			if(grow)
-			{
+			if(grow) {
 				double growthRate = 1D /(((ModMappedMultiOption) shrooms
 						.getOption("ShroomGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
 			}
 			
 			// ATTEMPT DEATH
@@ -75,10 +77,12 @@ public class BlockMushroom extends BlockFlower
 				death(world, i, j, k);
 			}
 		}
-	//========
-	// END AUTOFOREST
-	//========
+		//========
+		// END AUTOFOREST
+		//========
     }
+	
+	
 
     protected boolean canThisPlantGrowOnThisBlockID(int i)
     {

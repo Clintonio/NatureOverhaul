@@ -59,7 +59,8 @@ public class mod_AutoForest extends BaseMod {
 	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies");
 	
 	// Options for saplings
-	public static ModMappedMultiOption growthType;
+	public static ModMappedMultiOption 	growthType;
+	public static ModBooleanOption		defaultShroomSpread = new ModBooleanOption("Enable Default Spread");
 	
 	// Options for moss
 	public static ModBooleanOption		mossGrows		= new ModBooleanOption("Moss Grows");
@@ -81,7 +82,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "1.1";
+		return "1.1.0.2";
 	}
 	
 	//=====================
@@ -199,10 +200,13 @@ public class mod_AutoForest extends BaseMod {
 		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
 		pumpkins.addToggle("PumpkinsGrow");
 		
+		shrooms.addOption(defaultShroomSpread);
 		shrooms.addMappedMultiOption("ShroomDeathRate", pKeys, labels);
 		shrooms.addOption(shroomDeath);
 		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
 		shrooms.addToggle("ShroomsGrow");
+		
+		defaultShroomSpread.setValue(false);
 		
 		grass.addMappedMultiOption("GrassDeathRate", pKeys, labels);
 		grass.addOption(grassDeath);
@@ -377,4 +381,17 @@ public class mod_AutoForest extends BaseMod {
         BiomeGenBase base = BiomeGenBase.getBiomeFromLookup(temp, humi);
         return base.biomeName;
     }
+	
+	//=====================
+	// DEBUG METHODS
+	//=====================
+	
+	/**
+	* Print a message out specifically for NO mod debugging
+	*
+	* @param	msg		Message to print
+	*/
+	public static void debugOutput(String msg) {
+		System.out.println("(NatureOverhaul) " + msg);
+	}
 }

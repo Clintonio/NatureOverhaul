@@ -406,11 +406,10 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 									.getSubOption(mod_AutoForest.TREE_MENU_NAME)
 									.getOption("ApplesGrow")).getValue();
 			// The values for BOTH and DECAY are the higher ones
-			boolean growSaps 	= (((int) mod_AutoForest.growthType.getValue() % 2) > 1);
-			
+			boolean growSaps 	= ((int) mod_AutoForest.growthType.getValue() > 1);
 			if(growSaps) {
 				// Use increased growth rate here
-				if(growth(getSaplingFreq(world, i, j, k) * 120)) {
+				if(growth(getSaplingFreq(world, i, j, k) * 50)) {
 					emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
 											 world.getBlockMetadata(i, j, k) % 4));
 				}
