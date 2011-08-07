@@ -82,7 +82,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "1.1.0.2";
+		return "1.1.0.3";
 	}
 	
 	//=====================
