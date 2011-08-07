@@ -300,7 +300,7 @@ public class EntityItem extends Entity
 		
 		// Api-able plantable interface
 		if((age > 1200) && ((curBlockID == 0) || (curBlockID == Block.snow.blockID) 
-							|| (curBlockID == Block.grass.blockID)) 
+							|| (curBlockID == Block.tallGrass.blockID)) 
 			&& (Item.itemsList[item.itemID] instanceof Plantable)) {
 			Plantable pItem = (Plantable) Item.itemsList[item.itemID];
 			if(pItem.plantable(worldObj, i, j, k, belowID, age)) {
