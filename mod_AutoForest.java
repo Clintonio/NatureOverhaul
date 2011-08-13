@@ -62,10 +62,11 @@ public class mod_AutoForest extends BaseMod {
 	public static ModMappedMultiOption 	growthType;
 	public static ModBooleanOption		defaultShroomSpread = new ModBooleanOption("Enable Default Spread");
 	
-	// Options for moss
+	// Options for misc
 	public static ModBooleanOption		mossGrows		= new ModBooleanOption("Moss Grows");
 	public static ModMappedMultiOption	mossGrowthRate;
 	public static ModBooleanOption		infiniteFire	= new ModBooleanOption("Infinite Fire Spread");
+	public static ModBooleanOption 		waterFix		= new ModBooleanOption("Fix Water Bug");
 	
 	// Objects
 	public static ModOptions climate		= new ModOptions(CLIMATE_MENU_NAME);
@@ -82,7 +83,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "1.1.0.3";
+		return "1.2";
 	}
 	
 	//=====================
@@ -220,6 +221,7 @@ public class mod_AutoForest extends BaseMod {
 	private void addMiscOptions() {
 		// Mossy cobble growth speed related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
+		misc.addOption(waterFix);
 		misc.addOption(infiniteFire);
 		infiniteFire.setGlobalValue(false);
 		misc.addMappedMultiOption("MossGrowthRate", pKeys, labels);
