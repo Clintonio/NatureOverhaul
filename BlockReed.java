@@ -9,10 +9,10 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
+import moapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
+import moapi.ModOptions;
+import moapi.ModMappedMultiOption;
 //========
 // END AUTOFOREST
 //========
@@ -108,7 +108,7 @@ public class BlockReed extends BlockMortal
         {
             return true;
         }
-        if(l != Block.grass.blockID && l != Block.dirt.blockID)
+        if(l != Block.grass.blockID && l != Block.dirt.blockID && l != Block.sand.blockID)
         {
             return false;
         }

@@ -8,10 +8,10 @@ import java.util.Random;
 //=======================
 // START NATURE OVERHAUL
 //=======================
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModMappedMultiOption;
+import moapi.ModOptionsAPI;
+import moapi.ModOptions;
+import moapi.ModBooleanOption;
+import moapi.ModMappedMultiOption;
 import java.util.HashSet;
 //=======================
 // END NATURE OVERHAUL

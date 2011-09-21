@@ -9,11 +9,11 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModMultiOption;
-import modoptionsapi.ModMappedMultiOption;
-import modoptionsapi.ModOptionsAPI;
+import moapi.ModOptions;
+import moapi.ModBooleanOption;
+import moapi.ModMultiOption;
+import moapi.ModMappedMultiOption;
+import moapi.ModOptionsAPI;
 //========
 // END AUTOFOREST
 //========
@@ -26,6 +26,13 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
         super(i, j, Material.leaves, false);
         baseIndexInPNG = j;
         setTickOnLoad(true);
+    }
+
+    public int func_35274_i()
+    {
+        double d = 0.5D;
+        double d1 = 1.0D;
+        return ColorizerFoliage.getFoliageColor(d, d1);
     }
 
     public int getRenderColor(int i)
@@ -55,9 +62,8 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
             return ColorizerFoliage.getFoliageColorBirch();
         } else
         {
-            iblockaccess.getWorldChunkManager().func_4069_a(i, k, 1, 1);
-            double d = iblockaccess.getWorldChunkManager().temperature[0];
-            double d1 = iblockaccess.getWorldChunkManager().humidity[0];
+            double d = iblockaccess.getWorldChunkManager().func_35554_b(i, k);
+            double d1 = iblockaccess.getWorldChunkManager().func_35558_c(i, k);
             return ColorizerFoliage.getFoliageColor(d, d1);
         }
     }
@@ -96,7 +102,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
             return;
         }
         int l = world.getBlockMetadata(i, j, k);
-        if((l & 8) != 0)
+        if((l & 8) != 0 && (l & 4) == 0)
         {
             byte byte0 = 4;
             int i1 = byte0 + 1;
@@ -237,7 +243,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 				return true;
 			}
 		} else if((cocoaGrowth) && (growth(cocoaFreq))) {
-			String biomes[] = {"Rainforest"};
+			Biome biomes[] = {Biome.FOREST};
 			if((world.getBlockId(i, j - 1, k) == 0) && (canGrow(world,i,j,k, biomes))) {
 				//System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
 				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
@@ -265,7 +271,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		Random rand 	= new Random();	
 		int randInt 	= rand.nextInt(100);	
 		// Biomes for apples
-		String biomes[] = {"Rainforest"};
+		Biome biomes[] = {Biome.FOREST};
 		
 		if((canGrow(world,i,j,k, biomes)) && (randInt < 10)) {
 			emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
@@ -283,9 +289,9 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @param	biomes		List of biome names
 	* @return	true if can
 	*/
-	private boolean canGrow(World world, int i, int j, int k, String[] biomes) {
-		String curbiome = mod_AutoForest.getBiomeName(i,k);
-		for(String biome : biomes) {
+	private boolean canGrow(World world, int i, int j, int k, Biome[] biomes) {
+		Biome curbiome = Biome.getBiomeFromString(mod_AutoForest.getBiomeName(i,k));
+		for(Biome biome : biomes) {
 			if(curbiome.equals(biome)) {
 				return true;
 			}

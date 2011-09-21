@@ -9,7 +9,19 @@ import java.util.HashMap;
 */
 public enum Biome {
 	
-	RAINFOREST 		(0),
+	SWAMPLAND 		(0),
+	FOREST 			(1),
+	TAIGA			(2),
+	DESERT			(3),
+	PLAINS			(4),
+	HELL			(5),
+	OCEAN			(6),
+	HILLS			(7),
+	RIVER			(8),
+	SKY				(9);
+	// Removed: 0, 2, 4, 5, 8, 10
+	
+	/*	RAINFOREST 		(0),
 	SWAMPLAND 		(1),
 	SEASONAL_FOREST	(2),
 	FOREST 			(3),
@@ -20,8 +32,7 @@ public enum Biome {
 	ICE_DESERT		(8),
 	PLAINS			(9),
 	TUNDRA			(10),
-	HELL			(11);
-	
+	HELL			(11);*/
 	private static HashMap<String, Biome> BiomeTranslate 
 									= new HashMap<String, Biome>();
 	
@@ -50,17 +61,15 @@ public enum Biome {
 	}
 	
 	static {
-		BiomeTranslate.put("Rainforest", Biome.RAINFOREST);
 		BiomeTranslate.put("Swampland", Biome.SWAMPLAND);
-		BiomeTranslate.put("Seasonal Forest", Biome.SEASONAL_FOREST);
 		BiomeTranslate.put("Forest", Biome.FOREST);
-		BiomeTranslate.put("Savanna", Biome.SAVANNA);
-		BiomeTranslate.put("Shrubland", Biome.SHRUBLAND);
 		BiomeTranslate.put("Taiga", Biome.TAIGA);
 		BiomeTranslate.put("Desert", Biome.DESERT);
-		BiomeTranslate.put("Ice Desert", Biome.ICE_DESERT);
 		BiomeTranslate.put("Plains", Biome.PLAINS);
-		BiomeTranslate.put("Tundra", Biome.TUNDRA);
 		BiomeTranslate.put("Hell", Biome.HELL);
+		BiomeTranslate.put("Ocean", Biome.OCEAN);
+		BiomeTranslate.put("Extreme Hills", Biome.HILLS);
+		BiomeTranslate.put("River", Biome.RIVER);
+		BiomeTranslate.put("Sky", Biome.SKY);
 	}
 }

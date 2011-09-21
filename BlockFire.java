@@ -9,7 +9,7 @@ import java.util.Random;
 //====================
 // BEGIN NATURE OVERHAUL
 //====================
-import modoptionsapi.*;
+import moapi.*;
 //====================
 // END NATURE OVERHAUL
 //====================
@@ -36,6 +36,7 @@ public class BlockFire extends Block
         setBurnRate(Block.tnt.blockID, 15, 100);
         setBurnRate(Block.tallGrass.blockID, 60, 100);
         setBurnRate(Block.cloth.blockID, 30, 60);
+        setBurnRate(Block.vine.blockID, 15, 100);
     }
 
     private void setBurnRate(int i, int j, int k)
@@ -88,7 +89,7 @@ public class BlockFire extends Block
         {
             world.setBlockWithNotify(i, j, k, 0);
         }
-        if(!flag && world.func_27161_C() && (world.canBlockBeRainedOn(i, j, k) || world.canBlockBeRainedOn(i - 1, j, k) || world.canBlockBeRainedOn(i + 1, j, k) || world.canBlockBeRainedOn(i, j, k - 1) || world.canBlockBeRainedOn(i, j, k + 1)))
+        if(!flag && world.isRaining() && (world.canLightningStrikeAt(i, j, k) || world.canLightningStrikeAt(i - 1, j, k) || world.canLightningStrikeAt(i + 1, j, k) || world.canLightningStrikeAt(i, j, k - 1) || world.canLightningStrikeAt(i, j, k + 1)))
         {
             world.setBlockWithNotify(i, j, k, 0);
             return;
@@ -154,7 +155,7 @@ public class BlockFire extends Block
 					// This is where the main deviation from the old algorithm occurs
 					if(!infFire) {
 						int j2 = (i2 + 40) / (l + 30);
-						if(j2 <= 0 || random.nextInt(l1) > j2 || world.func_27161_C() && world.canBlockBeRainedOn(i1, k1, j1) || world.canBlockBeRainedOn(i1 - 1, k1, k) || world.canBlockBeRainedOn(i1 + 1, k1, j1) || world.canBlockBeRainedOn(i1, k1, j1 - 1) || world.canBlockBeRainedOn(i1, k1, j1 + 1))
+						if(j2 <= 0 || random.nextInt(l1) > j2 || world.isRaining() && world.canLightningStrikeAt(i1, k1, j1) || world.canLightningStrikeAt(i1 - 1, k1, k) || world.canLightningStrikeAt(i1 + 1, k1, j1) || world.canLightningStrikeAt(i1, k1, j1 - 1) || world.canLightningStrikeAt(i1, k1, j1 + 1))
 						{
 							continue;
 						}
@@ -165,7 +166,7 @@ public class BlockFire extends Block
 						}
 						world.setBlockAndMetadataWithNotify(i1, k1, j1, blockID, k2);
 					} else {
-						if(random.nextInt(l1) <= i2 && (!world.func_27161_C() || !world.canBlockBeRainedOn(i1, k1, j1)) && !world.canBlockBeRainedOn(i1 - 1, k1, k) && !world.canBlockBeRainedOn(i1 + 1, k1, j1) && !world.canBlockBeRainedOn(i1, k1, j1 - 1) && !world.canBlockBeRainedOn(i1, k1, j1 + 1))
+						if(random.nextInt(l1) <= i2 && (!world.isRaining() || !world.canLightningStrikeAt(i1, k1, j1)) && !world.canLightningStrikeAt(i1 - 1, k1, k) && !world.canLightningStrikeAt(i1 + 1, k1, j1) && !world.canLightningStrikeAt(i1, k1, j1 - 1) && !world.canLightningStrikeAt(i1, k1, j1 + 1))
                         {
                             world.setBlockWithNotify(i1, k1, j1, blockID);
                         }
@@ -206,7 +207,7 @@ public class BlockFire extends Block
         if(random.nextInt(l) < j1)
         {
             boolean flag = world.getBlockId(i, j, k) == Block.tnt.blockID;
-            if(!infFire && random.nextInt(i1 + 10) < 5 && !world.canBlockBeRainedOn(i, j, k))
+            if(!infFire && random.nextInt(i1 + 10) < 5 && !world.canLightningStrikeAt(i, j, k))
             {
                 int k1 = i1 + random.nextInt(5) / 4;
                 if(k1 > 15)
@@ -214,7 +215,7 @@ public class BlockFire extends Block
                     k1 = 15;
                 }
                 world.setBlockAndMetadataWithNotify(i, j, k, blockID, k1);
-            } else if(infFire && random.nextInt(2) == 0 && !world.canBlockBeRainedOn(i, j, k))
+            } else if(infFire && random.nextInt(2) == 0 && !world.canLightningStrikeAt(i, j, k))
             {
                 world.setBlockWithNotify(i, j, k, blockID);
 			} else

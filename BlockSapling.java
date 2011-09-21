@@ -8,10 +8,10 @@ import java.util.Random;
 //====================
 // BEGIN AUTOFOREST
 //====================
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
-import modoptionsapi.ModBooleanOption;
+import moapi.ModOptionsAPI;
+import moapi.ModOptions;
+import moapi.ModMappedMultiOption;
+import moapi.ModBooleanOption;
 
 public class BlockSapling extends BlockFlower
 {

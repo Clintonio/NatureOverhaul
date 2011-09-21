@@ -7,8 +7,8 @@ package net.minecraft.src;
 //========
 // START AUTOFOREST
 //========
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
+import moapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
 //========
 // END AUTOFOREST
 //========
@@ -19,15 +19,17 @@ public class ItemReed extends Item implements Plantable
     public ItemReed(int i, Block block)
     {
         super(i);
-        field_320_a = block.blockID;
+        spawnID = block.blockID;
     }
 
     public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
     {
-        if(world.getBlockId(i, j, k) == Block.snow.blockID)
+        int i1 = world.getBlockId(i, j, k);
+        if(i1 == Block.snow.blockID)
         {
             l = 0;
         } else
+        if(i1 != Block.vine.blockID)
         {
             if(l == 0)
             {
@@ -54,18 +56,25 @@ public class ItemReed extends Item implements Plantable
                 i++;
             }
         }
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
         if(itemstack.stackSize == 0)
         {
             return false;
         }
-        if(world.canBlockBePlacedAt(field_320_a, i, j, k, false, l))
+        if(world.canBlockBePlacedAt(spawnID, i, j, k, false, l))
         {
-            Block block = Block.blocksList[field_320_a];
-            if(world.setBlockWithNotify(i, j, k, field_320_a))
+            Block block = Block.blocksList[spawnID];
+            if(world.setBlockWithNotify(i, j, k, spawnID))
             {
-                Block.blocksList[field_320_a].onBlockPlaced(world, i, j, k, l);
-                Block.blocksList[field_320_a].onBlockPlacedBy(world, i, j, k, entityplayer);
-                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.func_1145_d(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
+                if(world.getBlockId(i, j, k) == spawnID)
+                {
+                    Block.blocksList[spawnID].onBlockPlaced(world, i, j, k, l);
+                    Block.blocksList[spawnID].onBlockPlacedBy(world, i, j, k, entityplayer);
+                }
+                world.playSoundEffect((float)i + 0.5F, (float)j + 0.5F, (float)k + 0.5F, block.stepSound.stepSoundDir2(), (block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
                 itemstack.stackSize--;
             }
         }
@@ -101,11 +110,11 @@ public class ItemReed extends Item implements Plantable
 	* @return	ID of block to plant
 	*/
 	public int getPlantBlockID() {
-		return field_320_a;
+		return spawnID;
 	}
 	//========
 	// END AUTOFOREST
 	//========
 
-    private int field_320_a;
+    private int spawnID;
 }

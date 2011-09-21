@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModOption;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
+import moapi.ModOptionsAPI;
+import moapi.ModOption;
+import moapi.ModBooleanOption;
+import moapi.ModOptions;
+import moapi.ModMappedOption;
+import moapi.ModMappedMultiOption;
 
 import java.util.HashMap;
 
@@ -26,7 +27,6 @@ public class mod_AutoForest extends BaseMod {
 	public static final String FLOWER_MENU_NAME	 = "Flower Options";
 	public static final String CACTI_MENU_NAME	 = "Cactus Options";
 	public static final String REED_MENU_NAME	 = "Reed Options";
-	public static final String PUMPKIN_MENU_NAME = "Pumpkin Options";
 	public static final String SHROOMS_MENU_NAME = "Mushroom Options";
 	private static final String GRASS_MENU_NAME  = "Grass Options";
 	private static final String MISC_MENU_NAME  = "Misc Options";
@@ -46,14 +46,12 @@ public class mod_AutoForest extends BaseMod {
 	public static ModOptions 		flowers 	= new ModOptions(FLOWER_MENU_NAME);
 	public static ModOptions 		cactii 		= new ModOptions(CACTI_MENU_NAME);
 	public static ModOptions 		reed 		= new ModOptions(REED_MENU_NAME);
-	public static ModOptions 		pumpkins 	= new ModOptions(PUMPKIN_MENU_NAME);
 	public static ModOptions 		shrooms 	= new ModOptions(SHROOMS_MENU_NAME);
 	public static ModOptions		grass		= new ModOptions(GRASS_MENU_NAME);
 	public static ModOptions		misc		= new ModOptions(MISC_MENU_NAME);
 	
 	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die");
 	public static ModBooleanOption shroomDeath 	= new ModBooleanOption("Shrooms Die");
-	public static ModBooleanOption pumpkinDeath = new ModBooleanOption("Pumkins Die");
 	public static ModBooleanOption reedDeath 	= new ModBooleanOption("Reeds Die");
 	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
 	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies");
@@ -64,9 +62,10 @@ public class mod_AutoForest extends BaseMod {
 	
 	// Options for misc
 	public static ModBooleanOption		mossGrows		= new ModBooleanOption("Moss Grows");
-	public static ModMappedMultiOption	mossGrowthRate;
+	public static ModMappedMultiOption		mossGrowthRate;
 	public static ModBooleanOption		infiniteFire	= new ModBooleanOption("Infinite Fire Spread");
 	public static ModBooleanOption 		waterFix		= new ModBooleanOption("Fix Water Bug");
+	public static ModMappedMultiOption		reproductionRate;
 	
 	// Objects
 	public static ModOptions climate		= new ModOptions(CLIMATE_MENU_NAME);
@@ -83,7 +82,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String Version() {
-		return "1.2";
+		return "1.3";
 	}
 	
 	//=====================
@@ -176,7 +175,6 @@ public class mod_AutoForest extends BaseMod {
 		plants.addSubOptions(flowers);
 		plants.addSubOptions(cactii);
 		plants.addSubOptions(reed);
-		plants.addSubOptions(pumpkins);
 		plants.addSubOptions(shrooms);
 		plants.addSubOptions(grass);
 		
@@ -195,11 +193,6 @@ public class mod_AutoForest extends BaseMod {
 		reed.addOption(reedDeath);
 		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
 		reed.addToggle("ReedsGrow");
-		
-		pumpkins.addMappedMultiOption("PumpkinDeathRate", pKeys, labels);
-		pumpkins.addOption(pumpkinDeath);
-		pumpkins.addMappedMultiOption("PumpkinGrowthRate", pKeys, labels);
-		pumpkins.addToggle("PumpkinsGrow");
 		
 		shrooms.addOption(defaultShroomSpread);
 		shrooms.addMappedMultiOption("ShroomDeathRate", pKeys, labels);
@@ -221,13 +214,19 @@ public class mod_AutoForest extends BaseMod {
 	private void addMiscOptions() {
 		// Mossy cobble growth speed related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
+		// Reproduction rate speed
+		Integer[] rKeys 	= { 16000, 1600, 160, 16, 64000, 32000 };
+		
 		misc.addOption(waterFix);
 		misc.addOption(infiniteFire);
 		infiniteFire.setGlobalValue(false);
 		misc.addMappedMultiOption("MossGrowthRate", pKeys, labels);
 		misc.addOption(mossGrows);
+		misc.addMappedMultiOption("Animal Birth Rate", rKeys, labels);
 		
-		mossGrowthRate = (ModMappedMultiOption) misc.getOption("MossGrowthRate");
+		
+		mossGrowthRate 	 = (ModMappedMultiOption) misc.getOption("MossGrowthRate");
+		reproductionRate = (ModMappedMultiOption) misc.getOption("Animal Birth Rate"); 
 	}
 	
 	/**
@@ -240,7 +239,6 @@ public class mod_AutoForest extends BaseMod {
 		Item.itemsList[Block.plantYellow.blockID]	= (new ItemFlower(Block.plantYellow.blockID - 256)).setItemName("Flower");
 		Item.itemsList[Block.plantRed.blockID] 		= (new ItemFlower(Block.plantRed.blockID - 256)).setItemName("Flower");
 		Item.itemsList[Block.cactus.blockID] 		= (new ItemCactus(Block.cactus.blockID - 256)).setItemName("Cactus");
-		Item.itemsList[Block.pumpkin.blockID] 		= (new ItemPumpkin(Block.pumpkin.blockID - 256)).setItemName("Pumpkin");
 		
 		// Put the cobblestone mossy into the blocklist
 		BlockCobblestoneMossy.createInBlockList();
@@ -291,22 +289,21 @@ public class mod_AutoForest extends BaseMod {
 		//=====
 		// NATURE OVERHAUL SPECIFIC biome MODIFIERS
 		//=====
-							  // 0   1   2   3   4   5   6    7    8   9  10   11
-		byte[] saplingSpawn = { 33,-10, 15,  0,-90,-90, 10,-100,-100,-95, -95,-100 };
-		byte[] saplingDeath = {  0, 10,  0,  0, 90, 90, 10,  95,  95, 95,  95, 100 };
-		byte[] treeDeath	= {  0,-10,  0,  0,-90,  0,  0, -90, -90,-90, -90, 100 };
-		byte[] bigTree		= { 20, 10, 15, 10,  1,  5, 10,   5,   0,  0,   0,   0 };
-		byte[] treeGap		= {  0,  3,  1,  1,  5,  4,  2,  10,  10,  9,  10,   0 };
-		byte[] flowerSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
-		byte[] cactiSpawn	= {  0,-25,  0,  0, 50, 75,-75,  20,-100,-90,   0,-100 };
-		byte[] cactiiDeath	= {  0, 25,  0,  0,-50,-75, 75, -20, 100, 90,   0, 100 };
-		byte[] reedSpawn	= { 25, 50, 15, 10,-75,  0,-90, -90,-100,-10,-100,-100 };
-		byte[] reedDeath	= {-90,-50,-30,-20, 10,  0,  5,  10, 100,  0, 100, 100 };
-		byte[] pumpkinSpawn	= { 15, 25, 10, 10,-75, 50,  0,-100,-100,-90,  95,-100 };
-		byte[] shroomSpawn	= { 15, 25, 10, 10,-75, 50,  0, -95,-100,-90,  95,-100 };
-		byte[] shroomDeath  = {-15,-25,-10,-10, 75, 50,  0,  95, 100, 90, -95, 100 };
-		byte[] mossGrowth 	= {100,100, 50, 50,-75,  0,-90,-100,-100,-90,-100,-100 };
-		
+							  //  0   1   2    3    4    5    6    7    8  9
+		byte[] saplingSpawn = { -10,  0, 10,-100, -95, -100,  0, -20,  10, 0 };
+		byte[] saplingDeath = {  10,  0, 10,  95,  95,  100,  0,  20,   5, 0 };
+		byte[] treeDeath	= { -10,  0,  0, -90, -90,  100,  0,  20,  10, 0 };
+		byte[] bigTree		= {  10, 10, 10,   5,   0,    0,  0,   0,  10, 0 };
+		byte[] treeGap		= {   3,  1,  2,  10,   9,    0,  0,   4,   2, 0 };
+		byte[] flowerSpawn	= {  25, 10,  0,-100, -90, -100,  0,   0,  50, 0 };
+		byte[] cactiSpawn	= { -25,  0,-75,  20, -90, -100,  0,  -5,   0, 0 };
+		byte[] cactiiDeath	= {  25,  0, 75, -20,  90,  100,  0, -10,   0, 0 };
+		byte[] reedSpawn	= {  50, 10,-90, -90, -10, -100,  0, -40, 100, 0 };
+		byte[] reedDeath	= { -50,-20,  5,  10,   0,  100,  0,  40, -20, 0 };
+		byte[] shroomSpawn	= {  25, 10,  0, -95, -90, -100,  0,   0,  35, 0 };
+		byte[] shroomDeath  = { -25,-10,  0,  95,  90,  100,  0,   0,  10, 0 };
+		byte[] mossGrowth 	= { 100, 50,-90,-100, -90, -100,  0,   0, 100, 0 };
+		 
 		biomeModifier.put("SaplingSpawn", saplingSpawn);
 		biomeModifier.put("SaplingDeath", saplingDeath);
 		biomeModifier.put("TreeDeath", treeDeath);
@@ -317,7 +314,6 @@ public class mod_AutoForest extends BaseMod {
 		biomeModifier.put("DeathSpawn", cactiiDeath);
 		biomeModifier.put("ReedSpawn", reedSpawn);
 		biomeModifier.put("ReedDeath", reedDeath);
-		biomeModifier.put("PumpkinSpawn", pumpkinSpawn);
 		biomeModifier.put("ShroomSpawn", shroomSpawn);
 		biomeModifier.put("ShroomDeath", shroomDeath);
 		biomeModifier.put("GrassSpawn", flowerSpawn);
@@ -326,7 +322,7 @@ public class mod_AutoForest extends BaseMod {
 		//=====
 		// STANDARD biome MODIFIERS - Don't edit
 		//=====
-		byte[] standardDeath = { -25, -5, -15, -10, 10, 5, 5, 100, 100, 50, 100, 100};
+		byte[] standardDeath = { 25, -10, 45, 90, 60, 100, 50, 65, -25, 100 };
 		
 		biomeModifier.put("StandardDeath", standardDeath);
 	}
@@ -377,11 +373,7 @@ public class mod_AutoForest extends BaseMod {
     public static String getBiomeName(int i, int j) {
 		WorldChunkManager cm = ModLoader.getMinecraftInstance().theWorld
 										.getWorldChunkManager();
-        cm.func_4069_a(i, j, 1, 1);
-        double temp = cm.temperature[0];
-        double humi = cm.humidity[0];
-        BiomeGenBase base = BiomeGenBase.getBiomeFromLookup(temp, humi);
-        return base.biomeName;
+        return cm.getBiomeGenAt(i, j).biomeName;
     }
 	
 	//=====================

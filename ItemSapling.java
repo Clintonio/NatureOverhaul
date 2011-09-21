@@ -7,8 +7,8 @@ package net.minecraft.src;
 //========
 // START AUTOFOREST
 //========
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
+import moapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
 //========
 // END AUTOFOREST
 //========

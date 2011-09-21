@@ -4,19 +4,12 @@
 
 package net.minecraft.src;
 
-//========
-// BEGIN AUTOFOREST
-//========
-import java.util.Random;
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
-//========
-// END AUTOFOREST
-//========
 
-public class BlockPumpkin extends BlockMortal
+// Referenced classes of package net.minecraft.src:
+//            Block, Material, World, EntityLiving, 
+//            MathHelper
+
+public class BlockPumpkin extends Block
 {
 
     protected BlockPumpkin(int i, int j, boolean flag)
@@ -26,35 +19,7 @@ public class BlockPumpkin extends BlockMortal
         setTickOnLoad(true);
         blockType = flag;
     }
-	
-	//========
-	// BEGIN AUTOFOREST
-	//========
-    protected String growthModifierType = "PumpkinSpawn";
-	
-    public void updateTick(World world, int i, int j, int k, Random random) {
-    	if(!world.multiplayerWorld){
-    		ModOptions pumpkins = mod_AutoForest.pumpkins;
-			boolean grow = ((ModBooleanOption) pumpkins.getOption("PumpkinsGrow")).getValue();
-			if(grow){
-				double growthRate = 1D /(((ModMappedMultiOption) pumpkins
-						.getOption("PumpkinGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
-			}
-			
-			// ATTEMPT DEATH
-			boolean death = mod_AutoForest.pumpkinDeath.getValue();
-			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) pumpkins
-						.getOption("PumpkinDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
-				death(world, i, j, k);
-			}
-		}
-	}
-	//========
-	// END AUTOFOREST
-	//========
-	
+
     public int getBlockTextureFromSideAndMetadata(int i, int j)
     {
         if(i == 1)

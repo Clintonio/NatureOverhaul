@@ -24,11 +24,15 @@ public class ItemDye extends Item
 
     public String getItemNameIS(ItemStack itemstack)
     {
-        return (new StringBuilder()).append(super.getItemName()).append(".").append(dyeColors[itemstack.getItemDamage()]).toString();
+        return (new StringBuilder()).append(super.getItemName()).append(".").append(dyeColorNames[itemstack.getItemDamage()]).toString();
     }
 
     public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int i, int j, int k, int l)
     {
+        if(!entityplayer.func_35190_e(i, j, k))
+        {
+            return false;
+        }
         if(itemstack.getItemDamage() == 15)
         {
             int i1 = world.getBlockId(i, j, k);
@@ -37,6 +41,23 @@ public class ItemDye extends Item
                 if(!world.multiplayerWorld)
                 {
                     ((BlockSapling)Block.sapling).growTree(world, i, j, k, world.rand);
+                    itemstack.stackSize--;
+                }
+                return true;
+            }
+            if(i1 == Block.mushroomBrown.blockID || i1 == Block.mushroomRed.blockID)
+            {
+                if(!world.multiplayerWorld && ((BlockMushroom)Block.blocksList[i1]).func_35293_c(world, i, j, k, world.rand))
+                {
+                    itemstack.stackSize--;
+                }
+                return true;
+            }
+            if(i1 == Block.melonStem.blockID || i1 == Block.pumpkinStem.blockID)
+            {
+                if(!world.multiplayerWorld)
+                {
+                    ((BlockStem)Block.blocksList[i1]).func_35294_i(world, i, j, k);
                     itemstack.stackSize--;
                 }
                 return true;
@@ -134,7 +155,7 @@ label0:
         if(entityliving instanceof EntitySheep)
         {
             EntitySheep entitysheep = (EntitySheep)entityliving;
-            int i = BlockCloth.func_21034_c(itemstack.getItemDamage());
+            int i = BlockCloth.getBlockFromDye(itemstack.getItemDamage());
             if(!entitysheep.getSheared() && entitysheep.getFleeceColor() != i)
             {
                 entitysheep.setFleeceColor(i);
@@ -143,11 +164,11 @@ label0:
         }
     }
 
-    public static final String dyeColors[] = {
+    public static final String dyeColorNames[] = {
         "black", "red", "green", "brown", "blue", "purple", "cyan", "silver", "gray", "pink", 
         "lime", "yellow", "lightBlue", "magenta", "orange", "white"
     };
-    public static final int field_31002_bk[] = {
+    public static final int dyeColors[] = {
         0x1e1b1b, 0xb3312c, 0x3b511a, 0x51301a, 0x253192, 0x7b2fbe, 0x287697, 0x287697, 0x434343, 0xd88198, 
         0x41cd34, 0xdecf2a, 0x6689d3, 0xc354cd, 0xeb8844, 0xf0f0f0
     };

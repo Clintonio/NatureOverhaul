@@ -9,10 +9,10 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
+import moapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
+import moapi.ModOptions;
+import moapi.ModMappedMultiOption;
 //========
 // END AUTOFOREST
 //========
@@ -154,12 +154,6 @@ public class EntityItem extends Entity
 				.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
 				.getOption("AutoSapling");
 	
-	private ModBooleanOption pumpkinGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.PUMPKIN_MENU_NAME)
-				.getOption("PumpkinsGrow");
-	
 	private ModBooleanOption flowerGrow = (ModBooleanOption) ModOptionsAPI
 				.getModOptions(mod_AutoForest.MENU_NAME)
 				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
@@ -218,11 +212,6 @@ public class EntityItem extends Entity
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
 			motionZ = (float)(Math.random() * baseSpeed) * randSign();	
 			// Pumpkins
-		} else if((pumpkinGrow.getValue()) && (i == 86)) {
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-			// Cacti
 		} else if((cactiGrow.getValue()) && (i == 81)) {
 			motionX = (float)(Math.random() * baseSpeed) * randSign();
 			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 3);
@@ -256,28 +245,19 @@ public class EntityItem extends Entity
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
 		// Terminal speed for flowers
-		} else if((flowerGrow.getValue()) && (i == 37 || i == 38))
-		{
+		} else if((flowerGrow.getValue()) && (i == 37 || i == 38)) {
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
 		// Terminal speed for flowers
-		} else if((shroomGrow.getValue()) && (i == 39 || i == 40))
-		{
+		} else if((shroomGrow.getValue()) && (i == 39 || i == 40)) {
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
 		// Terminal speed for reeds
-		} else if((reedGrow.getValue()) && (i == 256 + 82))
-		{
-			if(motionY > (-0.039999999105930328D * 10))
-				motionY -= 0.039999999105930328D;
-		// Terminal speed for pumpkins
-		} else if((pumpkinGrow.getValue()) && (i == 86))
-		{
+		} else if((reedGrow.getValue()) && (i == 256 + 82)) {
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
 		// Terminal speed for cacti
-		} else if((cactiGrow.getValue()) && (i == 81))
-		{
+		} else if((cactiGrow.getValue()) && (i == 81)) {
 			if(motionY > (-0.039999999105930328D * 10))
 				motionY -= 0.039999999105930328D;
 		} else {
@@ -322,10 +302,10 @@ public class EntityItem extends Entity
 
     protected void dealFireDamage(int i)
     {
-        attackEntityFrom(null, i);
+        attackEntityFrom(DamageSource.inFire, i);
     }
 
-    public boolean attackEntityFrom(Entity entity, int i)
+    public boolean attackEntityFrom(DamageSource damagesource, int i)
     {
         setBeenAttacked();
         health -= i;
@@ -348,7 +328,11 @@ public class EntityItem extends Entity
         health = nbttagcompound.getShort("Health") & 0xff;
         age = nbttagcompound.getShort("Age");
         NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Item");
-        item = new ItemStack(nbttagcompound1);
+        item = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+        if(item == null)
+        {
+            setEntityDead();
+        }
     }
 
     public void onCollideWithPlayer(EntityPlayer entityplayer)

@@ -5,10 +5,10 @@
 package net.minecraft.src;
 
 import java.util.Random;
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModMappedMultiOption;
-import modoptionsapi.ModBooleanOption;
+import moapi.ModOptionsAPI;
+import moapi.ModOptions;
+import moapi.ModMappedMultiOption;
+import moapi.ModBooleanOption;
 
 public class BlockFlower extends BlockMortal
 {

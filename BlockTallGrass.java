@@ -9,7 +9,7 @@ import java.util.Random;
 //====================
 // BEGIN NATURE OVERHAUL
 //====================
-import modoptionsapi.*;
+import moapi.*;
 //====================
 // END NATURE OVERHAUL
 //====================
@@ -50,6 +50,24 @@ public class BlockTallGrass extends BlockFlower
             return blockIndexInTexture;
         }
     }
+
+    public int func_35274_i()
+    {
+        double d = 0.5D;
+        double d1 = 1.0D;
+        return ColorizerGrass.getGrassColor(d, d1);
+    }
+
+    public int getRenderColor(int i)
+    {
+        if(i == 0)
+        {
+            return 0xffffff;
+        } else
+        {
+            return ColorizerFoliage.func_31073_c();
+        }
+    }
 	
 	//====================
 	// BEGIN NATURE OVERHAUL
@@ -65,7 +83,7 @@ public class BlockTallGrass extends BlockFlower
 			}
 			
 			// ATTEMPT DEATH
-			boolean death = mod_AutoForest.pumpkinDeath.getValue();
+			boolean death = mod_AutoForest.grassDeath.getValue();
 			double deathProb = 1D / (0.75D * (((ModMappedMultiOption) grass
 						.getOption("GrassDeathRate")).getValue()));
 			if(death && hasDied(world, i, j, k, deathProb)) {
@@ -112,12 +130,11 @@ public class BlockTallGrass extends BlockFlower
         {
             long l1 = i * 0x2fc20f + k * 0x5d8875 + j;
             l1 = l1 * l1 * 0x285b825L + l1 * 11L;
-            i = (int)((long)i + (l1 >> 14 & 31L));
-            j = (int)((long)j + (l1 >> 19 & 31L));
-            k = (int)((long)k + (l1 >> 24 & 31L));
-            iblockaccess.getWorldChunkManager().func_4069_a(i, k, 1, 1);
-            double d = iblockaccess.getWorldChunkManager().temperature[0];
-            double d1 = iblockaccess.getWorldChunkManager().humidity[0];
+            i = (int)((long)i + ((l1 >> 14 & 31L) - 16L));
+            j = (int)((long)j + ((l1 >> 19 & 31L) - 16L));
+            k = (int)((long)k + ((l1 >> 24 & 31L) - 16L));
+            double d = iblockaccess.getWorldChunkManager().func_35554_b(i, k);
+            double d1 = iblockaccess.getWorldChunkManager().func_35558_c(i, k);
             return ColorizerGrass.getGrassColor(d, d1);
         }
     }
@@ -130,6 +147,18 @@ public class BlockTallGrass extends BlockFlower
         } else
         {
             return -1;
+        }
+    }
+
+    public void harvestBlock(World world, EntityPlayer entityplayer, int i, int j, int k, int l)
+    {
+        if(!world.multiplayerWorld && entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().itemID == Item.shears.shiftedIndex)
+        {
+            entityplayer.addStat(StatList.mineBlockStatArray[blockID], 1);
+            dropBlockAsItem_do(world, i, j, k, new ItemStack(Block.tallGrass, 1, l));
+        } else
+        {
+            super.harvestBlock(world, entityplayer, i, j, k, l);
         }
     }
 }

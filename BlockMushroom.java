@@ -9,10 +9,10 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModMappedMultiOption;
-import modoptionsapi.ModOptions;
-import modoptionsapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
+import moapi.ModMappedMultiOption;
+import moapi.ModOptions;
+import moapi.ModOptionsAPI;
 //========
 // END AUTOFOREST
 //========
@@ -45,17 +45,43 @@ public class BlockMushroom extends BlockFlower
 		boolean keepDefaultSpread = mod_AutoForest.defaultShroomSpread.getValue();
         if(keepDefaultSpread && random.nextInt(100) == 0)
         {
-            int l = (i + random.nextInt(3)) - 1;
-            int i1 = (j + random.nextInt(2)) - random.nextInt(2);
-            int j1 = (k + random.nextInt(3)) - 1;
-            if(world.isAirBlock(l, i1, j1) && canBlockStay(world, l, i1, j1))
+            byte byte0 = 4;
+            int l = 5;
+            for(int i1 = i - byte0; i1 <= i + byte0; i1++)
             {
-                i += random.nextInt(3) - 1;
-                k += random.nextInt(3) - 1;
-                if(world.isAirBlock(l, i1, j1) && canBlockStay(world, l, i1, j1))
+                for(int k1 = k - byte0; k1 <= k + byte0; k1++)
                 {
-                    world.setBlockWithNotify(l, i1, j1, blockID);
+                    for(int i2 = j - 1; i2 <= j + 1; i2++)
+                    {
+                        if(world.getBlockId(i1, i2, k1) == blockID && --l <= 0)
+                        {
+                            return;
+                        }
+                    }
+
                 }
+
+            }
+
+            int j1 = (i + random.nextInt(3)) - 1;
+            int l1 = (j + random.nextInt(2)) - random.nextInt(2);
+            int j2 = (k + random.nextInt(3)) - 1;
+            for(int k2 = 0; k2 < 4; k2++)
+            {
+                if(world.isAirBlock(j1, l1, j2) && canBlockStay(world, j1, l1, j2))
+                {
+                    i = j1;
+                    j = l1;
+                    k = j2;
+                }
+                j1 = (i + random.nextInt(3)) - 1;
+                l1 = (j + random.nextInt(2)) - random.nextInt(2);
+                j2 = (k + random.nextInt(3)) - 1;
+            }
+
+            if(world.isAirBlock(j1, l1, j2) && canBlockStay(world, j1, l1, j2))
+            {
+                world.setBlockWithNotify(j1, l1, j2, blockID);
             }
         }
 		
@@ -91,12 +117,46 @@ public class BlockMushroom extends BlockFlower
 
     public boolean canBlockStay(World world, int i, int j, int k)
     {
-        if(j < 0 || j >= 128)
+label0:
         {
+            if(j >= 0)
+            {
+                world.getClass();
+                if(j < 128)
+                {
+                    break label0;
+                }
+            }
+            return false;
+        }
+        return world.getFullBlockLightValue(i, j, k) < 13 && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+    }
+
+    public boolean func_35293_c(World world, int i, int j, int k, Random random)
+    {
+        int l = world.getBlockId(i, j - 1, k);
+        if(l != Block.dirt.blockID && l != Block.grass.blockID)
+        {
+            return false;
+        }
+        int i1 = world.getBlockMetadata(i, j, k);
+        world.setBlock(i, j, k, 0);
+        WorldGenBigMushroom worldgenbigmushroom = null;
+        if(blockID == Block.mushroomBrown.blockID)
+        {
+            worldgenbigmushroom = new WorldGenBigMushroom(0);
+        } else
+        if(blockID == Block.mushroomRed.blockID)
+        {
+            worldgenbigmushroom = new WorldGenBigMushroom(1);
+        }
+        if(worldgenbigmushroom == null || !worldgenbigmushroom.generate(world, random, i, j, k))
+        {
+            world.setBlockAndMetadata(i, j, k, blockID, i1);
             return false;
         } else
         {
-            return world.getFullBlockLightValue(i, j, k) < 13 && canThisPlantGrowOnThisBlockID(world.getBlockId(i, j - 1, k));
+            return true;
         }
     }
 }

@@ -9,9 +9,9 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import modoptionsapi.ModMappedMultiOption;
-import modoptionsapi.ModBooleanOption;
-import modoptionsapi.ModOptions;
+import moapi.ModMappedMultiOption;
+import moapi.ModBooleanOption;
+import moapi.ModOptions;
 //========
 // END AUTOFOREST
 //========
@@ -184,6 +184,6 @@ public class BlockCactus extends BlockMortal
 
     public void onEntityCollidedWithBlock(World world, int i, int j, int k, Entity entity)
     {
-        entity.attackEntityFrom(null, 1);
+        entity.attackEntityFrom(DamageSource.cactus, 1);
     }
 }

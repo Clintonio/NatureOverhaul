@@ -1,7 +1,7 @@
 package net.minecraft.src;
 
-import modoptionsapi.ModOptionsAPI;
-import modoptionsapi.ModBooleanOption;
+import moapi.ModOptionsAPI;
+import moapi.ModBooleanOption;
 
 /**
 * Flower Item Representation for varied flowers.
