@@ -12,7 +12,6 @@ import java.util.Random;
 import moapi.ModBooleanOption;
 import moapi.ModMappedMultiOption;
 import moapi.ModOptions;
-import moapi.ModOptionsAPI;
 //========
 // END AUTOFOREST
 //========
@@ -86,13 +85,11 @@ public class BlockMushroom extends BlockFlower
         }
 		
 		if(!world.multiplayerWorld) {
-			ModOptions shrooms = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME)
-			.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME);
-			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomsGrow")).getValue();
+			ModOptions shrooms = mod_AutoForest.shrooms;
+			boolean grow = mod_AutoForest.shroomTreesGrow.getValue();
 			if(grow) {
-				double growthRate = 1D /(((ModMappedMultiOption) shrooms
-						.getOption("ShroomGrowthRate")).getValue());
+				double growthRate = 1D / mod_AutoForest.shroomTreeGrowth.getValue();
+				attemptGrowth(world, i, j, k, growthRate);
 			}
 			
 			// ATTEMPT DEATH
@@ -107,6 +104,21 @@ public class BlockMushroom extends BlockFlower
 		// END AUTOFOREST
 		//========
     }
+	
+	//=====================
+	// BEGIN NATURE OVERHAUL
+	//=====================
+	
+	/**
+	* Grow an item
+	*/
+	public void grow(World world, int i, int j, int k) {
+		func_35293_c(world, i, j, k, world.rand);
+	}
+	
+	//=====================
+	// END NATURE OVERHAUL
+	//=====================
 	
 	
 

@@ -9,7 +9,6 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import moapi.ModOptionsAPI;
 import moapi.ModBooleanOption;
 import moapi.ModOptions;
 import moapi.ModMappedMultiOption;

@@ -112,6 +112,29 @@ public class ItemReed extends Item implements Plantable
 	public int getPlantBlockID() {
 		return spawnID;
 	}
+	
+	/**
+	* Get the velocities of this item when it is created
+	*
+	* @param	double	Base speed of item
+	* @return	Array of speeds in format [x, y, z] velocities
+	*/
+	public float[] getVelocities(double baseSpeed) {
+		float[] out = new float[3];
+		
+		out[0] = (float) ((Math.random() * baseSpeed) * randSign());
+		out[1] = (float) (baseSpeed + (baseSpeed * Math.random() * 1.5));
+		out[2] = (float) ((Math.random() * baseSpeed) * randSign());
+		
+		return out;
+	}
+	
+	/**
+	* Picks a random -1 or 1
+	*/
+	private int randSign() {
+		return (int) Math.pow(-1, (int) Math.round(Math.random()) + 1) * 2;
+	}
 	//========
 	// END AUTOFOREST
 	//========

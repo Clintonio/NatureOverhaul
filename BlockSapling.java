@@ -102,11 +102,15 @@ public class BlockSapling extends BlockFlower
 				obj = new WorldGenTaiga2();
 			}
 		} else if(type == 2) {
-			obj = new WorldGenForest();
+			 obj = new WorldGenForest();
 		} else if(random.nextInt(100) < bigTreeRate) {
 			obj = new WorldGenBigTree();
 		} else {
-			obj = new WorldGenTrees();
+			if(mod_AutoForest.getBiomeAt(i, k) == Biome.SWAMPLAND) {
+				obj = new WorldGenSwamp();
+			} else {
+				obj = new WorldGenTrees();
+			}
 		}
 		
         world.setBlockWithNotify(i, j, k, 0); 

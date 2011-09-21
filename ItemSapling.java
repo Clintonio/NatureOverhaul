@@ -13,7 +13,7 @@ import moapi.ModBooleanOption;
 // END AUTOFOREST
 //========
 
-public class ItemSapling extends ItemPlantable implements Plantable {
+public class ItemSapling extends ItemPlantable {
 
     public ItemSapling(int i)
     {
@@ -45,5 +45,19 @@ public class ItemSapling extends ItemPlantable implements Plantable {
 				getSubOption(mod_AutoForest.SAPLING_MENU_NAME).
 				getOption("AutoSapling")).getValue();
 		return ((saplingGrow) && ((belowID == 2) || (belowID == 3)));
+	}
+	
+	/**
+	* Get the velocities of this item when it is created
+	*
+	* @param	double	Base speed of item
+	* @return	Array of speeds in format [x, y, z] velocities
+	*/
+	public float[] getVelocities(double baseSpeed) {
+		float[] out = super.getVelocities(baseSpeed);
+		
+		out[1] = (float) (baseSpeed + (baseSpeed * Math.random() * 2));
+		
+		return out;
 	}
 }

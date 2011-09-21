@@ -9,7 +9,7 @@ import moapi.ModOptionsAPI;
 * @author	Clinton Alexander
 * @version	1.0.0.0
 */
-public class ItemCactus extends ItemPlantable implements Plantable {
+public class ItemCactus extends ItemPlantable {
 	
     public ItemCactus(int i)
     {
@@ -38,5 +38,19 @@ public class ItemCactus extends ItemPlantable implements Plantable {
 				&& (!world.getBlockMaterial(i + 1, j, k).isSolid()) 
 				&& (!world.getBlockMaterial(i, j, k - 1).isSolid())
 				&& (!world.getBlockMaterial(i, j, k + 1).isSolid()));
+	}
+	
+	/**
+	* Get the velocities of this item when it is created
+	*
+	* @param	double	Base speed of item
+	* @return	Array of speeds in format [x, y, z] velocities
+	*/
+	public float[] getVelocities(double baseSpeed) {
+		float[] out = super.getVelocities(baseSpeed);
+		
+		out[1] = (float) (baseSpeed + (baseSpeed * Math.random() * 3));
+		
+		return out;
 	}
 }

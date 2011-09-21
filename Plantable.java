@@ -23,4 +23,12 @@ public interface Plantable {
 	* @return	Block ID of the plant to make
 	*/
 	public int getPlantBlockID();
+	
+	/**
+	* Get the velocities of this item when it is created
+	*
+	* @param	baseSpeed	Base speed of the item
+	* @return	Array of speeds in format [x, y, z] velocities
+	*/
+	public float[] getVelocities(double baseSpeed);
 }

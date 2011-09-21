@@ -56,6 +56,10 @@ public class mod_AutoForest extends BaseMod {
 	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
 	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies");
 	
+	// Options for shrooms
+	public static ModBooleanOption shroomTreesGrow = new ModBooleanOption("ShroomsTreesGrow");
+	public static ModMappedOption  shroomTreeGrowth;
+	
 	// Options for saplings
 	public static ModMappedMultiOption 	growthType;
 	public static ModBooleanOption		defaultShroomSpread = new ModBooleanOption("Enable Default Spread");
@@ -105,6 +109,7 @@ public class mod_AutoForest extends BaseMod {
 		options.addSubOptions(plants);
 		options.addSubOptions(climate);
 		options.addSubOptions(tree);
+		options.addSubOptions(shrooms);
 		options.addSubOptions(misc);
 		
 		// Sapling related
@@ -113,6 +118,8 @@ public class mod_AutoForest extends BaseMod {
 		setupTreeOptions();
 		// Set up flower options
 		addFlowers();
+		// Set up shrooms
+		setupShroomOptions();
 		
 		// Climate related
 		climate.addToggle("BiomeModifiedGrowth");
@@ -167,6 +174,26 @@ public class mod_AutoForest extends BaseMod {
 	}
 	
 	/**
+	* Setup shroom options
+	*/
+	private void setupShroomOptions() {
+		// Plant related
+		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
+		
+		shroomTreeGrowth = new ModMappedOption("ShroomTreeGrowthRate", pKeys, labels);
+		
+		shrooms.addOption(defaultShroomSpread);
+		shrooms.addOption(shroomTreeGrowth);
+		shrooms.addOption(shroomTreesGrow);
+		shrooms.addMappedMultiOption("ShroomDeathRate", pKeys, labels);
+		shrooms.addOption(shroomDeath);
+		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
+		shrooms.addToggle("ShroomsGrow");
+		
+		defaultShroomSpread.setValue(false);
+	}
+	
+	/**
 	* Set up flower options
 	*/
 	private void addFlowers() {
@@ -175,7 +202,6 @@ public class mod_AutoForest extends BaseMod {
 		plants.addSubOptions(flowers);
 		plants.addSubOptions(cactii);
 		plants.addSubOptions(reed);
-		plants.addSubOptions(shrooms);
 		plants.addSubOptions(grass);
 		
 		// Plant submenus
@@ -193,14 +219,6 @@ public class mod_AutoForest extends BaseMod {
 		reed.addOption(reedDeath);
 		reed.addMappedMultiOption("ReedGrowthRate", pKeys, labels);
 		reed.addToggle("ReedsGrow");
-		
-		shrooms.addOption(defaultShroomSpread);
-		shrooms.addMappedMultiOption("ShroomDeathRate", pKeys, labels);
-		shrooms.addOption(shroomDeath);
-		shrooms.addMappedMultiOption("ShroomGrowthRate", pKeys, labels);
-		shrooms.addToggle("ShroomsGrow");
-		
-		defaultShroomSpread.setValue(false);
 		
 		grass.addMappedMultiOption("GrassDeathRate", pKeys, labels);
 		grass.addOption(grassDeath);
@@ -375,6 +393,19 @@ public class mod_AutoForest extends BaseMod {
 										.getWorldChunkManager();
         return cm.getBiomeGenAt(i, j).biomeName;
     }
+	
+	/**
+	* The biome at position
+	*
+	* @param	i coord
+	* @param	j coord
+	* @return	Biome Enum object
+	*/
+	public static Biome getBiomeAt(int i, int j) {
+		String name = getBiomeName(i, j);
+		
+		return Biome.getBiomeFromString(name);
+	}
 	
 	//=====================
 	// DEBUG METHODS

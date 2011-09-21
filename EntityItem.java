@@ -148,87 +148,24 @@ public class EntityItem extends Entity
 	//========
 	// BEGIN AUTOFOREST
 	//========
-    
-	private ModBooleanOption saplingGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
-				.getOption("AutoSapling");
 	
-	private ModBooleanOption flowerGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.FLOWER_MENU_NAME)
-				.getOption("FlowersGrow");
-	
-	private ModBooleanOption shroomGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.SHROOMS_MENU_NAME)
-				.getOption("ShroomsGrow");
-	
-	private ModBooleanOption reedGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.REED_MENU_NAME)
-				.getOption("ReedsGrow");
-				
-	private ModBooleanOption cactiGrow = (ModBooleanOption) ModOptionsAPI
-				.getModOptions(mod_AutoForest.MENU_NAME)
-				.getSubOption(mod_AutoForest.PLANT_MENU_NAME)
-				.getSubOption(mod_AutoForest.CACTI_MENU_NAME)
-				.getOption("CactiiGrow");
-	/**
+	/*
 	* Set initial speed of items
 	*/
 	private void setInitialVelocity() {
 		double baseSpeed = 0.20000000298023224D;
-		int i = item.itemID;
-
-		// Special motion for sapling
-		if((saplingGrow.getValue()) && (i == 6)) {
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 2);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		// Brown Mushrooms (Ring Spread)
-		} else if((shroomGrow.getValue()) && (i == 39)) {
-			double circleDist = baseSpeed * 2;
-			motionX = (float) (circleDist - (Math.random() * circleDist)) * randSign();
-			motionY = (float) baseSpeed * 3;
-			motionZ = (float) (Math.pow(circleDist, 2) - Math.pow(motionX, 2)) * randSign();
-			// Red Shroom (Flower Spread)
-		} else if((shroomGrow.getValue()) && (i == 40))
-			{
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-			// Flowers
-		} else if((flowerGrow.getValue()) && (i == 37 || i == 38)) {
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-			// Reeds
-		} else if((reedGrow.getValue()) && (i == 256 + 82)) {
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 1.5);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();	
-			// Pumpkins
-		} else if((cactiGrow.getValue()) && (i == 81)) {
-			motionX = (float)(Math.random() * baseSpeed) * randSign();
-			motionY = (float) baseSpeed + (baseSpeed * Math.random() * 3);
-			motionZ = (float)(Math.random() * baseSpeed) * randSign();
-		// Other items
+		Item item = Item.itemsList[this.item.itemID];
+		
+		if(item instanceof Plantable) {
+			float[] motion = ((Plantable) item).getVelocities(baseSpeed);
+			motionX = motion[0];
+			motionY = motion[1];
+			motionZ = motion[2];
 		} else {
 			motionX = (float)(Math.random() * baseSpeed - baseSpeed / 2);
 			motionY = baseSpeed;
 			motionZ = (float)(Math.random() * baseSpeed - baseSpeed / 2);
 		}
-	}
-	
-	/**
-	* Picks a random -1 or 1
-	*/
-	private int randSign() {
-		return (int) Math.pow(-1, (int) Math.round(Math.random()) + 1) * 2;
 	}
 	
 	/**
@@ -238,28 +175,12 @@ public class EntityItem extends Entity
 	* @param	id	Item id
 	*/
 	private void setNextYSpeed(int id) {
-		// Terminal speed for saplings
-		int i = item.itemID;
-		if((saplingGrow.getValue()) && (i == 6))
-		{
-			if(motionY > (-0.039999999105930328D * 10))
+		Item item = Item.itemsList[id];
+		
+		if(item instanceof Plantable) {
+			if(motionY > (-0.039999999105930328D * 10)) {
 				motionY -= 0.039999999105930328D;
-		// Terminal speed for flowers
-		} else if((flowerGrow.getValue()) && (i == 37 || i == 38)) {
-			if(motionY > (-0.039999999105930328D * 10))
-				motionY -= 0.039999999105930328D;
-		// Terminal speed for flowers
-		} else if((shroomGrow.getValue()) && (i == 39 || i == 40)) {
-			if(motionY > (-0.039999999105930328D * 10))
-				motionY -= 0.039999999105930328D;
-		// Terminal speed for reeds
-		} else if((reedGrow.getValue()) && (i == 256 + 82)) {
-			if(motionY > (-0.039999999105930328D * 10))
-				motionY -= 0.039999999105930328D;
-		// Terminal speed for cacti
-		} else if((cactiGrow.getValue()) && (i == 81)) {
-			if(motionY > (-0.039999999105930328D * 10))
-				motionY -= 0.039999999105930328D;
+			}
 		} else {
 			motionY -= 0.039999999105930328D;
 		}
