@@ -40,6 +40,7 @@ public class mod_AutoForest extends BaseMod {
 	
 	// Options for trees
 	public static ModOptions tree = new ModOptions(TREE_MENU_NAME);
+	public static ModBooleanOption leafDecay = new ModBooleanOption("QuickLeafDecay");
 	
 	// Options for plants
 	public static ModOptions 		plants		= new ModOptions(PLANT_MENU_NAME);
@@ -163,7 +164,9 @@ public class mod_AutoForest extends BaseMod {
 		Integer[] dKeys 	= {5000, 2500, 250, 5, 20000, 10000};
 		Integer[] keys 		= {5, 3, 1, 0, 9, 7};
 		String[]  values 	= {"DEFAULT/AVERAGE", "FAST", "VERY FAST", "INSTANT", "VERY SLOW", "SLOW"};
+		
 		tree.addMappedMultiOption("TreeGrowthRate", keys, values);
+		tree.addOption(leafDecay);
 		tree.addToggle("Lumberjack");
 		tree.addMappedMultiOption("DeathRate", dKeys, labels);
 		tree.addToggle("TreeDeath");

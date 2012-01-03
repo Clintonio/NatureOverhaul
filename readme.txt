@@ -1,4 +1,4 @@
-NatureOverhaul 14
+NatureOverhaul 15
 
 Author: Clinton Alexander
 Description: Ever thought Minecrafts tree and forest system was rather unrealistic? Boring? Uneventful? Then this mod is for you.
@@ -72,6 +72,7 @@ When -ForestGrowth- is on, saplings and apples will generate from trees
 -Lumberjack-: 		When enabled, trees will collapse into wood blocks from the point they were cut.
 -TreeDeath-: 		When enabled, trees will die and turn into planks determined by -DeathRate-.
 -TreeGrowthRate-: 	Determines the speed at which trees grow from saplings
+-QuickLeafDecay-:	When enabled, tree leaves will instantly decay when lumberjack is enabled.
 
 ===Climate Options===
 

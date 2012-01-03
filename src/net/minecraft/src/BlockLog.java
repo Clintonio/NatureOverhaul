@@ -20,6 +20,16 @@ import java.util.HashSet;
 public class BlockLog extends Block
 {
 	private static final int MAX_TREE_HEIGHT = 16;
+	// Flag controls
+	private static final int iBits = 5;
+	private static final int jBits = 7;
+	private static final int kBits = 5;
+	/** 
+	* The radius at which leaves are destroyed by the nature overhaul
+	* algorithm providing that the option for leaf decay is enabled
+	* and there is no wood within this radius
+	*/
+	public int leafDeathRadius = 2;
 	
     protected BlockLog(int i)
     {
@@ -141,15 +151,17 @@ public class BlockLog extends Block
 	* Kill tree, includes selfblock
 	*/
 	private int killTree(World world, int i, int j, int k) {
-		return killTree(world,i,j,k,true);
+		boolean killLeaves = mod_AutoForest.leafDecay.getValue();
+		
+		return killTree(world, i, j, k, killLeaves);
 	}
 	/**
 	* Kills a tree from the given block upwards
 	*
-	* @param	treeDeath		If true then tree turns into wood
+	* @param	killLeaves	True if leaves should be killed
 	* @return	Number of logs removed
 	*/
-	private int killTree(World world, int i, int j, int k, boolean treeDeath) {
+	private int killTree(World world, int i, int j, int k, boolean killLeaves) {
 		boolean ignoreSelf = (world.getBlockId(i,j,k) == 0);
 		int treeHeight = getTreeHeight(world, i, j, k);
 		/* Numbr of blocks removed */
@@ -168,20 +180,95 @@ public class BlockLog extends Block
 		
 		int[] base  = {i, j, k};
 		int[] block = {i, j + 1, k};
-		flagBlock(block, flags);
-		return 1 + scanAndFlag(world, base, block, flags, treeHeight);
+		flagBlock(block, base, flags);
+		int out = 1 + scanAndFlag(world, base, block, flags, treeHeight);
+		
+		if(killLeaves) {
+			killLeaves(world, i, j, k, base, flags);
+		}
+		
+		return out;
+	}
+	
+	/**
+	* Scans through the flags for leaves and removes them
+	*
+	* @param	flags	The encoded flags
+	* @param	base		The base block (for reference)
+	*/
+	private void killLeaves(World world, int i, int j, int k, int[] base, HashSet<Integer> flags) {
+		for(Integer flag : flags) {
+			int iMod = decodeFlag(flag, iBits, jBits + kBits);
+			int jMod = decodeFlag(flag, jBits, kBits);
+			int kMod = decodeFlag(flag, kBits);
+			
+			int lI = iMod + base[0];
+			int lJ = jMod + base[1];
+			int lK = kMod + base[2];
+			
+			//System.out.println("iMod: " + iMod + ". jMod: " + jMod + ". kMod: " + kMod);
+			
+			//System.out.println("Kill Leaf: (" + lI + ", " + lJ + ", " + lK + "");
+			if(!hasNearbyWood(world, lI, lJ, lK, leafDeathRadius)) {
+				world.setBlockWithNotify(lI, lJ, lK, 0);
+			}
+		}
+	}
+	
+	/**
+	* Check if leaves have nearby wood
+	*
+	* @param	radius	Radius to check in
+	* @return	True if wood nearby
+	*/
+	private boolean hasNearbyWood(World world, int i, int j, int k, int radius) {
+		for(int x = -radius; x <= radius; x++) {
+			for(int y = -radius; y <= radius; y++) {
+				for(int z = -radius; z <= radius; z++) {
+					if(world.getBlockId(i + x, j + y, k + z) == Block.wood.blockID) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	* Decode the modifier of a flag
+	* 
+	* @param	flag
+	* @param	len 		length of entry
+	* @param	shift	How far left the value is shifted
+	* @return	Int value
+	*/
+	private int decodeFlag(int flag, int len, int shift) {
+		return ((flag >> shift) & ((int) Math.pow(2, len) - 1)) - (int) Math.pow(2, len - 1);
+	}
+	
+	/**
+	* Decode the modifier of a flag
+	* 
+	* @param	flag
+	* @param	len 		length of entry
+	* @return	Int value
+	*/
+	private int decodeFlag(int flag, int len) {
+		return decodeFlag(flag, len, 0);
 	}
 	
 	
 	/**
 	* Scans, deletes and flags blocks for lumberjacking
 	*
-	* @param	block	Current block to scan and flag
-	* @param	flags	Flag store
+	* @param	block		 Current block to scan and flag
+	* @param	base			 The base block
+	* @param	flags		 Flag store
 	* @return	Number of blocks removed
 	*/
 	private int scanAndFlag(World world, int[] base, int[] block, 
-							 HashSet<Integer> flags, int treeHeight) {
+						HashSet<Integer> flags, int treeHeight) {
 		int i = block[0];
 		int j = block[1];
 		int k = block[2];
@@ -191,17 +278,19 @@ public class BlockLog extends Block
 		
 		for(int[] nBlock : neighbours(block)) {
 			int id = world.getBlockId(nBlock[0], nBlock[1], nBlock[2]);
-			if((inRange(nBlock, base,treeHeight)) && (!isBlockFlagged(nBlock, flags))
+			if((inRange(nBlock, base,treeHeight)) && (!isBlockFlagged(nBlock, base, flags))
 				&& ((id == Block.wood.blockID) || (id == Block.leaves.blockID))) {
-				flagBlock(nBlock, flags);
+				flagBlock(nBlock, base, flags);
 				removed = removed + scanAndFlag(world, base, nBlock, flags, treeHeight);
 			}
 		}
+		
 		// Remove the current block if it's a non-tree log
-		if((world.getBlockId(i,j,k) == Block.wood.blockID)
-			&& ((!isTree(world, i, j, k)) || ((i == base[0]) && (k == base[2])))) {
-			killLog(world, block[0], block[1], block[2], true);
-			removed++;
+		if(world.getBlockId(i,j,k) == Block.wood.blockID) {
+			if((!isTree(world, i, j, k)) || ((i == base[0]) && (k == base[2]))) {
+				killLog(world, block[0], block[1], block[2], true);
+				removed++;
+			}
 		}
 		
 		return removed;
@@ -230,8 +319,8 @@ public class BlockLog extends Block
 	/**
 	* Flags an individual block for the lumberjack aglorithm
 	*/
-	private void flagBlock(int[] block, HashSet<Integer> flags) {
-		int flag = makeFlag(block);
+	private void flagBlock(int[] block, int[] base, HashSet<Integer> flags) {
+		int flag = makeFlag(block, base);
 		
 		flags.add(flag);
 	}
@@ -239,22 +328,19 @@ public class BlockLog extends Block
 	/**
 	* check if block is flagged
 	*/
-	private boolean isBlockFlagged(int[] block, HashSet<Integer> flags) {
-		int flag = makeFlag(block);
+	private boolean isBlockFlagged(int[] block, int[] base, HashSet<Integer> flags) {
+		int flag = makeFlag(block, base);
 		
 		return (flags.contains(flag));
 	}
 	
 	/**
-	* Create a flag from a block
+	* Create a flag from a block, based on distance from the base
 	*/
-	private int makeFlag(int[] block) {
-		int iBits = 4;
-		int jBits = 6;
-		int kBits = 4;
-		int i = block[0] % (int) Math.pow(2, iBits);
-		int j = block[1] % (int) Math.pow(2, jBits);
-		int k = block[2] % (int) Math.pow(2, kBits);
+	private int makeFlag(int[] block, int base[]) {
+		int i = ((block[0] - base[0]) % (int) Math.pow(2, iBits - 1)) + (int) Math.pow(2, iBits - 1);
+		int j = ((block[1] - base[1]) % (int) Math.pow(2, jBits - 1)) + (int) Math.pow(2, jBits - 1);
+		int k = ((block[2] - base[2]) % (int) Math.pow(2, kBits - 1)) + (int) Math.pow(2, kBits - 1);
 		
 		// Put i j+k bits in front so no clash with j/k
 		// put j in the jth to kth bits
@@ -263,24 +349,23 @@ public class BlockLog extends Block
 		// The size of i,j,kBits depends on the distance
 		// to search in the x/z of the inRange algoirthm
 		int flag = (int) (i << (jBits + kBits)) ^ (j << kBits) ^ k;
+
+		//System.out.println("Flag pieces: " + i + ", " + j + ", " + k  +". Result: " + flag);
 		
 		return flag;
+	}
+	
+	/**
+	* Java lacks a mod method
+	*/
+	private int mod(int num, int mod) {
+		return ((num = num % mod) < 0) ? num + mod : num;
 	}
 	
 	/**
 	* Check if a block is in range of the base
 	*/
 	private boolean inRange(int[] block, int[] base, int treeHeight) {
-		// Small trees have lower limits
-		if(treeHeight <= 5) {
-			int xDist = 2;
-			int yDist = 2;
-			int zDist = treeHeight + 2;
-		} else {
-			int xDist = (int) Math.ceil((2 * treeHeight) / 3);
-			int yDist = (int) Math.ceil(treeHeight * 1.75);
-			int zDist = (int) Math.ceil((2 * treeHeight) / 3);;
-		}
 		// Check the x/z are within a 6 square
 		if((Math.abs(block[0] - base[0]) <= 6) 
 		&& (Math.abs(block[2] - base[2]) <= 6)){
@@ -399,7 +484,7 @@ public class BlockLog extends Block
 				// Axe IDs only
 	            if((id >= 0) && (id < Item.itemsList.length) && 
 				   (Item.itemsList[id] instanceof ItemAxe)) {
-	            	int damage = killTree(world, i, j, k, false);
+	            	int damage = killTree(world, i, j, k);
 	    			additionalToolDamage(entityplayer,damage);
 	            }
 	        }

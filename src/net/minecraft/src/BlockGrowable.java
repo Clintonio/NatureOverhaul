@@ -65,8 +65,15 @@ public abstract class BlockGrowable extends Block implements Growable {
 		int metadata = world.getBlockMetadata(i, j, k);
 		int id = idDropped(metadata, world.rand, 0);
 		if((id >= 0) && (id < Item.itemsList.length)) {
-			ItemStack itemStack = new ItemStack(Item.itemsList[id]);
-			EntityItem entityitem = new EntityItem(world, i, j, k, itemStack, true);
+			// Patch: Some mods add items that have no shifted index
+			Item item = Item.itemsList[id];
+			ItemStack stack;
+			if(item instanceof Item) {
+				stack = new ItemStack(Item.itemsList[id]);
+			} else {
+				stack = new ItemStack(id, 1, 0);
+			}
+			EntityItem entityitem = new EntityItem(world, i, j, k, stack, true);
 			world.spawnEntityInWorld(entityitem);
 		}
 	}
