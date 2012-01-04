@@ -10,12 +10,6 @@ package net.minecraft.src;
 * @author	Clinton Alexander
 */
 public abstract class BlockMortal extends BlockGrowable implements BlockDeathInterface {
-	/**
-	* Implement this string as your biome modifier
-	* to be used by mod_autoforest.
-	* Use empty string to skip biome modification
-	*/
-	protected String deathModifierName = "StandardDeath";
 	
 	/**
 	* Constructor to interface subblocks with block growable
@@ -38,11 +32,10 @@ public abstract class BlockMortal extends BlockGrowable implements BlockDeathInt
 	* @param	i
 	* @param	j
 	* @param	k
-	* @param	prob		Probability of a random death
 	* @return	True if plant has died
 	*/
-	public boolean hasDied(World world, int i, int j, int k, double prob) {
-		return (hasStarved(world, i, j, k) || hasRandomlyDied(world, i, j, k, prob));
+	public boolean hasDied(World world, int i, int j, int k) {
+		return (hasStarved(world, i, j, k) || hasRandomlyDied(world, i, j, k));
 	}
 	
 	/**
@@ -56,7 +49,7 @@ public abstract class BlockMortal extends BlockGrowable implements BlockDeathInt
 	* @return	True if plant has starved
 	*/
 	public boolean hasStarved(World world, int i, int j, int k) {
-		int radius 			= getPrivacyRadius(world, i, j, k);
+		int radius 		= getPrivacyRadius(world, i, j, k);
 		int maxNeighbours 	= getMaxNeighbours(world, i, j, k);
 		int foundNeighbours = 0;
 		
@@ -109,6 +102,27 @@ public abstract class BlockMortal extends BlockGrowable implements BlockDeathInt
 	}
 	
 	/**
+	* Get the probably of this mortal block's death
+	*
+	* @return	The probability of this block dying at the current tick
+	*/
+	public abstract float getDeathProb(World world, int i, int j, int k);
+	
+	/**
+	* Checks whether this block has died from natural random causes using
+	* inbuilt probability measure
+	* 
+	* @param	world
+	* @param	i
+	* @param	j
+	* @param	k
+	* @return	True if plant has randomly died
+	*/
+	public boolean hasRandomlyDied(World world, int i, int j, int k) {
+		return hasRandomlyDied(world, i, j, k, getDeathProb(world, i, j, k));
+	}
+	
+	/**
 	* Checks whether this block has died from natural random causes
 	* 
 	* @param	world
@@ -118,8 +132,7 @@ public abstract class BlockMortal extends BlockGrowable implements BlockDeathInt
 	* @param	prob	Probability of death this tick
 	* @return	True if plant has randomly died
 	*/
-	public boolean hasRandomlyDied(World world, int i, int j, int k, double prob) {
-		prob = mod_AutoForest.applyBiomeModifier(prob, deathModifierName, world, i, k);
+	public boolean hasRandomlyDied(World world, int i, int j, int k, float prob) {
 		return (Math.random() < prob);
 	}
 	

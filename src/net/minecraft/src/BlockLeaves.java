@@ -9,11 +9,7 @@ import java.util.Random;
 //========
 // BEGIN NATURE OVERHAUL
 //========
-import moapi.ModOptions;
-import moapi.ModBooleanOption;
-import moapi.ModMultiOption;
-import moapi.ModMappedMultiOption;
-import moapi.ModOptionsAPI;
+import moapi.*;
 //========
 // END NATURE OVERHAUL
 //========
@@ -206,13 +202,6 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		
 	}
 	
-	/**
-	* Attempt growth for leaves
-	*/
-	protected boolean attemptGrowth(World world, int i, int j, int k, double prob) {
-		return attemptGrowth(world, i, j, k);
-	}
-	
 	private boolean attemptGrowth(World world, int i, int j, int k) {
 		// Mod options for autoforest
 		ModOptions mo = mod_AutoForest.options;
@@ -225,11 +214,11 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 								.getOption("CocoaGrows")).getValue();
 								
 		// Sapling growth frequency
-		double sapFreq 		= getSaplingFreq(world, i, j, k);
+		float sapFreq 		= getSaplingGrowthProb(world, i, j, k);
 		// Apple growth frequency
-		double appleFreq 	= getAppleFreq(world, i, j, k);
+		float appleFreq 	= getAppleGrowthProb(world, i, j, k);
 		// Cocoa frequency
-		double cocoaFreq 	= getCocoaFreq(world, i, j, k);
+		float cocoaFreq 	= getCocoaGrowthProb(world, i, j, k);
 		
 		if(growSaps && growth(sapFreq)) {
 			// Try to emit a sapling
@@ -244,8 +233,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 				return true;
 			}
 		} else if((cocoaGrowth) && (growth(cocoaFreq))) {
-			Biome biomes[] = {Biome.FOREST};
-			if((world.getBlockId(i, j - 1, k) == 0) && (canGrow(world,i,j,k, biomes))) {
+			if((world.getBlockId(i, j - 1, k) == 0) && (cocoaCanGrow(world,i,j,k))) {
 				//System.out.println("COCOA GROWTH IN RAINFOREST ("+i+","+j+","+k+")");
 				emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
 				return true;
@@ -271,12 +259,10 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	public void grow(World world, int i, int j, int k) {
 		Random rand 	= new Random();	
 		int randInt 	= rand.nextInt(100);	
-		// Biomes for apples
-		Biome biomes[] = {Biome.FOREST};
 		
-		if((canGrow(world,i,j,k, biomes)) && (randInt < 10)) {
+		if((cocoaCanGrow(world, i, j, k)) && (randInt < 10)) {
 			emitItem(world, i, j - 1, k, new ItemStack(Item.dyePowder, 1, 3));
-		} else if((appleCanGrow(world,i,j,k)) && (randInt < 25)) {
+		} else if((appleCanGrow(world, i, j, k)) && (randInt < 25)) {
 			emitItem(world, i, j - 1, k, new ItemStack(Item.appleRed));
 		} else {
 			emitItem(world, i, j + 1, k, new ItemStack(Block.sapling, 1,
@@ -285,20 +271,16 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	}
 	
 	/**
-	* Check if an item can grow in this biome
+	* Check if an cocoa can grow in this biome
 	*
-	* @param	biomes		List of biome names
-	* @return	true if can
+	* @return	true if can grow here
 	*/
-	private boolean canGrow(World world, int i, int j, int k, Biome[] biomes) {
-		Biome curbiome = Biome.getBiomeFromString(mod_AutoForest.getBiomeName(i,k));
-		for(Biome biome : biomes) {
-			if(curbiome.equals(biome)) {
-				return true;
-			}
-		}
+	private boolean cocoaCanGrow(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i,k);
 		
-		return false;
+		// Apples can grow in the named biomes
+		return ((biome.temperature >= 0.7F) && (biome.temperature <= 1.5F) 
+				&& (biome.rainfall >= 0.8F));
 	}
 	
 	/**
@@ -308,22 +290,23 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	* @param	i		X Coord
 	* @param	j		Y Coord
 	* @param	k		Z Coord
-	* @return	True if it can
+	* @return	True if it can grow in these coordinates
 	*/
 	private boolean appleCanGrow(World world, int i, int j, int k) {
 		// Get biome info
-		String biome = mod_AutoForest.getBiomeName(i,k);
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
 		// Apples can grow in the named biomes
-		return (biome.equals("Forest") || biome.equals("Swampland") || biome.equals("Rainforest")
-				|| biome.equals("Seasonal Forest") || biome.equals("Shrubland"));
+		return ((biome.temperature >= 0.7F) && (biome.temperature <= 1.0F) 
+				&& (biome.rainfall > 0.4F));
 	}
 	/**
 	* Check if there has been growth in these leaves
 	*
-	* @param	freq		Frequency to spawn
+	* @param	prob		Probability to spawn
 	* @return	True if there is an item grown
 	*/
-	protected boolean growth(double freq) {
+	protected boolean growth(float prob) {
 		// average time, in mins, between sapling pawning.
 		// Remember that each tree has between 13 and 30 leaves facing "up". 
 		// make number ~15 times larger if you want to do
@@ -334,11 +317,11 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		/*if(tmp < 0.001D) {
 			System.out.println(tmp);
 		}*/
-		return (tmp < freq);
+		return (tmp < prob);
 	}
 	
-	private double getSaplingFreq(World world, int i, int j, int k) {
-		double freq = 0.001;
+	private float getSaplingGrowthProb(World world, int i, int j, int k) {
+		float freq = 0.001F;
 		ModMultiOption o = (ModMultiOption) ModOptionsAPI
 							.getModOptions(mod_AutoForest.MENU_NAME)
 							.getSubOption(mod_AutoForest.SAPLING_MENU_NAME)
@@ -350,24 +333,28 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		// 4320 ticks per day
 		// Super slow wants one tree to reproduce every human day
 		if(v.equals("SUPERSLOW")) {
-			freq = 0.0000231481481D; 
+			freq = 0.0000231481481F; 
 		// Slow is a new tree per tree every 6 hours 
 		} else if(v.equals("SLOW")) {
-			freq = 0.0000925925926D; 
+			freq = 0.0000925925926F; 
 		// A tree every 3 hours
 		} else if(v.equals("AVERAGE")) {
-			freq = 0.000185185185D; 
+			freq = 0.000185185185F; 
 		//
 		} else if(v.equals("FAST")) {
-			freq = 0.000555555556D;
+			freq = 0.000555555556F;
 		} else if(v.equals("SUPERFAST")) {
-			freq = 0.0037037037D; // Each leaf @15 mins. Each tree ~1 min: EXTREMELY FAST
+			freq = 0.0037037037F; // Each leaf @15 mins. Each tree ~1 min: EXTREMELY FAST
 		} else if(v.equals("INSANE")) {
-			freq = 9.5;
+			freq = 9.5F;
 		}
 		
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		return mod_AutoForest.applyBiomeModifier(freq, "SaplingSpawn", world,i,k);
+		freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 10F);
+		freq = (int) freq * getOptValueMult(biome.temperature, 0.8F, 0.1F);
+	
+		return freq;
 	}
 	
 	/**
@@ -375,29 +362,45 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 	*
 	* @return	apple freq
 	*/
-	private double getAppleFreq(World world, int i, int j, int k) {
-		ModMappedMultiOption o = (ModMappedMultiOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.TREE_MENU_NAME)
-							.getOption("AppleGrowthRate");
-		double freq = (double) 1 / o.getValue();
+	private float getAppleGrowthProb(World world, int i, int j, int k) {
+		float freq = ((ModMappedOption) ModOptionsAPI
+			.getModOptions(mod_AutoForest.MENU_NAME)
+			.getSubOption(mod_AutoForest.TREE_MENU_NAME)
+			.getOption("AppleGrowthRate")).getValue();
 		
-		freq = mod_AutoForest.applyBiomeModifier(freq, "SaplingSpawn", world,i,k);
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		return freq;
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 0F;
+		} else {
+			freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 4F);
+			freq = (int) freq * getOptValueMult(biome.temperature, 0.7F, 4F);
+		
+			return 1F / freq;
+		}
 	}
 
 	/**
 	* Returns cocoa growth rate
 	*
-	* @return	cocoa freq
+	* @return	float probability
 	*/
-	private double getCocoaFreq(World world, int i, int j, int k) {
-		ModMappedMultiOption o = (ModMappedMultiOption) ModOptionsAPI
-							.getModOptions(mod_AutoForest.MENU_NAME)
-							.getSubOption(mod_AutoForest.TREE_MENU_NAME)
-							.getOption("CocoaGrowthRate");
-		return (double) 1 / o.getValue();
+	private float getCocoaGrowthProb(World world, int i, int j, int k) {
+		float freq = ((ModMappedOption) ModOptionsAPI
+			.getModOptions(mod_AutoForest.MENU_NAME)
+			.getSubOption(mod_AutoForest.TREE_MENU_NAME)
+			.getOption("CocoaGrowthRate")).getValue();
+		
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 0F;
+		} else {
+			freq = (int) freq * getOptValueMult(biome.rainfall, 1.0F, 15F);
+			freq = (int) freq * getOptValueMult(biome.temperature, 1.0F, 15F);
+		
+			return 1F / freq;
+		}
 	}
 	
 	/**
@@ -416,7 +419,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 			boolean growSaps 	= ((int) mod_AutoForest.growthType.getValue() > 1);
 			if(growSaps) {
 				// Use increased growth rate here
-				if(growth(getSaplingFreq(world, i, j, k) * 50)) {
+				if(growth(getSaplingGrowthProb(world, i, j, k) * 50)) {
 					emitItem(world, i, j, k, new ItemStack(Block.sapling, 1, 
 											 world.getBlockMetadata(i, j, k) % 4));
 				}
@@ -424,7 +427,7 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 			
 			// Check if apples grow
 			if(appleGrowth) {
-				if(growth(getAppleFreq(world, i, j, k))) {
+				if(growth(getAppleGrowthProb(world, i, j, k))) {
 					emitItem(world, i, j, k, new ItemStack(Item.appleRed));
 				}
 			}
@@ -433,6 +436,23 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		}
         world.setBlockWithNotify(i, j, k, 0);
     }
+	
+	/**
+	* Calculate an optimal distance coefficient. This is for cases
+	* where a larger number is desired the furhter you get from
+	* the optimal value. The minimum is 1, so multiplying any number "r"
+	* by the result of this operation will result in "r" if r is equal to "opt".
+	* If r is extremely far from opt, the coefficient will be extremely large
+	*
+	* @param	rain		Current value
+	* @param	opt		Optimal value
+	* @param	tol		tolerance (lower = Higher probability)
+	* @return The modifier. Output always >= 1, where 1 is "just as likely" and
+	* 		higher is "less likely"
+	*/
+	protected float getOptValueMult(float rain, float opt, float tol) {
+		return tol * (float) Math.pow(opt - rain, 2) + 1;
+	}
 	
 	//========
 	// END NATURE OVERHAUL

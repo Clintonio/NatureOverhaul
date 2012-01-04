@@ -86,8 +86,7 @@ public class BlockSapling extends BlockFlower
 		ModBooleanOption sapDeathOp = (ModBooleanOption) saps.getOption("SaplingDeath");
 		
 		// Rate of big tree growth:
-		int bigTreeRate = mod_AutoForest.getBiomeModifier(mod_AutoForest.getBiomeName(i,k), 
-							"BigTree");
+		int bigTreeRate = getBigTreeRate(world, i, j, k);
 		
 		// Choose a generator
 		Object obj = null;
@@ -106,7 +105,7 @@ public class BlockSapling extends BlockFlower
 		} else if(random.nextInt(100) < bigTreeRate) {
 			obj = new WorldGenBigTree(true);
 		} else {
-			if(mod_AutoForest.getBiomeAt(i, k) == Biome.SWAMPLAND) {
+			if(BiomeUtil.getBiome(i, k) == BiomeGenBase.swampland) {
 				obj = new WorldGenSwamp();
 			} else {
 				obj = new WorldGenTrees(true);
@@ -122,73 +121,111 @@ public class BlockSapling extends BlockFlower
 			}
 		// Sapling has a random chance of dying instead of growing
 		} else {
-			boolean starved = starvedSapling(world, i, j, k);
-			boolean died    = randomDeath(world, i, j, k, random);
 			boolean canDie  = sapDeathOp.getValue();
 			boolean grew 	 = false;
 			
-			if(!starved && (!died || !canDie) && 
+			if((!canDie || !hasDied(world, i, j, k)) && 
 				(grew = !((WorldGenerator) (obj)).generate(world, random, i, j, k))) {
 				world.setBlockAndMetadata(i, j, k, blockID, type);
 			}
 		}
     }
+	
+	/**
+	* Get the big tree rate
+	*
+	* @return	Big tree rate (out of 100)
+	*/
+	private int getBigTreeRate(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		int temp = 10 * (int) Math.abs(0.5 - biome.temperature);
+		int rain = (int) (10 * biome.rainfall);
+		
+		if(temp > 5 || rain == 0) {
+			return 0;
+		} else {
+			return 22 - (temp * 2) + rain;
+		}
+	}
+	
+	/**
+	* Get the death modifier
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		// Every 10000 ticks, this sapling dies
+		int freq = 10000;
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		if(biome.rainfall == 0F) {
+			return 1F;
+		} else {
+			float prob = freq * (biome.rainfall / 2);
+			
+			prob = prob / (1 + Math.abs(biome.temperature - 0.5F));
+			
+			return prob;
+		}
+	}
+	
+	/**
+	* growth
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		return 0F;
+	}
+	
+	/**
+	* Get the privacy radius (ie; How many blocks to scan
+	* for other saplings
+	*
+	* @return	Privacy radius
+	*/
+	protected int getPrivacyRadius(World world, int i, int j, int k) {
+		int radius = 2;
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		if(biome.temperature > 1F) {
+			radius = 4;
+		}
+		
+		if(biome.rainfall < 0.5F) {
+			radius++;
+		}
+		
+		return radius;
+	}
+	
+	/**
+	* Get the maximum number of neighbours
+	*
+	* @return	Max neighbours before starvation occurs
+	*/
+	protected int getMaxNeighbours(World world, int i, int j, int k) {
+		int max = 5;
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		if(biome.temperature <= 0F) {
+			max = 1;
+		} else if(biome.temperature > 1F) {
+			max = 1;
+		}
+		
+		int rainMod = (int) Math.ceil(biome.rainfall / 0.2) - 2;
+		
+		max = max + rainMod;
+		
+		if(max < 0) {
+			return 0;
+		} else {
+			return max;
+		}
+	}
 
     protected int damageDropped(int i)
     {
         return i & 3;
     }
-
-	
-	/**
-	* Check if a sapling is starved by it's neighbours
-	*
-	* @return	true is starved
-	*/
-	private boolean starvedSapling(World world, int i, int j, int k) {
-		// Check options
-		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME);
-		ModOptions saps = mo.getSubOption(mod_AutoForest.SAPLING_MENU_NAME);
-		boolean sapDeathOp = ((ModBooleanOption) saps.getOption("SaplingDeath")).getValue();
-		
-		if(sapDeathOp) {
-			// Min dist between trees
-			int dist = mod_AutoForest.getBiomeModifier(mod_AutoForest.getBiomeName(i,k),
-							"TreeGap");
-			
-			for(int x = i - dist; x <= dist + i; x++) {
-				for(int z = k - dist; z <= dist + k; z++) {
-					if(world.getBlockId(x, j, z) == Block.wood.blockID) {
-						//System.out.println("STARVED SAPLING IN biome: " + mod_AutoForest.getBiomeName(i,k) + ". DIST: " + dist);
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	/**
-	* Check if a sapling has died due to natural causes
-	*
-	* @return	True if a sapling has died
-	*/
-	private boolean randomDeath(World world, int i, int j, int k, Random random) {
-		// Check options
-		ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME);
-		ModOptions saps = mo.getSubOption(mod_AutoForest.SAPLING_MENU_NAME);
-		boolean sapDeathOp = ((ModBooleanOption) saps.getOption("SaplingDeath")).getValue();
-		String biomeName = mod_AutoForest.getBiomeName(i,k);
-		int deathRate = mod_AutoForest.getBiomeModifier(biomeName, "SaplingDeath");
-		
-		// This means that a sapling with a death rate of X will die x% of the time
-		if((sapDeathOp) && (random.nextInt(100) >= 100 - deathRate)) {
-			//System.out.println("SAPLING RANDOM DEATH IN biome: "+ biomeName + " AT RATE " + deathRate);
-			return true;
-		}
-		
-		return false;
-	}
 }	
 //====================
 // END NATURE OVERHAUL

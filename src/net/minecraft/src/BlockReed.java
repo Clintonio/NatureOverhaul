@@ -9,16 +9,22 @@ import java.util.Random;
 //========
 // BEGIN NATURE OVERHAUL
 //========
-import moapi.ModBooleanOption;
-import moapi.ModOptions;
-import moapi.ModMappedMultiOption;
+import moapi.*;
 //========
 // END NATURE OVERHAUL
 //========
 
 public class BlockReed extends BlockMortal
 {
-
+	//=====================
+	// BEGIN NATURE OVERHAUL
+	//=====================
+	protected float optRain = 0.8F;
+	protected float optTemp = 0.8F;
+	//=====================
+	// END NATURE OVERHAUL
+	//=====================
+	
     protected BlockReed(int i, int j)
     {
         super(i, Material.plants);
@@ -56,24 +62,56 @@ public class BlockReed extends BlockMortal
         	ModOptions reed = mod_AutoForest.reed;
 			boolean grow = ((ModBooleanOption) reed.getOption("ReedsGrow")).getValue();
 			if(grow) {
-				double growthRate = 1D /(((ModMappedMultiOption) reed
-						.getOption("ReedGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k, getGrowthProb(world, i, j, k));
 			}
 			
 			// ATTEMPT DEATH
 			boolean death = mod_AutoForest.reedDeath.getValue();
-			// 4.5D instead of 1.5D due to reeds being 3 high
-			double deathProb = 1D / (4.5D * (((ModMappedMultiOption) reed
-						.getOption("ReedDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
+			if(death && hasDied(world, i, j, k)) {
 				death(world, i, j, k);
 			}
 		}
     }
 	
-    protected String growthModifierType = "ReedSpawn";
-	protected String deathModifierName  = "ReedDeath";
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.reed.getOption("ReedGrowthRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 0F;
+		} else {
+			freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 1F);
+			freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		
+			return 1F / freq;
+		}
+	}
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.reed.getOption("ReedDeathRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 1F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
+		
+			return 1F / (3F * freq);
+		}
+	}
 	
 	/**
 	* Death action; remove all reeds above and below

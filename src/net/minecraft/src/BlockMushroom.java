@@ -9,25 +9,22 @@ import java.util.Random;
 //========
 // BEGIN AUTOFOREST
 //========
-import moapi.ModBooleanOption;
-import moapi.ModMappedMultiOption;
-import moapi.ModOptions;
+import moapi.*;
 //========
 // END AUTOFOREST
 //========
 
 public class BlockMushroom extends BlockFlower
 {
-    
-	//========
+	//=====================
 	// BEGIN NATURE OVERHAUL
-	//========
-    protected String growthModifierType = "ShroomSpawn";
-	protected String deathModifierName  = "ShroomDeath";
-	//========
+	//=====================
+	protected float optRain = 1.0F;
+	protected float optTemp = 0.9F;
+	//=====================
 	// END NATURE OVERHAUL
-	//========
-
+	//=====================
+	
     protected BlockMushroom(int i, int j)
     {
         super(i, j);
@@ -85,23 +82,19 @@ public class BlockMushroom extends BlockFlower
         }
 		
 		if(!world.multiplayerWorld) {
-			ModOptions shrooms = mod_AutoForest.shrooms;
 			boolean grow = mod_AutoForest.shroomTreesGrow.getValue();
 			if(grow) {
-				double growthRate = 1D / mod_AutoForest.shroomTreeGrowth.getValue();
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k);
 			}
 			
 			// ATTEMPT DEATH
 			boolean death = mod_AutoForest.shroomDeath.getValue();
-			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) shrooms
-						.getOption("ShroomDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
+			if(death && hasDied(world, i, j, k)) {
 				death(world, i, j, k);
 			}
 		}
 		//========
-		// END AUTOFOREST
+		// END NATURE OVERHAUL
 		//========
     }
 	
@@ -114,6 +107,46 @@ public class BlockMushroom extends BlockFlower
 	*/
 	public void grow(World world, int i, int j, int k) {
 		fertilizeMushroom(world, i, j, k, world.rand);
+	}
+	
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = mod_AutoForest.shroomTreeGrowth.getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 0F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		
+			return 1F / freq;
+		}
+	}
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = mod_AutoForest.shroomDeathRate.getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 1F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
+		
+			return 1F / freq;
+		}
 	}
 	
 	//=====================

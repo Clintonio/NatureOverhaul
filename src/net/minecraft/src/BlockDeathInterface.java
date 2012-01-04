@@ -16,10 +16,9 @@ public interface BlockDeathInterface {
 	* @param	i
 	* @param	j
 	* @param	k
-	* @param	prob	Probability of death this tick
 	* @return	True if plant has died
 	*/
-	public boolean hasDied(World world, int i, int j, int k, double prob);
+	public boolean hasDied(World world, int i, int j, int k);
 	
 	/**
 	* Checks whether this block has starved on this tick
@@ -43,7 +42,7 @@ public interface BlockDeathInterface {
 	* @param	prob	Probability of death this tick
 	* @return	True if plant has randomly died
 	*/
-	public boolean hasRandomlyDied(World world, int i, int j, int k, double prob);
+	public boolean hasRandomlyDied(World world, int i, int j, int k, float prob);
 	
 	/**
 	* The action to take upon death

@@ -10,11 +10,6 @@ import java.util.HashMap;
 */
 public abstract class BlockGrowable extends Block implements Growable {
 	/**
-	* Override this with the name of biome modifier you use
-	*/
-	protected String growthModifierType = null;
-	
-	/**
 	* See parent constructor
 	*/
     protected BlockGrowable(int i, Material material) {
@@ -30,14 +25,19 @@ public abstract class BlockGrowable extends Block implements Growable {
 	/**
 	* Attempt to grow here
 	*
-	* @param	prob	Probability of growing from 0 to 1 inclusive
+	* @return True if growth occured
 	*/
-	protected boolean attemptGrowth(World world, int i, int j, int k, double prob) {
-		// Apply a modifier if the user has set one
-		if(growthModifierType != null) {
-			prob = mod_AutoForest.applyBiomeModifier(prob, growthModifierType, world, i, k);
-		}
-		
+	protected boolean attemptGrowth(World world, int i, int j, int k) {
+		return attemptGrowth(world, i, j, k, getGrowthProb(world, i, j, k));
+	}
+	
+	/**
+	* Attempt to grow here
+	*
+	* @param	prob	Probability of growing from 0 to 1 inclusive
+	* @return True if growth occured
+	*/
+	protected boolean attemptGrowth(World world, int i, int j, int k, float prob) {
 		if(growth(prob)) {
 			grow(world, i, j, k);
 			
@@ -48,14 +48,40 @@ public abstract class BlockGrowable extends Block implements Growable {
 	}
 	
 	/**
+	* Get the probability of growth occuring on this block
+	*
+	* @return	Probability of growth occuring on this tick
+	*/
+	public abstract float getGrowthProb(World world, int i, int j, int k);
+	
+	/**
+	* Calculate an optimal distance coefficient. This is for cases
+	* where a larger number is desired the furhter you get from
+	* the optimal value. The minimum is 1, so multiplying any number "r"
+	* by the result of this operation will result in "r" if r is equal to "opt".
+	* If r is extremely far from opt, the coefficient will be extremely large
+	*
+	* @param	rain		Current value
+	* @param	opt		Optimal value
+	* @param	tol		tolerance (lower = Higher probability)
+	* @return The modifier. Output always >= 1, where 1 is "just as likely" and
+	* 		higher is "less likely"
+	*/
+	protected float getOptValueMult(float rain, float opt, float tol) {
+		float out = tol * (float) Math.pow(opt - rain, 2) + 1;
+		
+		return out;
+	}
+	
+	/**
 	* Check if the plant has grown
 	*
-	* @param	freq	Configured rate of growth
+	* @param	prob		The probability of growth from 0 to 1
 	* @return	True if a plant has possibly grown
 	*/
-	protected boolean growth(double freq) {
+	protected boolean growth(double prob) {
 		// Since tickRate() is 10, we only use 6 as the mult.
-		return (Math.random() < freq);
+		return (Math.random() < prob);
 	}
 	
 	/**

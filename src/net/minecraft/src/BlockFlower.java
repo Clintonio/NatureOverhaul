@@ -7,11 +7,19 @@ package net.minecraft.src;
 import java.util.Random;
 import moapi.ModOptionsAPI;
 import moapi.ModOptions;
-import moapi.ModMappedMultiOption;
+import moapi.ModMappedOption;
 import moapi.ModBooleanOption;
 
 public class BlockFlower extends BlockMortal
 {
+	//=====================
+	// BEGIN NATURE OVERHAUL
+	//=====================
+	protected float optRain = 0.7F;
+	protected float optTemp = 0.6F;
+	//=====================
+	// END NATURE OVERHAUL
+	//=====================
 
     protected BlockFlower(int i, int j)
     {
@@ -41,7 +49,6 @@ public class BlockFlower extends BlockMortal
 	//========
 	// BEGIN NATURE OVERHAUL
 	//========
-    protected String growthModifierType = "FlowerSpawn";
 	
 	public void updateTick(World world, int i, int j, int k, Random random) {
 		if((!world.multiplayerWorld) && (!(this instanceof BlockCrops))) {
@@ -49,16 +56,12 @@ public class BlockFlower extends BlockMortal
 			ModOptions flowers = mod_AutoForest.flowers;
 			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
 			if(grow) {
-				double growthRate = 1D /(((ModMappedMultiOption) flowers
-						.getOption("FlowerGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k);
 			}
 			
 			// ATTEMPT DEATH
 			boolean death = mod_AutoForest.flowerDeath.getValue();
-			double deathProb = 1D / (1.5D * (((ModMappedMultiOption) flowers
-						.getOption("FlowerDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
+			if(death && hasDied(world, i, j, k)) {
 				death(world, i, j, k);
 			}
 		}
@@ -67,6 +70,46 @@ public class BlockFlower extends BlockMortal
 			checkFlowerChange(world, i, j, k);
 		}
     }
+	
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.flowers.getOption("FlowerGrowthRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 0F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 1.5F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 1.5F);
+			
+			return 1F / freq;
+		}
+	}
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.flowers.getOption("FlowerDeathRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 1F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 2.5F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 2.5F);
+			
+			return 1F / freq;
+		}
+	}
 	//========
 	// END NATURE OVERHAUL
 	//========

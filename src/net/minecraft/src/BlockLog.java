@@ -8,17 +8,20 @@ import java.util.Random;
 //=======================
 // START NATURE OVERHAUL
 //=======================
-import moapi.ModOptionsAPI;
-import moapi.ModOptions;
-import moapi.ModBooleanOption;
-import moapi.ModMappedMultiOption;
+import moapi.*;
 import java.util.HashSet;
 //=======================
 // END NATURE OVERHAUL
 //=======================
 
-public class BlockLog extends Block
+public class BlockLog extends Block implements BlockDeathInterface
 {
+	//=====================
+	// BEGIN NATURE OVERHAUL
+	//=====================
+	protected float optRain = 0.8F;
+	protected float optTemp = 0.6F;
+	
 	private static final int MAX_TREE_HEIGHT = 16;
 	// Flag controls
 	private static final int iBits = 5;
@@ -30,6 +33,9 @@ public class BlockLog extends Block
 	* and there is no wood within this radius
 	*/
 	public int leafDeathRadius = 2;
+	//=====================
+	// END NATURE OVERHAUL
+	//=====================
 	
     protected BlockLog(int i)
     {
@@ -43,23 +49,106 @@ public class BlockLog extends Block
 	//=======================
 	public void updateTick(World world, int i, int j, int k, Random random) {
 		if(!world.multiplayerWorld) {
-			ModOptions mo = ModOptionsAPI.getModOptions(mod_AutoForest.MENU_NAME).getSubOption(mod_AutoForest.TREE_MENU_NAME);
-			boolean treeDeath = ((ModBooleanOption) mo.getOption("TreeDeath")).getValue();
-			// Death rate per thousand per tick
-			int deathRate = ((ModMappedMultiOption) mo.getOption("DeathRate")).getValue();	 
-			// Modify the rate, higher for drying biomes
-			deathRate = (int) mod_AutoForest.applyBiomeModifier(deathRate, "TreeDeath",
-														  world, i, k);
-			if((treeDeath) &&  ((deathRate <= 0) || (random.nextInt(deathRate) == 0)) && (isTree(world, i, j, k))) {
+			boolean treeDeath = ((ModBooleanOption) mod_AutoForest.tree.getOption("TreeDeath")).getValue();
+			
+			if((treeDeath) && hasDied(world, i, j, k) && (isTree(world, i, j, k))) {
 				int lowestLogJ = getLowestLogJ(world, i, j, k);
 				//System.out.println("KILLING A TREE IN biome " + mod_AutoForest.getBiomeName(i,k) + ". WITH RATE: " + deathRate);
-				killTree(world, i, lowestLogJ, k);
+				death(world, i, lowestLogJ, k);
 			}
 		}
+	}	 
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.tree.getOption("DeathRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 1F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 6F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 9F);
+			
+			return 1F / freq;
+		}
+	}
+	
+	/**
+	* Kills the tree and it's leaves
+	*/
+	public void death(World world, int i, int j, int k) {
+		killTree(world, i, j, k, true);
+	}
+	
+	/**
+	* Check if this tree has died
+	*/
+	public boolean hasDied(World world, int i, int j, int k) {
+		return hasRandomlyDied(world, i, j, k);
+	}
+	
+	/**
+	* Not used
+	*/
+	public boolean hasStarved(World world, int i, int j, int k) {
+		return false;
+	}
+	
+	/**
+	* Checks whether this block has died from natural random causes
+	* 
+	* @param	world
+	* @param	i
+	* @param	j
+	* @param	k
+	* @return	True if plant has randomly died
+	*/
+	public boolean hasRandomlyDied(World world, int i, int j, int k) {
+		float prob = getDeathProb(world, i, j, k);
+		
+		return hasRandomlyDied(world, i, j, k, prob);
+	}
+	
+	/**
+	* Checks whether this block has died from natural random causes
+	* 
+	* @param	world
+	* @param	i
+	* @param	j
+	* @param	k
+	* @param	prob	Probability of death this tick
+	* @return	True if plant has randomly died
+	*/
+	public boolean hasRandomlyDied(World world, int i, int j, int k, float prob) {
+		return (Math.random() < prob);
+	}
+	
+	/**
+	* Calculate an optimal distance coefficient. This is for cases
+	* where a larger number is desired the furhter you get from
+	* the optimal value. The minimum is 1, so multiplying any number "r"
+	* by the result of this operation will result in "r" if r is equal to "opt".
+	* If r is extremely far from opt, the coefficient will be extremely large
+	*
+	* @param	rain		Current value
+	* @param	opt		Optimal value
+	* @param	tol		tolerance (lower = Higher probability)
+	* @return The modifier. Output always >= 1, where 1 is "just as likely" and
+	* 		higher is "less likely"
+	*/
+	protected float getOptValueMult(float rain, float opt, float tol) {
+		return tol * (float) Math.pow(opt - rain, 2) + 1;
+	}
+	
 	//=======================
 	// END NATURE OVERHAUL
 	//=======================
-	}
 	
     public int tickRate()
     {

@@ -18,6 +18,8 @@ import moapi.ModOptions;
 
 public class BlockCactus extends BlockMortal
 {
+	protected float optRain = 0.2F;
+	protected float optTemp = 1.5F;
 
     protected BlockCactus(int i, int j)
     {
@@ -53,23 +55,48 @@ public class BlockCactus extends BlockMortal
 			ModOptions cactii = mod_AutoForest.cactii;
 			boolean grow = ((ModBooleanOption) cactii.getOption("CactiiGrow")).getValue();
 			if(grow) {
-				double growthRate = 1D /(((ModMappedMultiOption) cactii
-						.getOption("CactiiGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k);
 			}
 			
 			// ATTEMPT DEATH
 			boolean death = mod_AutoForest.cactiiDeath.getValue();
-			// 4.5D instead of 1.5D due to reeds being 3 high
-			double deathProb = 1D / (4.5D * (((ModMappedMultiOption) cactii
-						.getOption("CactiiDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
+			if(death && hasDied(world, i, j, k)) {
 				death(world, i, j, k);
 			}
 		}
     }
-    protected String growthModifierType = "CactiiSpawn";
-	protected String deathModifierName  = "CactiiDeath";
+	
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedMultiOption) mod_AutoForest.cactii.getOption("CactiiGrowthRate")).getValue();
+		
+		freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 0.5F);
+		freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 0.5F);
+	
+		return 1F / freq;
+	}
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedMultiOption) mod_AutoForest.cactii.getOption("CactiiDeathRate")).getValue();
+	
+		freq = freq * getOptValueMult(biome.rainfall, optRain, 10F);
+		freq = freq * getOptValueMult(biome.temperature, optTemp, 10F);
+	
+		return 1F / (3F * freq);
+	}
 	
 	/**
 	* Death action; remove all reeds above and below

@@ -19,7 +19,8 @@ public class BlockTallGrass extends BlockFlower
 	//====================
 	// BEGIN NATURE OVERHAUL
 	//====================
-    protected String growthModifierType = "GrassSpawn";
+	protected float optRain = 0.5F;
+	protected float optTemp = 0.7F;
 	//====================
 	// END NATURE OVERHAUL
 	//====================
@@ -77,18 +78,55 @@ public class BlockTallGrass extends BlockFlower
     		ModOptions grass = mod_AutoForest.grass;
 			boolean grow = ((ModBooleanOption) grass.getOption("GrassGrows")).getValue();
 			if(grow){
-				double growthRate = 1D /(((ModMappedMultiOption) grass
-						.getOption("GrassGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k);
 			}
 			
 			// ATTEMPT DEATH
 			boolean death = mod_AutoForest.grassDeath.getValue();
-			double deathProb = 1D / (0.75D * (((ModMappedMultiOption) grass
-						.getOption("GrassDeathRate")).getValue()));
-			if(death && hasDied(world, i, j, k, deathProb)) {
+			double deathProb = 1D / (0.75D);
+			if(death && hasDied(world, i, j, k)) {
 				death(world, i, j, k);
 			}
+		}
+	}
+	
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.grass.getOption("GrassGrowthRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 0.015F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		
+			return 1F / freq;
+		}
+	}
+	
+	/**
+	* Get the death probability
+	*
+	* @return	Death probability
+	*/
+	public float getDeathProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.grass.getOption("GrassDeathRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+			return 0.01F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 0.25F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 0.25F);
+		
+			return 1F / freq;
 		}
 	}
 	

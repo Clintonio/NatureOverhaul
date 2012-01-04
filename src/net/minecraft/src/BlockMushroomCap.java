@@ -6,17 +6,13 @@ package net.minecraft.src;
 
 import java.util.Random;
 
-//======================
+//========
 // BEGIN NATURE OVERHAUL
-//======================
-import moapi.ModOptionsAPI;
-import moapi.ModOptions;
-import moapi.ModOption;
-import moapi.ModBooleanOption;
-import moapi.ModMappedMultiOption;
-//======================
+//========
+import moapi.*;
+//========
 // END NATURE OVERHAUL
-//======================
+//========
 
 
 // Referenced classes of package net.minecraft.src:
@@ -24,6 +20,14 @@ import moapi.ModMappedMultiOption;
 
 public class BlockMushroomCap extends BlockGrowable
 {
+	//=====================
+	// BEGIN NATURE OVERHAUL
+	//=====================
+	protected float optRain = 1.0F;
+	protected float optTemp = 0.9F;
+	//=====================
+	// END NATURE OVERHAUL
+	//=====================
 
     private int mushroomType;
 
@@ -37,19 +41,34 @@ public class BlockMushroomCap extends BlockGrowable
 	//======================
 	// BEGIN NATURE OVERHAUL
 	//======================
-    
-    protected String growthModifierType = "ShroomSpawn";
-	protected String deathModifierName  = "ShroomDeath";
 	
     public void updateTick(World world, int i, int j, int k, Random random) {
 		if(!world.multiplayerWorld) {
 			ModOptions shrooms = mod_AutoForest.shrooms;
 			boolean grow = ((ModBooleanOption) shrooms.getOption("ShroomsGrow")).getValue();
 			if(grow && (world.getBlockId(i, j + 1, k) == 0)) {
-				double growthRate = 1D /(((ModMappedMultiOption) shrooms
-						.getOption("ShroomGrowthRate")).getValue());
-				attemptGrowth(world, i, j, k, growthRate);
+				attemptGrowth(world, i, j, k);
 			}
+		}
+	}
+	
+	/**
+	* Get the growth probability
+	*
+	* @return	Growth probability
+	*/
+	public float getGrowthProb(World world, int i, int j, int k) {
+		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
+		
+		float freq = ((ModMappedOption) mod_AutoForest.shrooms.getOption("ShroomGrowthRate")).getValue();
+		
+		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+			return 0F;
+		} else {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 3F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 3F);
+		
+			return 1F / freq;
 		}
 	}
 
