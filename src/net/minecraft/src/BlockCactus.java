@@ -76,8 +76,10 @@ public class BlockCactus extends BlockMortal
 		
 		float freq = ((ModMappedMultiOption) mod_AutoForest.cactii.getOption("CactiiGrowthRate")).getValue();
 		
-		freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 0.5F);
-		freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 0.5F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 0.5F);
+			freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 0.5F);
+		}
 	
 		return 1F / freq;
 	}
@@ -92,9 +94,11 @@ public class BlockCactus extends BlockMortal
 		
 		float freq = ((ModMappedMultiOption) mod_AutoForest.cactii.getOption("CactiiDeathRate")).getValue();
 	
-		freq = freq * getOptValueMult(biome.rainfall, optRain, 10F);
-		freq = freq * getOptValueMult(biome.temperature, optTemp, 10F);
-	
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			freq = freq * getOptValueMult(biome.rainfall, optRain, 10F);
+			freq = freq * getOptValueMult(biome.temperature, optTemp, 10F);
+		}
+		
 		return 1F / (3F * freq);
 	}
 	

@@ -31,4 +31,11 @@ public interface Plantable {
 	* @return	Array of speeds in format [x, y, z] velocities
 	*/
 	public float[] getVelocities(double baseSpeed);
+	
+	/**
+	* The method by which the item plants itself
+	*
+	* @param	damage	Item damage
+	*/
+	public void plant(World world, int i, int j, int k, int damage);
 }

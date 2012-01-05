@@ -83,12 +83,16 @@ public class BlockReed extends BlockMortal
 		
 		float freq = ((ModMappedOption) mod_AutoForest.reed.getOption("ReedGrowthRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 0F;
-		} else {
-			freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 1F);
-			freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 0F;
+			} else {
+				freq = (int) freq * getOptValueMult(biome.rainfall, optRain, 1F);
+				freq = (int) freq * getOptValueMult(biome.temperature, optTemp, 1F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
@@ -103,12 +107,16 @@ public class BlockReed extends BlockMortal
 		
 		float freq = ((ModMappedOption) mod_AutoForest.reed.getOption("ReedDeathRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 1F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 1F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
 		
+				return 1F / (3F * freq);
+			}
+		} else {
 			return 1F / (3F * freq);
 		}
 	}

@@ -69,12 +69,16 @@ public class BlockLog extends Block implements BlockDeathInterface
 		
 		float freq = ((ModMappedOption) mod_AutoForest.tree.getOption("DeathRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 1F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 6F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 9F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 1F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 6F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 9F);
 			
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}

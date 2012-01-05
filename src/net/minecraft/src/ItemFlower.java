@@ -9,7 +9,7 @@ import moapi.ModBooleanOption;
 * @author	Clinton Alexander
 * @version	1.0.0.0
 */
-public class ItemFlower extends ItemPlantable implements Plantable {
+public class ItemFlower extends ItemPlantable {
 	
     public ItemFlower(int i)
     {

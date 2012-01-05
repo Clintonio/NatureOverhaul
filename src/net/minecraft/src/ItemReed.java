@@ -107,6 +107,15 @@ public class ItemReed extends Item implements Plantable
 	}
 	
 	/**
+	* The method by which the item plants itself
+	*
+	* @param	damage	Item damage
+	*/
+	public void plant(World world, int i, int j, int k, int damage) {
+		world.setBlockAndMetadataWithNotify(i, j, k, getPlantBlockID(), damage);
+	}
+	
+	/**
 	* Get plant ID
 	*
 	* @return	ID of block to plant

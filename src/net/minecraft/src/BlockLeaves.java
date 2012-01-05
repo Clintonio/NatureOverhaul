@@ -351,9 +351,11 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		
 		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 10F);
-		freq = (int) freq * getOptValueMult(biome.temperature, 0.8F, 0.1F);
-	
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 10F);
+			freq = (int) freq * getOptValueMult(biome.temperature, 0.8F, 0.1F);
+		}
+		
 		return freq;
 	}
 	
@@ -366,16 +368,20 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		float freq = ((ModMappedOption) ModOptionsAPI
 			.getModOptions(mod_AutoForest.MENU_NAME)
 			.getSubOption(mod_AutoForest.TREE_MENU_NAME)
-			.getOption("AppleGrowthRate")).getValue();
+			.getOption("AppleGrowthRate")).getValue() * 1.5F;
 		
 		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 0F;
-		} else {
-			freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 4F);
-			freq = (int) freq * getOptValueMult(biome.temperature, 0.7F, 4F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 0F;
+			} else {
+				freq = (int) freq * getOptValueMult(biome.rainfall, 0.8F, 4F);
+				freq = (int) freq * getOptValueMult(biome.temperature, 0.7F, 4F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
@@ -393,12 +399,16 @@ public class BlockLeaves extends BlockLeavesBase implements Growable
 		
 		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 0F;
-		} else {
-			freq = (int) freq * getOptValueMult(biome.rainfall, 1.0F, 15F);
-			freq = (int) freq * getOptValueMult(biome.temperature, 1.0F, 15F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 0F;
+			} else {
+				freq = (int) freq * getOptValueMult(biome.rainfall, 1.0F, 15F);
+				freq = (int) freq * getOptValueMult(biome.temperature, 1.0F, 15F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}

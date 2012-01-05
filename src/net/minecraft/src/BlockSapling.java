@@ -8,10 +8,7 @@ import java.util.Random;
 //====================
 // BEGIN NATURE OVERHAUL
 //====================
-import moapi.ModOptionsAPI;
-import moapi.ModOptions;
-import moapi.ModMappedMultiOption;
-import moapi.ModBooleanOption;
+import moapi.*;
 
 public class BlockSapling extends BlockFlower
 {
@@ -154,17 +151,21 @@ public class BlockSapling extends BlockFlower
 	*/
 	public float getDeathProb(World world, int i, int j, int k) {
 		// Every 10000 ticks, this sapling dies
-		int freq = 10000;
+		int freq = ((ModMappedOption) mod_AutoForest.saps.getOption("DeathRate")).getValue();
 		BiomeGenBase biome = BiomeUtil.getBiome(i, k);
 		
-		if(biome.rainfall == 0F) {
-			return 1F;
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if(biome.rainfall == 0F) {
+				return 1F;
+			} else {
+				float prob = freq * (biome.rainfall / 2);
+			
+				prob = prob / (1 + Math.abs(biome.temperature - 0.5F));
+			
+				return prob;
+			}
 		} else {
-			float prob = freq * (biome.rainfall / 2);
-			
-			prob = prob / (1 + Math.abs(biome.temperature - 0.5F));
-			
-			return prob;
+			return 1F / freq;
 		}
 	}
 	

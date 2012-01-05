@@ -1,4 +1,4 @@
-NatureOverhaul 16
+NatureOverhaul 17
 
 Author: Clinton Alexander
 Description: Ever thought Minecrafts tree and forest system was rather unrealistic? Boring? Uneventful? Then this mod is for you.
@@ -19,6 +19,7 @@ The plants, mushrooms, cactii, reeds and pumpkins of your world will also reprod
 - Moss spreads across other cobble types
 - Water is fixed. No more strange currents in the sea.
 - Mushroom trees grow from mushrooms naturally
+- Nether Wart grows and dies naturally
 
 -----------------
 Prerequisites

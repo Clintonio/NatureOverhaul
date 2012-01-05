@@ -6,6 +6,14 @@ import moapi.ModBooleanOption;
 import moapi.ModOptions;
 import moapi.ModMappedOption;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
 /**
@@ -18,6 +26,14 @@ import java.util.HashMap;
 public class mod_AutoForest extends BaseMod {
 	// Check bottom for static shortcuts
 	
+	/**
+	* The automatic update URL
+	*/
+	private final String updateURL = "http://minecraft.digitaluppercut.com/updateExists.php";
+	/**
+	* True if an update exists
+	*/
+	private boolean updateExists = false;
 	
 	private static final HashMap<String, byte[]> biomeModifier = new HashMap<String, byte[]>();
 	
@@ -25,7 +41,7 @@ public class mod_AutoForest extends BaseMod {
 	* Version
 	*/
 	public String getVersion() {
-		return "16";
+		return "17";
 	}
 	
 	public mod_AutoForest() {
@@ -42,6 +58,10 @@ public class mod_AutoForest extends BaseMod {
 	*/
 	public void load() {
 		setupModOptions();
+		
+		if(autoUpdate.getValue()) {
+			checkForUpdates(updateURL);
+		}
 	}
 	
 	/**
@@ -54,6 +74,9 @@ public class mod_AutoForest extends BaseMod {
 		options.addSubOptions(tree);
 		options.addSubOptions(shrooms);
 		options.addSubOptions(misc);
+		
+		options.addOption(autoUpdate);
+		options.setWideOption(autoUpdate.getName());
 		
 		// Sapling related
 		setupSaplings();
@@ -83,10 +106,12 @@ public class mod_AutoForest extends BaseMod {
 	private void setupSaplings() {
 		String[] 	growthLabels = {"Both", "Decay", "Growth", "Neither"};
 		Integer[]	growthValues = {3, 2, 1, 0};
+		Integer[] dKeys 	= {5000, 2500, 250, 5, 20000, 10000};
 		
-		saps.addToggle("AutoSapling");
+		saps.addMappedOption("DeathRate", dKeys, labels);
 		saps.addToggle("SaplingDeath");
 		saps.addMultiOption("GrowthRate", labels);
+		saps.addToggle("AutoSapling");
 		saps.addMappedOption("Growth Occurs On", growthValues, 
 								  growthLabels);
 		growthType = (ModMappedOption) saps.getOption("Growth Occurs On");
@@ -146,30 +171,52 @@ public class mod_AutoForest extends BaseMod {
 		// Plant related
 		Integer[] pKeys 	= {2400, 240, 30, 5, 30000, 9000};
 		plants.addSubOptions(flowers);
+		plants.addSubOptions(wort);
 		plants.addSubOptions(cactii);
 		plants.addSubOptions(reed);
 		plants.addSubOptions(grass);
 		
+		ModMappedOption drate = new ModMappedOption("FlowerDeathRate", "Death Rate", pKeys, labels);
+		ModMappedOption grate = new ModMappedOption("FlowerGrowthRate", "Growth Rate", pKeys, labels);
+		
 		// Plant submenus
-		flowers.addMappedOption("FlowerDeathRate", pKeys, labels);
+		flowers.addOption(drate);
 		flowers.addOption(flowerDeath);
-		flowers.addMappedOption("FlowerGrowthRate", pKeys, labels);
-		flowers.addToggle("FlowersGrow");
+		flowers.addOption(grate);
+		flowers.addOption(flowersGrow);
 		
-		cactii.addMappedOption("CactiiDeathRate", pKeys, labels);
+		drate = new ModMappedOption("WortDeathRate", "Death Rate", pKeys, labels);
+		grate = new ModMappedOption("WortGrowthRate", "Growth Rate", pKeys, labels);
+		
+		// NetherWort submenus
+		wort.addOption(drate);
+		wort.addOption(wortDeath);
+		wort.addOption(grate);
+		wort.addOption(wortsGrow);
+		
+		drate = new ModMappedOption("CactiiDeathRate", "Death Rate", pKeys, labels);
+		grate = new ModMappedOption("CactiiGrowthRate", "Growth Rate", pKeys, labels);
+		
+		cactii.addOption(drate);
 		cactii.addOption(cactiiDeath);
-		cactii.addMappedOption("CactiiGrowthRate", pKeys, labels);
-		cactii.addToggle("CactiiGrow");
+		cactii.addOption(grate);
+		cactii.addOption(cactiiGrow);
 		
-		reed.addMappedOption("ReedDeathRate", pKeys, labels);
+		drate = new ModMappedOption("ReedDeathRate", "Death Rate", pKeys, labels);
+		grate = new ModMappedOption("ReedGrowthRate", "Growth Rate", pKeys, labels);
+		
+		reed.addOption(drate);
 		reed.addOption(reedDeath);
-		reed.addMappedOption("ReedGrowthRate", pKeys, labels);
-		reed.addToggle("ReedsGrow");
+		reed.addOption(grate);
+		reed.addOption(reedsGrow);
 		
-		grass.addMappedOption("GrassDeathRate", pKeys, labels);
+		drate = new ModMappedOption("GrassDeathRate", "Death Rate", pKeys, labels);
+		grate = new ModMappedOption("GrassGrowthRate", "Growth Rate", pKeys, labels);
+		
+		grass.addOption(drate);
 		grass.addOption(grassDeath);
-		grass.addMappedOption("GrassGrowthRate", pKeys, labels);
-		grass.addToggle("GrassGrows");
+		grass.addOption(grate);
+		grass.addOption(grassGrows);
 	}
 	
 	/**
@@ -203,6 +250,7 @@ public class mod_AutoForest extends BaseMod {
 		Item.itemsList[Block.plantYellow.blockID]	= (new ItemFlower(Block.plantYellow.blockID - 256)).setItemName("Flower");
 		Item.itemsList[Block.plantRed.blockID] 		= (new ItemFlower(Block.plantRed.blockID - 256)).setItemName("Flower");
 		Item.itemsList[Block.cactus.blockID] 		= (new ItemCactus(Block.cactus.blockID - 256)).setItemName("Cactus");
+		Item.itemsList[Item.netherStalkSeeds.shiftedIndex]= (new ItemNetherSeeds(116, Block.netherStalk.blockID, Block.slowSand.blockID)).setIconCoord(13, 7).setItemName("netherStalkSeeds").setPotionModifier("+4");
 		
 		// Put the cobblestone mossy into the blocklist
 		BlockCobblestoneMossy.createInBlockList();
@@ -227,6 +275,60 @@ public class mod_AutoForest extends BaseMod {
 	}
 	
 	//=====================
+	// ACTION METHODS
+	//=====================
+	
+	/**
+	* Check for an update
+	*
+	* @param	urlStr 	URL to check for updates
+	*/
+	private void checkForUpdates(String urlStr) {
+		try {
+			// Construct data
+			String data = URLEncoder.encode("mod", "UTF-8") + "=" + URLEncoder.encode("no", "UTF-8");
+			data += "&" + URLEncoder.encode("ver", "UTF-8") + "=" + URLEncoder.encode(getVersion(), "UTF-8");
+
+			// Send data
+			URL url = new URL(urlStr);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setReadTimeout(1000);
+			conn.setDoOutput(true);
+			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+			wr.write(data);
+			wr.flush();
+
+			// Get the response
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String resp = rd.readLine();
+			
+			wr.close();
+			rd.close();
+			System.out.println(resp);
+			if(resp.equals("1")) {
+				updateExists = true;
+				ModLoader.SetInGameHook(this, true, true);
+			}
+		} catch (Exception e) {
+			System.err.println("Could not check for new NatureOverhaul version");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	* Update tick ingame, notify user of updates
+	*/
+	public boolean OnTickInGame(float tick, net.minecraft.client.Minecraft game) {
+		if(updateExists) {
+			game.ingameGUI.addChatMessage("An update exists for Nature Overhaul");
+		}
+		
+		ModLoader.SetInGameHook(this, false, false);
+		
+		return true;
+	}
+	
+	//=====================
 	// CONVENIENCE OBJECTS
 	//=====================
 	
@@ -238,6 +340,7 @@ public class mod_AutoForest extends BaseMod {
 	public static final String CLIMATE_MENU_NAME = "Climate Options";
 	public static final String NIGHT_MENU_NAME	= "Day and Night Options";
 	public static final String FLOWER_MENU_NAME	= "Flower Options";
+	public static final String WORT_MENU_NAME	= "Netherwort Options";
 	public static final String CACTI_MENU_NAME	= "Cactus Options";
 	public static final String REED_MENU_NAME	= "Reed Options";
 	public static final String SHROOMS_MENU_NAME = "Mushroom Options";
@@ -258,36 +361,49 @@ public class mod_AutoForest extends BaseMod {
 	// Options for plants
 	public static ModOptions 	plants	= new ModOptions(PLANT_MENU_NAME);
 	public static ModOptions 	flowers 	= new ModOptions(FLOWER_MENU_NAME);
+	public static ModOptions		wort		= new ModOptions(WORT_MENU_NAME);
 	public static ModOptions 	cactii 	= new ModOptions(CACTI_MENU_NAME);
 	public static ModOptions 	reed 	= new ModOptions(REED_MENU_NAME);
 	public static ModOptions 	shrooms 	= new ModOptions(SHROOMS_MENU_NAME);
 	public static ModOptions		grass	= new ModOptions(GRASS_MENU_NAME);
 	public static ModOptions		misc		= new ModOptions(MISC_MENU_NAME);
 	
-	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die");
-	public static ModBooleanOption shroomDeath 	= new ModBooleanOption("Shrooms Die");
-	public static ModBooleanOption reedDeath 	= new ModBooleanOption("Reeds Die");
-	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die");
-	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies");
+	public static ModBooleanOption flowerDeath 	= new ModBooleanOption("Flowers Die", "Can Die");
+	public static ModBooleanOption flowersGrow	= new ModBooleanOption("FlowersGrow", "Can Grow");
 	
-	public static ModMappedOption shroomDeathRate;
+	public static ModBooleanOption reedDeath 	= new ModBooleanOption("Reeds Die", "Can Die");
+	public static ModBooleanOption reedsGrow	= new ModBooleanOption("ReedsGrow", "Can Grow");
+	
+	public static ModBooleanOption cactiiDeath 	= new ModBooleanOption("Cactii Die", "Can Die");
+	public static ModBooleanOption cactiiGrow	= new ModBooleanOption("CactiiGrow", "Can Grow");
+	
+	public static ModBooleanOption grassDeath 	= new ModBooleanOption("Grass Dies", "Can Die");
+	public static ModBooleanOption grassGrows	= new ModBooleanOption("GrassGrows", "Can Grow");
+	
+	// Wort options
+	public static ModBooleanOption wortDeath 	= new ModBooleanOption("WortDies", "Can Die");
+	public static ModBooleanOption wortsGrow	= new ModBooleanOption("WortGrows", "Can Reproduce");
+	
 	
 	// Misc options
 	public static ModBooleanOption biomeModifiedGrowth = new ModBooleanOption("BiomeModifiedGrowth");
+	public static ModBooleanOption autoUpdate 		 = new ModBooleanOption("Automatic Update Checks");
 	
 	// Options for shrooms
-	public static ModBooleanOption shroomTreesGrow = new ModBooleanOption("ShroomsTreesGrow");
-	public static ModMappedOption  shroomTreeGrowth;
+	public static ModBooleanOption 	shroomDeath 	= new ModBooleanOption("Shrooms Die", "Can Die");
+	public static ModMappedOption 	shroomDeathRate;
+	public static ModBooleanOption 	shroomTreesGrow = new ModBooleanOption("ShroomsTreesGrow");
+	public static ModMappedOption  	shroomTreeGrowth;
+	public static ModBooleanOption	defaultShroomSpread = new ModBooleanOption("Enable Default Spread");
 	
 	// Options for saplings
 	public static ModMappedOption 	growthType;
-	public static ModBooleanOption		defaultShroomSpread = new ModBooleanOption("Enable Default Spread");
 	
 	// Options for misc
-	public static ModBooleanOption		mossGrows		= new ModBooleanOption("Moss Grows");
+	public static ModBooleanOption	mossGrows		= new ModBooleanOption("Moss Grows");
 	public static ModMappedOption		mossGrowthRate;
-	public static ModBooleanOption		infiniteFire	= new ModBooleanOption("Infinite Fire Spread");
-	public static ModBooleanOption 		waterFix		= new ModBooleanOption("Fix Water Bug");
+	public static ModBooleanOption	infiniteFire	= new ModBooleanOption("Infinite Fire Spread");
+	public static ModBooleanOption 	waterFix		= new ModBooleanOption("Fix Water Bug");
 	public static ModMappedOption		reproductionRate;
 	
 	// Objects

@@ -119,12 +119,16 @@ public class BlockMushroom extends BlockFlower
 		
 		float freq = mod_AutoForest.shroomTreeGrowth.getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 0F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 0F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
@@ -139,12 +143,16 @@ public class BlockMushroom extends BlockFlower
 		
 		float freq = mod_AutoForest.shroomDeathRate.getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 1F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 1F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 5F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 5F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}

@@ -48,6 +48,15 @@ public abstract class ItemPlantable extends ItemBlock implements Plantable {
 	}
 	
 	/**
+	* The method by which the item plants itself
+	*
+	* @param	damage	Item damage
+	*/
+	public void plant(World world, int i, int j, int k, int damage) {
+		world.setBlockAndMetadataWithNotify(i, j, k, getPlantBlockID(), damage);
+	}
+	
+	/**
 	* Check if the item can be planted on top of the 
 	* block with the idBelow at i, j, k
 	*

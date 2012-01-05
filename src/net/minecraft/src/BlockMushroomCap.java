@@ -62,12 +62,16 @@ public class BlockMushroomCap extends BlockGrowable
 		
 		float freq = ((ModMappedOption) mod_AutoForest.shrooms.getOption("ShroomGrowthRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1F)) {
-			return 0F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 3F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 3F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1F)) {
+				return 0F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 3F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 3F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}

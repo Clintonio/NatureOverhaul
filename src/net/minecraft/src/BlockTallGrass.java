@@ -100,12 +100,16 @@ public class BlockTallGrass extends BlockFlower
 		
 		float freq = ((ModMappedOption) mod_AutoForest.grass.getOption("GrassGrowthRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 0.015F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 0.015F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 1F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 1F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
@@ -120,12 +124,16 @@ public class BlockTallGrass extends BlockFlower
 		
 		float freq = ((ModMappedOption) mod_AutoForest.grass.getOption("GrassDeathRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 0.01F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 0.25F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 0.25F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 0.01F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 0.25F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 0.25F);
 		
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}

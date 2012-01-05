@@ -5,10 +5,13 @@
 package net.minecraft.src;
 
 import java.util.Random;
-import moapi.ModOptionsAPI;
-import moapi.ModOptions;
-import moapi.ModMappedOption;
-import moapi.ModBooleanOption;
+//====================
+// BEGIN NATURE OVERHAUL
+//====================
+import moapi.*;
+//====================
+// END NATURE OVERHAUL
+//====================
 
 public class BlockFlower extends BlockMortal
 {
@@ -51,7 +54,7 @@ public class BlockFlower extends BlockMortal
 	//========
 	
 	public void updateTick(World world, int i, int j, int k, Random random) {
-		if((!world.multiplayerWorld) && (!(this instanceof BlockCrops))) {
+		if((!world.multiplayerWorld) && ((this.blockID == Block.plantYellow.blockID) || (this.blockID == Block.plantRed.blockID))) {
 			// ATTEMPT REPRODUCTION
 			ModOptions flowers = mod_AutoForest.flowers;
 			boolean grow = ((ModBooleanOption) flowers.getOption("FlowersGrow")).getValue();
@@ -81,12 +84,16 @@ public class BlockFlower extends BlockMortal
 		
 		float freq = ((ModMappedOption) mod_AutoForest.flowers.getOption("FlowerGrowthRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 0F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 1.5F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 1.5F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 0F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 1.5F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 1.5F);
 			
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
@@ -101,12 +108,16 @@ public class BlockFlower extends BlockMortal
 		
 		float freq = ((ModMappedOption) mod_AutoForest.flowers.getOption("FlowerDeathRate")).getValue();
 		
-		if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
-			return 1F;
-		} else {
-			freq = freq * getOptValueMult(biome.rainfall, optRain, 2.5F);
-			freq = freq * getOptValueMult(biome.temperature, optTemp, 2.5F);
+		if(mod_AutoForest.biomeModifiedGrowth.getValue()) {
+			if((biome.rainfall == 0) || (biome.temperature > 1.5F)) {
+				return 1F;
+			} else {
+				freq = freq * getOptValueMult(biome.rainfall, optRain, 2.5F);
+				freq = freq * getOptValueMult(biome.temperature, optTemp, 2.5F);
 			
+				return 1F / freq;
+			}
+		} else {
 			return 1F / freq;
 		}
 	}
