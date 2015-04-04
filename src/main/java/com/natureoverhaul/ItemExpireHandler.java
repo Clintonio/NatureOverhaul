@@ -65,7 +65,7 @@ public class ItemExpireHandler {
                 && world.isAirBlock(x, y + 1, z)) {
             try {
                 place(world, entity, getBlock(plantable));
-            } catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
+            } catch (Exception e) {
                 System.err.print(e);
             }
         }

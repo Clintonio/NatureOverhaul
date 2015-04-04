@@ -1,14 +1,14 @@
 [
 {
-  "modid": "natureoverhaul",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "NatureOverhaul",
+  "name": "Nature Overhaul",
+  "description": "A mod to make nature more dynamic in Minecraft",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Clintonio"],
+  "credits": "To Forge, FML, MCP and Minecraft devs",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
