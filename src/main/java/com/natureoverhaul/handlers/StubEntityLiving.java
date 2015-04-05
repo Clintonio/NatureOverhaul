@@ -1,4 +1,4 @@
-package com.natureoverhaul;
+package com.natureoverhaul.handlers;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;

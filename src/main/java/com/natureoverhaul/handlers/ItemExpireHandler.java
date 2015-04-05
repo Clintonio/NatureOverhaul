@@ -1,4 +1,4 @@
-package com.natureoverhaul;
+package com.natureoverhaul.handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
@@ -72,7 +72,7 @@ public class ItemExpireHandler {
     }
 
     @SubscribeEvent
-    public void onItemTossed(ItemExpireEvent event) {
+    public void onItemExpire(ItemExpireEvent event) {
         ItemStack stack = event.entityItem.getEntityItem();
         Item item = stack.getItem();
         if(item instanceof ItemSeeds) {
