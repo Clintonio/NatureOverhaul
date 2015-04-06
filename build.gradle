@@ -42,7 +42,6 @@ dependencies {
 
 }
 
-sourceSets.main.resources{srcDirs project.projectDir.getPath() include("META-INF/**")}
 processResources
 {
     // this will ensure that this task is redone when the versions change.
