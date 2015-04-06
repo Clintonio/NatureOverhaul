@@ -29,7 +29,8 @@ class GrowthHandler {
 
     private void dropSeed(World world, BlockContainer container) {
         Item dropItem = container.block.getItemDropped(container.metadata, world.rand, 0);
-        EntityItem entity = new EntityItem(world, container.x, container.y, container.z, new ItemStack(dropItem));
+        ItemStack stack = new ItemStack(dropItem, 1, container.block.damageDropped(container.metadata));
+        EntityItem entity = new EntityItem(world, container.x, container.y, container.z, stack);
         entity.addVelocity(0, 0.5, 0);
         world.spawnEntityInWorld(entity);
     }

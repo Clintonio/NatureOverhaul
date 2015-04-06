@@ -1,3 +1,14 @@
+Current overall picture:
+
+- Forests expand on their own
+
+Current Features:
+
+- Most seeds, saplings and plants will self plant if they aren't picked up before they expire.
+- Most trees will generate saplings.
+
+OLD README BELOW:
+
 NatureOverhaul 17
 
 Author: Clinton Alexander
