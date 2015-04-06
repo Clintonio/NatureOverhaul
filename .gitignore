@@ -3,7 +3,6 @@
 eclipse
 gradle
 *.iml
-build.gradle
 forge_readme.txt
 gradlew
 gradlew.bat
