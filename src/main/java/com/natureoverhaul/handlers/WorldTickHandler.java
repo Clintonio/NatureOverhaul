@@ -1,30 +1,58 @@
 package com.natureoverhaul.handlers;
 
+import com.natureoverhaul.util.XORShiftRandom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Iterator;
-import java.util.Random;
 
 class BlockContainer {
     public Block block;
-    int x;
-    int y;
-    int z;
+    public int x;
+    public int y;
+    public int z;
+    public int metadata;
 }
 
 class GrowthHandler {
-    private Random random = new Random();
+    private XORShiftRandom random = new XORShiftRandom();
+    private static final int invSeedDropChance = 10000;
 
-    void processSeedDrops(World world, BlockContainer container) {
-        if(container.block instanceof BlockLeavesBase) {
-            //world.setBlock(container.x, container.y, container.z, Blocks.air);
+    private boolean eventHappens(int chance) {
+        int curInt = random.nextInt();
+        int halfChance = Integer.MAX_VALUE / chance;
+        return ((curInt >= -halfChance) && (curInt < (halfChance)));
+    }
+
+    private boolean shouldDropSeeds(World world, BlockContainer container) {
+        Block block = container.block;
+        if(block instanceof BlockLeaves) {
+            return world.canBlockSeeTheSky(container.x, container.y + 1, container.z) && eventHappens(invSeedDropChance);
+        } else {
+            return false;
+        }
+    }
+
+    private void dropSeed(World world, BlockContainer container) {
+        Item dropItem = container.block.getItemDropped(container.metadata, world.rand, 0);
+        EntityItem entity = new EntityItem(world, container.x, container.y, container.z, new ItemStack(dropItem));
+        entity.addVelocity(0, 0.5, 0);
+        world.spawnEntityInWorld(entity);
+    }
+
+    public void processSeedDrops(World world, BlockContainer container) {
+        if(shouldDropSeeds(world, container)) {
+            dropSeed(world, container);
         }
     }
 }
@@ -33,14 +61,15 @@ public class WorldTickHandler {
     private static final int ticksPerSecond = 20;
     private static final int invChunkUpdateChance = 10;
     private GrowthHandler growthHandler = new GrowthHandler();
-    private Random random = new Random();
+    private XORShiftRandom random = new XORShiftRandom();
 
-    private BlockContainer getBlockContainer(int x, int y, int z, Block block) {
+    private BlockContainer getBlockContainer(int x, int y, int z, Block block, int metadata) {
         BlockContainer container = new BlockContainer();
         container.x = x;
         container.y = y;
         container.z = z;
         container.block = block;
+        container.metadata = metadata;
 
         return container;
     }
@@ -57,8 +86,9 @@ public class WorldTickHandler {
             for(int z = 0; z < 16; z++) {
                 for(int y = 0; y < height; y++) {
                     Block block = chunk.getBlock(x, y, z);
+                    int metadata = chunk.getBlockMetadata(x, y, z);
                     if(block instanceof Block) {
-                        processBlock(world, getBlockContainer(x + xMin, y, z + zMin, block));
+                        processBlock(world, getBlockContainer(x + xMin, y, z + zMin, block, metadata));
                     }
                 }
             }
@@ -68,7 +98,7 @@ public class WorldTickHandler {
     private void processChunk(World world, ChunkCoordIntPair chunkCoords) {
         if(shouldProcessChunk()) {
             Chunk chunk = world.getChunkFromChunkCoords(chunkCoords.chunkXPos, chunkCoords.chunkZPos);
-            if(chunk instanceof Chunk) {
+            if((chunk instanceof Chunk) && chunk.isChunkLoaded && chunk.isTerrainPopulated) {
                 processChunk(world, chunk);
             }
         }
