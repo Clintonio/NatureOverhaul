@@ -10,7 +10,10 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.common.MinecraftForge;
+
+import java.util.Map;
 
 @Mod(modid = NatureOverhaul.MODID, version = NatureOverhaul.VERSION)
 public class NatureOverhaul

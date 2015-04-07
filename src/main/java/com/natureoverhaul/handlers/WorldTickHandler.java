@@ -3,11 +3,15 @@ package com.natureoverhaul.handlers;
 import com.natureoverhaul.util.XORShiftRandom;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.block.Block;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldServerMulti;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 public class WorldTickHandler {
@@ -54,11 +58,26 @@ public class WorldTickHandler {
         return random.nextInt(ticksPerSecond) == 0;
     }
 
+    private HashSet getActiveChunkSet(World world) {
+        try {
+            Class clas = world.getClass().getSuperclass();
+            if(world instanceof WorldServerMulti) {
+                return (HashSet) ReflectionHelper.findField(clas.getSuperclass(), "activeChunkSet", "field_72993_I").get(world);
+            } else if(world instanceof WorldServer) {
+                return (HashSet) ReflectionHelper.findField(clas, "activeChunkSet", "field_72993_I").get(world);
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+
+        return new HashSet();
+    }
+
     private void onTickStart(World world) {}
 
     private void onTickEnd(World world) {
         if(shouldProcessTick()) {
-            Iterator<?> it = world.activeChunkSet.iterator();
+            Iterator<?> it = getActiveChunkSet(world).iterator();
             while(it.hasNext()) {
                 ChunkCoordIntPair chunkCoords = (ChunkCoordIntPair) it.next();
                 processChunk(world, chunkCoords);
