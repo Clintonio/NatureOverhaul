@@ -18,10 +18,12 @@ public class WorldTickHandler {
     private static final int ticksPerSecond = 20;
     private static final int invChunkUpdateChance = 10;
     private GrowthHandler growthHandler = new GrowthHandler();
+    private FireHandler fireHandler = new FireHandler();
     private XORShiftRandom random = new XORShiftRandom();
 
     private void processBlock(World world, BlockContainer container) {
         growthHandler.processSeedDrops(world, container);
+        fireHandler.processFire(world, container);
     }
 
     private void processChunk(World world, Chunk chunk) {
