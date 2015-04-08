@@ -12,8 +12,8 @@ import net.minecraftforge.common.IPlantable;
 
 class GrowthHandler {
     private XORShiftRandom random = new XORShiftRandom();
-    private static final int invSeedDropChance = 10000;
-    private static final int invPlantDropChance = 10000;
+    private static final int invSeedDropChance = 40000;
+    private static final int invPlantDropChance = 40000;
 
     private boolean eventHappens(int chance) {
         int curInt = random.nextInt();
