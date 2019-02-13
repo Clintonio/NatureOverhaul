@@ -1,18 +1,17 @@
 package com.natureoverhaul.handlers;
 
 import com.natureoverhaul.util.XORShiftRandom;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import net.minecraft.block.Block;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldServerMulti;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class WorldTickHandler {
     private static final int ticksPerSecond = 20;
@@ -28,25 +27,21 @@ public class WorldTickHandler {
 
     private void processChunk(World world, Chunk chunk) {
         int height = world.getHeight();
-        int xMin = chunk.xPosition * 16;
-        int zMin = chunk.zPosition * 16;
-        for(int x = 0; x < 16; x++) {
-            for(int z = 0; z < 16; z++) {
-                for(int y = 0; y < height; y++) {
-                    Block block = chunk.getBlock(x, y, z);
-                    int metadata = chunk.getBlockMetadata(x, y, z);
-                    if(block instanceof Block) {
-                        processBlock(world, new BlockContainer(x + xMin, y, z + zMin, block, metadata));
-                    }
+        int xMin = chunk.x * 16;
+        int zMin = chunk.z * 16;
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < height; y++) {
+                    processBlock(world, new BlockContainer(new BlockPos(x + xMin, y, z + zMin), chunk.getBlockState(x, y, z)));
                 }
             }
         }
     }
 
-    private void processChunk(World world, ChunkCoordIntPair chunkCoords) {
-        if(shouldProcessChunk()) {
-            Chunk chunk = world.getChunkFromChunkCoords(chunkCoords.chunkXPos, chunkCoords.chunkZPos);
-            if((chunk instanceof Chunk) && chunk.isChunkLoaded && chunk.isTerrainPopulated) {
+    private void processChunk(World world, ChunkPos chunkCoords) {
+        if (shouldProcessChunk()) {
+            Chunk chunk = world.getChunkFromChunkCoords(chunkCoords.x, chunkCoords.z);
+            if (chunk.isLoaded() && chunk.isTerrainPopulated()) {
                 processChunk(world, chunk);
             }
         }
@@ -63,9 +58,9 @@ public class WorldTickHandler {
     private HashSet getActiveChunkSet(World world) {
         try {
             Class clas = world.getClass().getSuperclass();
-            if(world instanceof WorldServerMulti) {
+            if (world instanceof WorldServerMulti) {
                 return (HashSet) ReflectionHelper.findField(clas.getSuperclass(), "activeChunkSet", "field_72993_I").get(world);
-            } else if(world instanceof WorldServer) {
+            } else if (world instanceof WorldServer) {
                 return (HashSet) ReflectionHelper.findField(clas, "activeChunkSet", "field_72993_I").get(world);
             }
         } catch (Exception e) {
@@ -75,24 +70,29 @@ public class WorldTickHandler {
         return new HashSet();
     }
 
-    private void onTickStart(World world) {}
+    private void onTickStart(World world) {
+    }
 
     private void onTickEnd(World world) {
-        if(shouldProcessTick()) {
-            Iterator<?> it = getActiveChunkSet(world).iterator();
-            while(it.hasNext()) {
-                ChunkCoordIntPair chunkCoords = (ChunkCoordIntPair) it.next();
+        if (shouldProcessTick() && shouldProcessWorld(world)) {
+            for (Object o : getActiveChunkSet(world)) {
+                ChunkPos chunkCoords = (ChunkPos) o;
                 processChunk(world, chunkCoords);
             }
         }
     }
 
+    private boolean shouldProcessWorld(World world) {
+        // This mod only runs in the overworld
+        return (world.provider.getDimension() == 0);
+    }
+
     @SubscribeEvent
     public void tickStart(TickEvent.WorldTickEvent event) {
-        if(event.side.isServer()) {
-            if(event.phase == TickEvent.Phase.START) {
+        if (event.side.isServer()) {
+            if (event.phase == TickEvent.Phase.START) {
                 onTickStart(event.world);
-            } else if(event.phase == TickEvent.Phase.END) {
+            } else if (event.phase == TickEvent.Phase.END) {
                 onTickEnd(event.world);
             }
         }

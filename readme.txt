@@ -6,6 +6,7 @@ Current Features:
 
 - Most seeds, saplings and plants will self plant if they aren't picked up before they expire.
 - Most trees will generate saplings.
+- Only runs in overworld for performance reasons and to prevent affecting modded dimensions
 
 OLD README BELOW:
 
@@ -16,7 +17,7 @@ Description: Ever thought Minecrafts tree and forest system was rather unrealist
 
 In a Nature Overhauled world, forests will grow, flourish, then die, they will expand, then contract. They will try to spread over deserts and fail! Saplings will grow from trees, fly on the wind, then spawn a new tree where they fall. Though, they can die in this process if the world is unfavourable! A desert will kill a new born sapling.
 
-The plants, mushrooms, cactii, reeds and pumpkins of your world will also reproduce and spread their kin far and wide. They too will form intricate ecosystems. Based on biome their growth, death and spread rates change! 
+The plants, mushrooms, cactii, reeds and pumpkins of your world will also reproduce and spread their kin far and wide. They too will form intricate ecosystems. Based on biome their growth, death and spread rates change!
 
 - Plants and trees grow, spread and die based on biome
 - Grass and moss spread naturally
@@ -36,7 +37,7 @@ The plants, mushrooms, cactii, reeds and pumpkins of your world will also reprod
 Prerequisites
 -----------------
 
-Please download and install ModOptionsAPI 
+Please download and install ModOptionsAPI
 http://www.minecraftforum.net/viewtopic.php?f=1032&t=207630
 
 Please download and install Risugami's Modloader
@@ -52,7 +53,7 @@ Installation
 
 3) Extract the contents of the NatureOverhaul ZIP file
 
-4) Copy the files into your minecraft.jar 
+4) Copy the files into your minecraft.jar
 
 6) Delete META-INF folder IF it exists in the minecraft.jar
 
@@ -79,7 +80,7 @@ When -ForestGrowth- is on, saplings and apples will generate from trees
 
 ===Tree Options===
 
--ApplesGrow-: 		Decides whether apples grow from trees. 
+-ApplesGrow-: 		Decides whether apples grow from trees.
 -AppleGrowthRate-: 	Decides rate apples spawn at if -ApplesGrow- is on
 -Lumberjack-: 		When enabled, trees will collapse into wood blocks from the point they were cut.
 -TreeDeath-: 		When enabled, trees will die and turn into planks determined by -DeathRate-.
@@ -93,12 +94,12 @@ When -ForestGrowth- is on, saplings and apples will generate from trees
 ===Plant&Mushroom Options===
 
 Each submenu has an option similar to the one below here:
-Turn on -PlantsGrow- to enable plants such as flowers mushrooms, reeds and cactii to reproduce and plant themselves. 
+Turn on -PlantsGrow- to enable plants such as flowers mushrooms, reeds and cactii to reproduce and plant themselves.
 -PlantGrowthRate- controls the speed at which plants reproduce.
 
 ===Sapling Options===
 
--AutoSapling-: When enabled, saplings will automatically plant themselves. 
+-AutoSapling-: When enabled, saplings will automatically plant themselves.
 -FastSapling-: When enabled, saplings will fly further and faster
 -GrowthRate-: Determines how fast saplings are generated from trees
 -SaplingDeath-: Saplings that plant in an invalid location die, or they can die randomly, and die based on biome/ proximity to other trees.

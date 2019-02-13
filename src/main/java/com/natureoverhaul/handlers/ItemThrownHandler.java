@@ -1,8 +1,7 @@
 package com.natureoverhaul.handlers;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.item.*;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ItemThrownHandler {
     @SubscribeEvent

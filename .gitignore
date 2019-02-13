@@ -1,8 +1,22 @@
-.gradle
-.idea
-eclipse
-gradle
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
 *.iml
-forge_readme.txt
-gradlew
-gradlew.bat
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run

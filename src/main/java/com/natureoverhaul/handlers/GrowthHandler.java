@@ -4,9 +4,11 @@ import com.natureoverhaul.util.XORShiftRandom;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockMushroom;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 
@@ -22,27 +24,26 @@ class GrowthHandler {
     }
 
     private boolean shouldDropSeeds(World world, BlockContainer container) {
-        int x = container.x;
-        int y = container.y;
-        int z = container.z;
-        Block block = container.block;
+        BlockPos blockPos = container.blockPos;
+        IBlockState blockState = container.blockState;
+        Block block = blockState.getBlock();
         if(block instanceof BlockLeaves) {
-            return world.canBlockSeeTheSky(x, y + 1, z) && eventHappens(invSeedDropChance);
+            return world.canSeeSky(blockPos.add(0, 1, 0)) && eventHappens(invSeedDropChance);
         } else if(block instanceof IPlantable) {
-            return world.canBlockSeeTheSky(x, y + 1, z) && eventHappens(invPlantDropChance);
-        } else if(block instanceof BlockMushroom) {
-            return world.canBlockSeeTheSky(x, y + 1, z) && eventHappens(invPlantDropChance);
+            return world.canSeeSky(blockPos.add(0, 1, 0)) && eventHappens(invPlantDropChance);
         } else {
             return false;
         }
     }
 
     private void dropSeed(World world, BlockContainer container) {
-        Item dropItem = container.block.getItemDropped(container.metadata, world.rand, 0);
-        ItemStack stack = new ItemStack(dropItem, 1, container.block.damageDropped(container.metadata));
-        EntityItem entity = new EntityItem(world, container.x, container.y, container.z, stack);
+        BlockPos blockPos = container.blockPos;
+        Block block = container.blockState.getBlock();
+        Item dropItem = block.getItemDropped(container.blockState, world.rand, 0);
+        ItemStack stack = new ItemStack(dropItem, 1, block.damageDropped(container.blockState));
+        EntityItem entity = new EntityItem(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), stack);
         entity.addVelocity(0, 0.5, 0);
-        world.spawnEntityInWorld(entity);
+        world.spawnEntity(entity);
     }
 
     public void processSeedDrops(World world, BlockContainer container) {
