@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
+import org.apache.logging.log4j.LogManager;
 
 class GrowthHandler {
     private XORShiftRandom random = new XORShiftRandom();
@@ -43,7 +44,11 @@ class GrowthHandler {
         ItemStack stack = new ItemStack(dropItem, 1, block.damageDropped(container.blockState));
         EntityItem entity = new EntityItem(world, blockPos.getX(), blockPos.getY(), blockPos.getZ(), stack);
         entity.addVelocity(0, 0.5, 0);
-        world.spawnEntity(entity);
+        if (entity.isDead) {
+            LogManager.getLogger().warn("Entity created is already dead: " + entity.getItem().getDisplayName());
+        } else {
+            world.spawnEntity(entity);
+        }
     }
 
     public void processSeedDrops(World world, BlockContainer container) {

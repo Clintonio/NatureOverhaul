@@ -2,16 +2,12 @@ package com.natureoverhaul.handlers;
 
 import com.natureoverhaul.util.XORShiftRandom;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldServerMulti;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
-import java.util.HashSet;
+import java.util.Collection;
 
 public class WorldTickHandler {
     private static final int ticksPerSecond = 20;
@@ -38,15 +34,6 @@ public class WorldTickHandler {
         }
     }
 
-    private void processChunk(World world, ChunkPos chunkCoords) {
-        if (shouldProcessChunk()) {
-            Chunk chunk = world.getChunkFromChunkCoords(chunkCoords.x, chunkCoords.z);
-            if (chunk.isLoaded() && chunk.isTerrainPopulated()) {
-                processChunk(world, chunk);
-            }
-        }
-    }
-
     private boolean shouldProcessChunk() {
         return random.nextInt(invChunkUpdateChance) == 0;
     }
@@ -55,19 +42,8 @@ public class WorldTickHandler {
         return random.nextInt(ticksPerSecond) == 0;
     }
 
-    private HashSet getActiveChunkSet(World world) {
-        try {
-            Class clas = world.getClass().getSuperclass();
-            if (world instanceof WorldServerMulti) {
-                return (HashSet) ReflectionHelper.findField(clas.getSuperclass(), "activeChunkSet", "field_72993_I").get(world);
-            } else if (world instanceof WorldServer) {
-                return (HashSet) ReflectionHelper.findField(clas, "activeChunkSet", "field_72993_I").get(world);
-            }
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-
-        return new HashSet();
+    private Collection<Chunk> getActiveChunkSet(World world) {
+        return ((ChunkProviderServer) world.getChunkProvider()).getLoadedChunks();
     }
 
     private void onTickStart(World world) {
@@ -75,9 +51,10 @@ public class WorldTickHandler {
 
     private void onTickEnd(World world) {
         if (shouldProcessTick() && shouldProcessWorld(world)) {
-            for (Object o : getActiveChunkSet(world)) {
-                ChunkPos chunkCoords = (ChunkPos) o;
-                processChunk(world, chunkCoords);
+            for (Chunk chunk : getActiveChunkSet(world)) {
+                if (shouldProcessChunk()) {
+                    processChunk(world, chunk);
+                }
             }
         }
     }
