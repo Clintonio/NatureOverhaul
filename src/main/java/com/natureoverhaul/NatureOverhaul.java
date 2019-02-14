@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = NatureOverhaul.MODID, version = NatureOverhaul.VERSION)
+@Mod(modid = NatureOverhaul.MODID, version = NatureOverhaul.VERSION, serverSideOnly = true, acceptableRemoteVersions = "*")
 public class NatureOverhaul {
     public static final String MODID = "natureoverhaul";
     public static final String VERSION = "1.3";
