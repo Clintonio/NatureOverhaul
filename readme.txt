@@ -1,105 +1,25 @@
-Current overall picture:
+# Nature Overhaul
 
-- Forests expand on their own
+Nature Overhaul is a Minecraft Forge mod that makes Minecraft's nature dynamic by giving all living plants and trees
+the ability to spread via seed spreading, auto planting, and spread.
 
-Current Features:
+## Features
 
-- Most seeds, saplings and plants will self plant if they aren't picked up before they expire.
-- Most trees will generate saplings.
-- Only runs in overworld for performance reasons and to prevent affecting modded dimensions
+* Most seeds, saplings and plants will self plant if they aren't picked up before they expire.
+* Most trees will generate saplings.
+* Only runs in overworld for performance reasons and to prevent affecting modded dimensions.
+* Fire burns until the object is consumed - forests will burn down.
 
-OLD README BELOW:
+## Limitations
 
-NatureOverhaul 17
+This mod is made for me. I will not maintain it unless I am actively playing Minecraft at the time. It does not have
+any configuration files.
 
-Author: Clinton Alexander
-Description: Ever thought Minecrafts tree and forest system was rather unrealistic? Boring? Uneventful? Then this mod is for you.
+## Installation
 
-In a Nature Overhauled world, forests will grow, flourish, then die, they will expand, then contract. They will try to spread over deserts and fail! Saplings will grow from trees, fly on the wind, then spawn a new tree where they fall. Though, they can die in this process if the world is unfavourable! A desert will kill a new born sapling.
+1. Install Forge
+2. Install this mod to your mods directory
 
-The plants, mushrooms, cactii, reeds and pumpkins of your world will also reproduce and spread their kin far and wide. They too will form intricate ecosystems. Based on biome their growth, death and spread rates change!
+## Licence
 
-- Plants and trees grow, spread and die based on biome
-- Grass and moss spread naturally
-- Lumberjack means axes will cut down the entire tree at once.
-- Darker nights can be enabled
-- Apples drop from trees in temperate biomes
-- Cocoa falls from trees in forests
-- Bonemeal will make all types of plants and fauna grow
-- Biome based growth rates
-- Infinite fire spread can be enabled
-- Moss spreads across other cobble types
-- Water is fixed. No more strange currents in the sea.
-- Mushroom trees grow from mushrooms naturally
-- Nether Wart grows and dies naturally
-
------------------
-Prerequisites
------------------
-
-Please download and install ModOptionsAPI
-http://www.minecraftforum.net/viewtopic.php?f=1032&t=207630
-
-Please download and install Risugami's Modloader
-http://www.minecraftforum.net/viewtopic.php?t=80246
-
------------------
-Installation
------------------
-
-1) Find your minecraft.jar (check note below)*
-
-2) Open the minecraft.jar file in WinRAR or 7zip (do not extract it)
-
-3) Extract the contents of the NatureOverhaul ZIP file
-
-4) Copy the files into your minecraft.jar
-
-6) Delete META-INF folder IF it exists in the minecraft.jar
-
-7) Run Minecraft
-
-
-* Windows: <your user folder>/AppData/Roaming/.minecraft/bin/
-* Mac: Home -> Library -> Application Support -> Minecraft -> bin
-* Linux: ~/.minecraft/bin/
-
-------------------
-Compatibility
-------------------
-
-None Known.
-
-------------------
-Configuration (Ingame Options Menu)
-------------------
-
-===Main Options===
-
-When -ForestGrowth- is on, saplings and apples will generate from trees
-
-===Tree Options===
-
--ApplesGrow-: 		Decides whether apples grow from trees.
--AppleGrowthRate-: 	Decides rate apples spawn at if -ApplesGrow- is on
--Lumberjack-: 		When enabled, trees will collapse into wood blocks from the point they were cut.
--TreeDeath-: 		When enabled, trees will die and turn into planks determined by -DeathRate-.
--TreeGrowthRate-: 	Determines the speed at which trees grow from saplings
--QuickLeafDecay-:	When enabled, tree leaves will instantly decay when lumberjack is enabled.
-
-===Climate Options===
-
--BiomeModifiedGrowth- 	When on, plant and tree growth and death rates depend on biome
-
-===Plant&Mushroom Options===
-
-Each submenu has an option similar to the one below here:
-Turn on -PlantsGrow- to enable plants such as flowers mushrooms, reeds and cactii to reproduce and plant themselves.
--PlantGrowthRate- controls the speed at which plants reproduce.
-
-===Sapling Options===
-
--AutoSapling-: When enabled, saplings will automatically plant themselves.
--FastSapling-: When enabled, saplings will fly further and faster
--GrowthRate-: Determines how fast saplings are generated from trees
--SaplingDeath-: Saplings that plant in an invalid location die, or they can die randomly, and die based on biome/ proximity to other trees.
+MIT
